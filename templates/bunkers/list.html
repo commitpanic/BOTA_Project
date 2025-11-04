@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{% trans "Bunkers" %} - BOTA Project{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1><i class="bi bi-geo-alt"></i> {% trans "Bunkers Database" %}</h1>
+            <p class="text-muted">{% trans "Browse and search all bunkers in the BOTA program" %}</p>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-primary">{{ total_bunkers }}</h3>
+                    <p class="mb-0">{% trans "Total Bunkers" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-success">{{ verified_count }}</h3>
+                    <p class="mb-0">{% trans "Verified" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-warning">{{ pending_count }}</h3>
+                    <p class="mb-0">{% trans "Pending Verification" %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="bi bi-funnel"></i> {% trans "Filters & Search" %}
+        </div>
+        <div class="card-body">
+            <form method="get" action="{% url 'bunker_list' %}">
+                <div class="row g-3">
+                    <!-- Search -->
+                    <div class="col-md-4">
+                        <label for="search" class="form-label">{% trans "Search" %}</label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               value="{{ search }}" placeholder="{% trans 'Reference, name, description...' %}">
+                    </div>
+                    
+                    <!-- Status Filter -->
+                    <div class="col-md-3">
+                        <label for="status" class="form-label">{% trans "Status" %}</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">{% trans "All" %}</option>
+                            <option value="verified" {% if status == 'verified' %}selected{% endif %}>{% trans "Verified" %}</option>
+                            <option value="pending" {% if status == 'pending' %}selected{% endif %}>{% trans "Pending" %}</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Category Filter -->
+                    <div class="col-md-3">
+                        <label for="category" class="form-label">{% trans "Category" %}</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">{% trans "All Categories" %}</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.id }}" {% if category_id|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>
+                                {{ cat.name_en }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Reference Prefix -->
+                    <div class="col-md-2">
+                        <label for="prefix" class="form-label">{% trans "Prefix" %}</label>
+                        <input type="text" class="form-control" id="prefix" name="prefix" 
+                               value="{{ prefix }}" placeholder="B/SP-">
+                    </div>
+                    
+                    <!-- Sort -->
+                    <div class="col-md-6">
+                        <label for="sort" class="form-label">{% trans "Sort By" %}</label>
+                        <select class="form-select" id="sort" name="sort">
+                            <option value="reference" {% if sort == 'reference' %}selected{% endif %}>{% trans "Reference Number" %}</option>
+                            <option value="name" {% if sort == 'name' %}selected{% endif %}>{% trans "Name" %}</option>
+                            <option value="date" {% if sort == 'date' %}selected{% endif %}>{% trans "Date Added" %}</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="col-md-6 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="bi bi-search"></i> {% trans "Apply Filters" %}
+                        </button>
+                        <a href="{% url 'bunker_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> {% trans "Clear" %}
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>{% trans "Results" %} ({{ bunkers|length }})</span>
+            {% if user.is_authenticated %}
+            <a href="{% url 'request_bunker' %}" class="btn btn-sm btn-accent">
+                <i class="bi bi-plus-circle"></i> {% trans "Request New Bunker" %}
+            </a>
+            {% endif %}
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>{% trans "Reference" %}</th>
+                            <th>{% trans "Name" %}</th>
+                            <th>{% trans "Type" %}</th>
+                            <th>{% trans "Coordinates" %}</th>
+                            <th>{% trans "Status" %}</th>
+                            <th>{% trans "Actions" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bunker in bunkers %}
+                        <tr>
+                            <td><strong>{{ bunker.reference_number }}</strong></td>
+                            <td>{{ bunker.name_en }}</td>
+                            <td><span class="badge bg-secondary">{{ bunker.category.name_en }}</span></td>
+                            <td>
+                                {% localize off %}
+                                <small>{{ bunker.latitude }}, {{ bunker.longitude }}</small>
+                                {% endlocalize %}
+                            </td>
+                            <td>
+                                {% if bunker.is_verified %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> {% trans "Verified" %}
+                                </span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-clock"></i> {% trans "Pending" %}
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'bunker_detail' bunker.reference_number %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> {% trans "View" %}
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                <p class="mt-2">{% trans "No bunkers found matching your filters." %}</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,377 @@
+"""
+Service for processing ADIF log imports and updating user statistics.
+Handles activator log uploads and hunter point calculations.
+"""
+from django.db import transaction
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+from typing import Dict, List
+from decimal import Decimal
+
+from .adif_parser import ADIFParser
+from .models import ActivationLog, ActivationKey
+from bunkers.models import Bunker
+from accounts.models import UserStatistics
+
+User = get_user_model()
+
+
+class LogImportService:
+    """Service for importing ADIF logs and processing activations"""
+    
+    def __init__(self):
+        self.parser = None
+        self.bunker = None
+        self.activator = None
+        self.errors = []
+        self.warnings = []
+    
+    @transaction.atomic
+    def process_adif_upload(self, file_content: str, uploader_user: User) -> Dict:
+        """
+        Process uploaded ADIF file
+        
+        Args:
+            file_content: Content of .adi file as string
+            uploader_user: User uploading the file
+            
+        Returns:
+            Dictionary with processing results
+        """
+        # Parse ADIF file
+        self.parser = ADIFParser(file_content)
+        parse_result = self.parser.parse()
+        
+        # Validate
+        validation = self.parser.validate()
+        if not validation['valid']:
+            return {
+                'success': False,
+                'errors': validation['errors'],
+                'qsos_processed': 0,
+                'hunters_updated': 0
+            }
+        
+        # Extract key information
+        bunker_ref = self.parser.extract_bunker_reference()
+        activator_callsign = self.parser.extract_activator_callsign()
+        
+        # Verify bunker exists
+        try:
+            self.bunker = Bunker.objects.get(reference_number=bunker_ref)
+        except Bunker.DoesNotExist:
+            return {
+                'success': False,
+                'errors': [f"Bunker {bunker_ref} not found in database"],
+                'qsos_processed': 0,
+                'hunters_updated': 0
+            }
+        
+        # Verify activator user
+        try:
+            self.activator = User.objects.get(callsign=activator_callsign)
+        except User.DoesNotExist:
+            # Create user if doesn't exist (optional - could require pre-registration)
+            self.warnings.append(f"Activator {activator_callsign} not found, will need to register")
+            return {
+                'success': False,
+                'errors': [f"Activator user {activator_callsign} not found. Please register first."],
+                'qsos_processed': 0,
+                'hunters_updated': 0
+            }
+        
+        # Verify uploader is the activator (security check)
+        if uploader_user.callsign != activator_callsign and not uploader_user.is_staff:
+            return {
+                'success': False,
+                'errors': [f"You can only upload logs for your own callsign ({uploader_user.callsign})"],
+                'qsos_processed': 0,
+                'hunters_updated': 0
+            }
+        
+        # Process QSOs
+        qsos_processed = 0
+        hunters_updated = set()
+        b2b_qsos = 0
+        
+        for qso in self.parser.qsos:
+            result = self._process_qso(qso)
+            if result['success']:
+                qsos_processed += 1
+                if result.get('hunter_callsign'):
+                    hunters_updated.add(result['hunter_callsign'])
+                if result.get('is_b2b'):
+                    b2b_qsos += 1
+            else:
+                self.warnings.append(result.get('error', 'Unknown error processing QSO'))
+        
+        # Update activator statistics
+        self._update_activator_stats(qsos_processed, b2b_qsos)
+        
+        # Update diploma progress for activator
+        self._update_diploma_progress(self.activator)
+        
+        # Update diploma progress for all hunters
+        for hunter_callsign in hunters_updated:
+            try:
+                hunter = User.objects.get(callsign=hunter_callsign)
+                self._update_diploma_progress(hunter)
+            except User.DoesNotExist:
+                pass
+        
+        return {
+            'success': True,
+            'qsos_processed': qsos_processed,
+            'hunters_updated': len(hunters_updated),
+            'b2b_qsos': b2b_qsos,
+            'bunker': bunker_ref,
+            'activator': activator_callsign,
+            'warnings': self.warnings,
+            'errors': []
+        }
+    
+    def _process_qso(self, qso: Dict) -> Dict:
+        """
+        Process individual QSO record
+        
+        Args:
+            qso: Parsed QSO dictionary
+            
+        Returns:
+            Result dictionary
+        """
+        try:
+            hunter_callsign = qso.get('CALL', '').strip().upper()
+            if not hunter_callsign:
+                return {'success': False, 'error': 'Missing callsign'}
+            
+            # Parse QSO datetime
+            qso_datetime = self.parser.parse_qso_datetime(qso)
+            if not qso_datetime:
+                return {'success': False, 'error': f'Invalid date/time for {hunter_callsign}'}
+            
+            # Check if B2B
+            is_b2b = self.parser.is_b2b_qso(qso)
+            
+            # Get or create hunter user
+            hunter_user, created = User.objects.get_or_create(
+                callsign=hunter_callsign,
+                defaults={
+                    'email': f'{hunter_callsign.lower()}@temp.bota.invalid',  # Temporary email
+                    'is_active': False  # Inactive until they register properly
+                }
+            )
+            
+            if created:
+                self.warnings.append(f"Created placeholder account for hunter {hunter_callsign}")
+            
+            # Check for duplicate log entry
+            existing = ActivationLog.objects.filter(
+                user=hunter_user,
+                bunker=self.bunker,
+                activator=self.activator,
+                activation_date=qso_datetime
+            ).exists()
+            
+            if existing:
+                return {
+                    'success': False, 
+                    'error': f'Duplicate QSO with {hunter_callsign} at {qso_datetime}'
+                }
+            
+            # Create activation log entry
+            log = ActivationLog.objects.create(
+                user=hunter_user,
+                bunker=self.bunker,
+                activator=self.activator,
+                activation_date=qso_datetime,
+                is_b2b=is_b2b,
+                mode=self.parser.get_qso_mode(qso),
+                band=self.parser.get_qso_band(qso),
+                notes=f"Imported from ADIF log",
+                verified=True  # Auto-verify activator-uploaded logs
+            )
+            
+            # Award points to ACTIVATOR (person who uploaded the log = person who was at the bunker)
+            self._award_activator_points(self.activator)
+            
+            # Award points to HUNTER (person who worked the bunker = person in the log)
+            self._award_hunter_points(hunter_user)
+            
+            # Check if B2B can be confirmed (both logs uploaded)
+            if is_b2b:
+                self._check_and_award_b2b(self.activator, hunter_user, qso_datetime)
+            
+            return {
+                'success': True,
+                'hunter_callsign': hunter_callsign,
+                'is_b2b': is_b2b,
+                'log_id': log.id
+            }
+        
+        except Exception as e:
+            return {
+                'success': False,
+                'error': f'Error processing QSO: {str(e)}'
+            }
+    
+    def _award_hunter_points(self, hunter_user: User):
+        """
+        Award points to hunter for working a bunker
+        
+        Args:
+            hunter_user: Hunter User object (person who worked the bunker)
+        """
+        stats, _ = UserStatistics.objects.get_or_create(user=hunter_user)
+        
+        # Hunter gets 1 point per QSO with a bunker
+        stats.total_hunter_qso += 1
+        
+        # Update unique bunkers hunted count
+        unique_bunkers = ActivationLog.objects.filter(
+            user=hunter_user
+        ).values('bunker').distinct().count()
+        stats.unique_bunkers_hunted = unique_bunkers
+        
+        stats.save()
+    
+    def _award_activator_points(self, activator_user: User):
+        """
+        Award points to activator for making QSO from bunker
+        
+        Args:
+            activator_user: Activator User object (person who was at the bunker)
+        """
+        stats, _ = UserStatistics.objects.get_or_create(user=activator_user)
+        
+        # Activator gets 1 point per QSO made from bunker
+        stats.total_activator_qso += 1
+        
+        stats.save()
+    
+    def _check_and_award_b2b(self, activator: User, hunter: User, qso_datetime):
+        """
+        Check if B2B can be confirmed (both logs uploaded) and award points
+        
+        B2B is only confirmed when:
+        1. Activator A uploads log showing they worked Activator B
+        2. Activator B uploads log showing they worked Activator A
+        3. Both QSOs are within reasonable time window (±30 minutes)
+        
+        Args:
+            activator: The activator who just uploaded their log
+            hunter: The hunter in the log (who might also be an activator)
+            qso_datetime: The datetime of this QSO
+        """
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        # Check if the "hunter" has also uploaded a log showing they worked this activator
+        # Look for a reciprocal QSO within ±30 minutes
+        time_window_start = qso_datetime - timedelta(minutes=30)
+        time_window_end = qso_datetime + timedelta(minutes=30)
+        
+        # Find reciprocal log: hunter was activator, current activator was in their log
+        reciprocal_log = ActivationLog.objects.filter(
+            activator=hunter,  # Hunter was the activator
+            user=activator,    # Current activator was in their log
+            activation_date__gte=time_window_start,
+            activation_date__lte=time_window_end,
+            is_b2b=True  # They also marked it as B2B
+        ).first()
+        
+        if reciprocal_log:
+            # B2B confirmed! Award points to both
+            activator_stats, _ = UserStatistics.objects.get_or_create(user=activator)
+            hunter_stats, _ = UserStatistics.objects.get_or_create(user=hunter)
+            
+            # Check if we haven't already counted this B2B pair
+            # (to avoid double-counting if logs are uploaded multiple times)
+            current_log = ActivationLog.objects.get(
+                activator=activator,
+                user=hunter,
+                activation_date=qso_datetime
+            )
+            
+            # Mark both logs as B2B confirmed
+            if not hasattr(current_log, 'b2b_confirmed') or not current_log.b2b_confirmed:
+                # Award B2B points
+                activator_stats.activator_b2b_qso += 1
+                activator_stats.save()
+                
+                hunter_stats.activator_b2b_qso += 1
+                hunter_stats.save()
+                
+                self.warnings.append(
+                    f"B2B confirmed between {activator.callsign} and {hunter.callsign}!"
+                )
+    
+    def _update_activator_stats(self, qso_count: int, b2b_count: int):
+        """
+        Update activator-specific statistics
+        
+        Args:
+            qso_count: Total QSOs processed
+            b2b_count: Number of B2B QSOs
+        """
+        stats, _ = UserStatistics.objects.get_or_create(user=self.activator)
+        
+        # Update unique bunkers activated
+        unique_activations = ActivationLog.objects.filter(
+            activator=self.activator
+        ).values('bunker').distinct().count()
+        stats.unique_activations = unique_activations
+        
+        stats.save()
+    
+    def _update_diploma_progress(self, user: User):
+        """
+        Update diploma progress for user after statistics change
+        
+        Args:
+            user: User to update diploma progress for
+        """
+        from diplomas.models import DiplomaType, DiplomaProgress, Diploma
+        
+        # Get user's current statistics
+        stats, _ = UserStatistics.objects.get_or_create(user=user)
+        
+        # Get or create progress records for all active diplomas
+        active_diplomas = DiplomaType.objects.filter(is_active=True)
+        
+        for diploma_type in active_diplomas:
+            # Skip time-limited diplomas that are not currently valid
+            if diploma_type.is_time_limited() and not diploma_type.is_currently_valid():
+                continue
+            
+            progress, created = DiplomaProgress.objects.get_or_create(
+                user=user,
+                diploma_type=diploma_type
+            )
+            
+            # Update points based on user statistics
+            # Each QSO as activator = 1 activator point
+            # Each QSO hunting bunkers = 1 hunter point
+            # Each B2B QSO = 1 B2B point
+            progress.update_points(
+                activator=stats.total_activator_qso,    # Total QSOs as activator
+                hunter=stats.total_hunter_qso,          # Total QSOs hunting bunkers
+                b2b=stats.activator_b2b_qso             # Total B2B QSOs
+            )
+            
+            # Check if eligible and not already awarded
+            if progress.is_eligible:
+                existing = Diploma.objects.filter(
+                    user=user,
+                    diploma_type=diploma_type
+                ).exists()
+                
+                if not existing:
+                    # Automatically issue diploma
+                    Diploma.objects.create(
+                        diploma_type=diploma_type,
+                        user=user,
+                        activator_points_earned=progress.activator_points,
+                        hunter_points_earned=progress.hunter_points,
+                        b2b_points_earned=progress.b2b_points
+                    )

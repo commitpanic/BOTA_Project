@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load l10n %}
+
+{% block title %}{{ bunker.reference_number }} - BOTA Project{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'bunker_list' %}">{% trans "Bunkers" %}</a></li>
+            <li class="breadcrumb-item active">{{ bunker.reference_number }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2>{{ bunker.reference_number }} - {{ bunker.name_en }}</h2>
+                </div>
+                <div class="card-body">
+                    {% if bunker.is_verified %}
+                    <span class="badge bg-success mb-3">
+                        <i class="bi bi-check-circle"></i> {% trans "Verified" %}
+                    </span>
+                    {% else %}
+                    <span class="badge bg-warning text-dark mb-3">
+                        <i class="bi bi-clock"></i> {% trans "Pending Verification" %}
+                    </span>
+                    {% endif %}
+
+                    <h5>{% trans "Description" %}</h5>
+                    <p>{{ bunker.description_en|linebreaks }}</p>
+
+                    <h5>{% trans "Category" %}</h5>
+                    <p><span class="badge bg-secondary">{{ bunker.category.name_en }}</span></p>
+
+                    <h5>{% trans "Location" %}</h5>
+                    {% localize off %}
+                    <p>
+                        <strong>{% trans "Coordinates:" %}</strong> 
+                        {{ bunker.latitude }}, {{ bunker.longitude }}<br>
+                        <a href="https://www.google.com/maps?q={{ bunker.latitude }},{{ bunker.longitude }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-map"></i> {% trans "View on Google Maps" %}
+                        </a>
+                    </p>
+                    {% endlocalize %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>{% trans "Statistics" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>{% trans "Total Activations:" %}</strong>
+                        <h3 class="text-primary">{{ activation_count }}</h3>
+                    </div>
+                    <div class="mb-3">
+                        <strong>{% trans "Unique Activators:" %}</strong>
+                        <h3 class="text-success">{{ unique_activators }}</h3>
+                    </div>
+                </div>
+            </div>
+
+            {% if bunker.verified_by %}
+            <div class="card">
+                <div class="card-header">
+                    <h5>{% trans "Verification Info" %}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>{% trans "Verified by:" %}</strong> {{ bunker.verified_by.callsign }}</p>
+                    {% if bunker.verification_date %}
+                    <p><strong>{% trans "Date:" %}</strong> {{ bunker.verification_date|date:"Y-m-d" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

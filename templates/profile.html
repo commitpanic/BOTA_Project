@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Profile" %} - BOTA Project{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>{% trans "My Profile" %}</h1>
+        <p class="text-muted">{{ user.callsign }} ({{ user.email }})</p>
+    </div>
+</div>
+
+<!-- Statistics Overview -->
+<div class="row mb-4">
+    <div class="col-12 mb-3">
+        <h3>{% trans "My Statistics" %}</h3>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-2">{% trans "Total Points" %}</h6>
+                <h2 class="text-primary">{{ stats.total_points }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-2">{% trans "Activator QSOs" %}</h6>
+                <h2 class="text-success">{{ stats.total_activator_qso }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-2">{% trans "Hunter QSOs" %}</h6>
+                <h2 class="text-info">{{ stats.total_hunter_qso }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-2">{% trans "B2B QSOs" %}</h6>
+                <h2 class="text-warning">{{ stats.total_b2b_qso }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Statistics -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">{% trans "Activator Statistics" %}</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{% trans "Total Activator QSOs" %}</span>
+                        <strong>{{ stats.total_activator_qso }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{% trans "Unique Activations" %}</span>
+                        <strong>{{ stats.unique_activations }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{% trans "Activator B2B QSOs" %}</span>
+                        <strong>{{ stats.activator_b2b_qso }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{% trans "Activator Points" %}</span>
+                        <strong class="text-success">{{ stats.activator_points }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">{% trans "Hunter Statistics" %}</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{% trans "Total Hunter QSOs" %}</span>
+                        <strong>{{ stats.total_hunter_qso }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{% trans "Unique Bunkers Hunted" %}</span>
+                        <strong>{{ stats.unique_bunkers_hunted }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{% trans "Total B2B QSOs" %}</span>
+                        <strong>{{ stats.total_b2b_qso }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>{% trans "Hunter Points" %}</span>
+                        <strong class="text-info">{{ stats.hunter_points }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Account Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">{% trans "Account Actions" %}</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary">
+                        <i class="bi bi-speedometer2"></i> {% trans "Back to Dashboard" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

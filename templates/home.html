@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center py-5">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="bi bi-broadcast-pin"></i> Bunkers on the Air
+                </h1>
+                <p class="lead mb-4">
+                    {% trans "Connect amateur radio with military history. Activate bunkers, hunt contacts, earn diplomas!" %}
+                </p>
+                {% if not user.is_authenticated %}
+                <div class="mt-4">
+                    <a href="{% url 'register' %}" class="btn btn-light btn-lg me-2">
+                        <i class="bi bi-person-plus"></i> {% trans "Get Started" %}
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-box-arrow-in-right"></i> {% trans "Login" %}
+                    </a>
+                </div>
+                {% else %}
+                <div class="mt-4">
+                    <a href="{% url 'dashboard' %}" class="btn btn-light btn-lg">
+                        <i class="bi bi-speedometer2"></i> {% trans "Go to Dashboard" %}
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features -->
+<div class="row mb-5">
+    <div class="col-12 mb-3">
+        <h2 class="text-center">{% trans "How It Works" %}</h2>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="display-4 text-primary mb-3">
+                    <i class="bi bi-broadcast"></i>
+                </div>
+                <h4>{% trans "Activate Bunkers" %}</h4>
+                <p>{% trans "Visit military fortifications and activate them on amateur radio bands. Upload your ADIF logs to record your activations." %}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="display-4 text-primary mb-3">
+                    <i class="bi bi-people"></i>
+                </div>
+                <h4>{% trans "Hunt Contacts" %}</h4>
+                <p>{% trans "Contact activators at bunker locations. Earn points for each QSO and build your collection of bunkers." %}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <div class="display-4 text-primary mb-3">
+                    <i class="bi bi-trophy"></i>
+                </div>
+                <h4>{% trans "Earn Diplomas" %}</h4>
+                <p>{% trans "Track your progress and earn diplomas based on your activity. From Bronze to Diamond levels!" %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mb-5">
+    <div class="col-12 mb-3">
+        <h2 class="text-center">Program Statistics</h2>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-value">{{ total_bunkers }}</div>
+            <div class="stat-label">Active Bunkers</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-label">Registered Users</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-value">{{ total_qsos }}</div>
+            <div class="stat-label">Total QSOs</div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card text-center">
+            <div class="stat-value">{{ total_diplomas }}</div>
+            <div class="stat-label">Diplomas Issued</div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+{% if recent_activations %}
+<div class="row">
+    <div class="col-12 mb-3">
+        <h2 class="text-center">Recent Activations</h2>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Activator</th>
+                                <th>Bunker</th>
+                                <th>Last QSO</th>
+                                <th>QSOs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activation in recent_activations %}
+                            <tr>
+                                <td><strong>{{ activation.activator__callsign }}</strong></td>
+                                <td>
+                                    {{ activation.bunker__reference_number }}
+                                    <br><small class="text-muted">{{ activation.bunker__name_en }}</small>
+                                </td>
+                                <td>{{ activation.latest_qso|date:"Y-m-d H:i" }} UTC</td>
+                                <td><span class="badge bg-success">{{ activation.qso_count }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

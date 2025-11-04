@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Request New Bunker" %} - BOTA Project{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="bi bi-plus-circle"></i> {% trans "Request New Bunker" %}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> 
+                        {% trans "Your request will be reviewed by staff before the bunker is added to the database." %}
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="reference_number" class="form-label">{% trans "Reference Number" %} *</label>
+                            <input type="text" class="form-control" id="reference_number" name="reference_number" 
+                                   required placeholder="B/SP-XXXX">
+                            <small class="form-text text-muted">{% trans "Proposed reference code (e.g., B/SP-0246)" %}</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">{% trans "Bunker Name" %} *</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="bunker_type" class="form-label">{% trans "Type" %}</label>
+                            <input type="text" class="form-control" id="bunker_type" name="bunker_type" 
+                                   placeholder="{% trans 'e.g., WW2 Battle Bunker' %}">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="latitude" class="form-label">{% trans "Latitude" %} *</label>
+                                <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="longitude" class="form-label">{% trans "Longitude" %} *</label>
+                                <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="locator" class="form-label">{% trans "Maidenhead Locator" %}</label>
+                            <input type="text" class="form-control" id="locator" name="locator" 
+                                   placeholder="JO72RI">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">{% trans "Description" %}</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="photo_url" class="form-label">{% trans "Photo URL" %}</label>
+                            <input type="url" class="form-control" id="photo_url" name="photo_url" 
+                                   placeholder="https://...">
+                            <small class="form-text text-muted">{% trans "Link to photo or documentation" %}</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="additional_info" class="form-label">{% trans "Additional Information" %}</label>
+                            <textarea class="form-control" id="additional_info" name="additional_info" rows="3"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> {% trans "Submit Request" %}
+                            </button>
+                            <a href="{% url 'bunker_list' %}" class="btn btn-secondary">
+                                {% trans "Cancel" %}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

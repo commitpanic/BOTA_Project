@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Upload Bunkers CSV" %} - BOTA{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-file-upload"></i> {% trans "Upload Bunkers CSV" %}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="file" class="form-label">
+                                {% trans "CSV File" %} *
+                            </label>
+                            <input type="file" class="form-control" id="file" 
+                                   name="file" accept=".csv" required>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <h5><i class="fas fa-info-circle"></i> {% trans "CSV Format Requirements" %}</h5>
+                            <p>{% trans "Your CSV file must contain the following columns:" %}</p>
+                            <ul class="mb-0">
+                                <li><code>reference_number</code> - {% trans "Unique bunker reference (e.g., B/SP-0039)" %}</li>
+                                <li><code>name_pl</code> - {% trans "Bunker name in Polish" %}</li>
+                                <li><code>name_en</code> - {% trans "Bunker name in English" %}</li>
+                                <li><code>category</code> - {% trans "Category name (will be created if doesn't exist)" %}</li>
+                                <li><code>latitude</code> - {% trans "GPS latitude in decimal degrees" %}</li>
+                                <li><code>longitude</code> - {% trans "GPS longitude in decimal degrees" %}</li>
+                                <li><code>description_pl</code> - {% trans "Description in Polish (optional)" %}</li>
+                                <li><code>description_en</code> - {% trans "Description in English (optional)" %}</li>
+                            </ul>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <strong>{% trans "Example CSV Format:" %}</strong>
+                            </div>
+                            <div class="card-body">
+                                <pre class="mb-0" style="font-size: 0.85rem;">reference_number,name_pl,name_en,category,latitude,longitude,description_pl,description_en
+B/SP-0001,Bunkier Dowództwa,Command Bunker,Military,51.123456,17.234567,Bunkier sztabu,Command staff bunker
+B/SP-0002,Schron Sanitarny,Medical Shelter,Medical,51.234567,17.345678,Schron medyczny,Medical shelter</pre>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>{% trans "Note:" %}</strong>
+                            {% trans "Bunkers with duplicate reference numbers will be skipped." %}
+                            {% if user.is_staff %}
+                            {% trans "As a staff member, imported bunkers will be automatically verified." %}
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-upload"></i> {% trans "Upload CSV" %}
+                            </button>
+                            <a href="{% url 'bunkers_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> {% trans "Cancel" %}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <strong><i class="fas fa-download"></i> {% trans "Download Sample CSV" %}</strong>
+                </div>
+                <div class="card-body">
+                    <p>{% trans "You can copy this sample data to create your CSV file:" %}</p>
+                    <textarea class="form-control" rows="5" readonly>reference_number,name_pl,name_en,category,latitude,longitude,description_pl,description_en
+B/SP-0039,Bunkier "Alfa",Bunker "Alpha",Military,51.234567,17.345678,Bunkier wojskowy z okresu zimnej wojny,Military bunker from the Cold War era
+B/SP-0050,Schron Obserwacyjny,Observation Shelter,Military,51.345678,17.456789,Schron obserwacyjny linii obrony,Observation shelter of defense line</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

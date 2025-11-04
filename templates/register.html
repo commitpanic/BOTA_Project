@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Register" %} - BOTA Project{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-person-plus"></i> {% trans "Create Your Account" %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">{% trans "Email Address" %}</label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="email" 
+                               name="email" 
+                               required
+                               autofocus>
+                        <div class="form-text">{% trans "Used for login" %}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="callsign" class="form-label">{% trans "Callsign" %}</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="callsign" 
+                               name="callsign" 
+                               required
+                               placeholder="SP3XXX">
+                        <div class="form-text">{% trans "Your amateur radio callsign" %}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">{% trans "Password" %}</label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password" 
+                               name="password" 
+                               required
+                               minlength="8">
+                        <div class="form-text">{% trans "Minimum 8 characters" %}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password2" class="form-label">{% trans "Confirm Password" %}</label>
+                        <input type="password" 
+                               class="form-control" 
+                               id="password2" 
+                               name="password2" 
+                               required
+                               minlength="8">
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus"></i> {% trans "Register" %}
+                        </button>
+                    </div>
+                </form>
+
+                <hr>
+
+                <div class="text-center">
+                    <p class="mb-0">
+                        {% trans "Already have an account?" %} 
+                        <a href="{% url 'login' %}">{% trans "Login here" %}</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

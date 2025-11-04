@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "My Diplomas" %} - BOTA Project{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1>{% trans "My Diplomas" %}</h1>
+        <p class="text-muted">{% trans "Track your achievements and progress" %}</p>
+    </div>
+</div>
+
+<!-- Earned Diplomas -->
+{% if earned_diplomas %}
+<div class="row mb-4">
+    <div class="col-12 mb-3">
+        <h3>{% trans "Earned Diplomas" %}</h3>
+    </div>
+    
+    {% for diploma in earned_diplomas %}
+    <div class="col-md-6 mb-3">
+        <div class="card border-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h5 class="mb-1">
+                            <i class="bi bi-trophy-fill text-warning"></i>
+                            {{ diploma.diploma_type.name }}
+                        </h5>
+                        <p class="text-muted small mb-2">{{ diploma.diploma_type.description }}</p>
+                    </div>
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle"></i> {% trans "Earned" %}
+                    </span>
+                </div>
+                
+                <div class="row">
+                    <div class="col-6">
+                        <small class="text-muted">{% trans "Earned Date" %}</small>
+                        <div><strong>{{ diploma.issue_date|date:"Y-m-d" }}</strong></div>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted">{% trans "Certificate #" %}</small>
+                        <div><strong>{{ diploma.diploma_number }}</strong></div>
+                    </div>
+                </div>
+                
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <small class="text-muted">{% trans "Category" %}</small>
+                        <div>
+                            <span class="badge bg-primary">{{ diploma.diploma_type.get_category_display }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted">{% trans "Requirements Met" %}</small>
+                        <div>
+                            {% with req_count=0 %}
+                                {% if diploma.diploma_type.min_activator_points > 0 %}{% with req_count=req_count|add:1 %}{% endwith %}{% endif %}
+                                {% if diploma.diploma_type.min_hunter_points > 0 %}{% with req_count=req_count|add:1 %}{% endwith %}{% endif %}
+                                {% if diploma.diploma_type.min_b2b_points > 0 %}{% with req_count=req_count|add:1 %}{% endwith %}{% endif %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> 
+                                    {% if diploma.diploma_type.min_activator_points > 0 and diploma.diploma_type.min_hunter_points > 0 and diploma.diploma_type.min_b2b_points > 0 %}3
+                                    {% elif diploma.diploma_type.min_activator_points > 0 and diploma.diploma_type.min_hunter_points > 0 or diploma.diploma_type.min_activator_points > 0 and diploma.diploma_type.min_b2b_points > 0 or diploma.diploma_type.min_hunter_points > 0 and diploma.diploma_type.min_b2b_points > 0 %}2
+                                    {% else %}1
+                                    {% endif %}
+                                </span>
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <a href="{% url 'download_certificate' diploma.id %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-download"></i> {% trans "Download Certificate" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> {% trans "You haven't earned any diplomas yet. Keep activating and hunting!" %}
+</div>
+{% endif %}
+
+<!-- Progress Toward Diplomas -->
+<div class="row">
+    <div class="col-12 mb-3">
+        <h3>{% trans "Diploma Progress" %}</h3>
+    </div>
+    
+    {% for progress in all_progress %}
+    {% if not progress.is_eligible %}
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">{{ progress.diploma_type.name_en }}</h5>
+                    <span class="badge bg-secondary">{% trans "In Progress" %}</span>
+                </div>
+                <p class="text-muted small mb-2">{{ progress.diploma_type.description_en }}</p>
+                
+                <!-- Requirements -->
+                <div class="mb-2">
+                    {% if progress.diploma_type.min_activator_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Activator Points" %}</small>
+                        <span class="badge {% if progress.activator_points >= progress.diploma_type.min_activator_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.activator_points }} / {{ progress.diploma_type.min_activator_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_hunter_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Hunter Points" %}</small>
+                        <span class="badge {% if progress.hunter_points >= progress.diploma_type.min_hunter_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.hunter_points }} / {{ progress.diploma_type.min_hunter_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_b2b_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "B2B Points" %}</small>
+                        <span class="badge {% if progress.b2b_points >= progress.diploma_type.min_b2b_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.b2b_points }} / {{ progress.diploma_type.min_b2b_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="progress mb-2">
+                    <div class="progress-bar" 
+                         role="progressbar" 
+                         style="width: {{ progress.percentage_complete }}%"
+                         aria-valuenow="{{ progress.percentage_complete }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        {{ progress.percentage_complete|floatformat:0 }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> {% trans "No diploma progress yet. Start activating or hunting to begin!" %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
