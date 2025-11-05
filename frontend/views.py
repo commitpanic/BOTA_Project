@@ -315,12 +315,15 @@ def download_certificate(request, diploma_id):
         lato_regular = fonts_dir / 'Lato-Regular.ttf'
         lato_bold = fonts_dir / 'Lato-Bold.ttf'
         lato_italic = fonts_dir / 'Lato-Italic.ttf'
+        lato_bolditalic = fonts_dir / 'Lato-BoldItalic.ttf'
         
         # Register Lato fonts if they exist
         if lato_regular.exists() and lato_bold.exists() and lato_italic.exists():
             pdfmetrics.registerFont(TTFont('Lato', str(lato_regular)))
             pdfmetrics.registerFont(TTFont('Lato-Bold', str(lato_bold)))
             pdfmetrics.registerFont(TTFont('Lato-Italic', str(lato_italic)))
+            if lato_bolditalic.exists():
+                pdfmetrics.registerFont(TTFont('Lato-BoldItalic', str(lato_bolditalic)))
             default_font = 'Lato'
             bold_font = 'Lato-Bold'
             italic_font = 'Lato-Italic'

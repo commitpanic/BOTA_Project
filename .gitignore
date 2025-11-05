@@ -34,8 +34,10 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 /media
-/static
+# Only ignore collected static files, not source static files
 /staticfiles
+# Ignore compiled translation files
+*.mo
 
 # Django migrations (optional - uncomment to ignore)
 # */migrations/*.py
@@ -74,7 +76,7 @@ coverage.xml
 cover/
 
 # Translations
-*.mo
+# *.mo files are ignored above in Django section
 *.pot
 
 # Sphinx documentation
