@@ -110,6 +110,35 @@
         .progress {
             height: 25px;
             border-radius: 12px;
+            position: relative;
+        }
+        
+        /* Progress bar with centered percentage text */
+        .progress .progress-bar {
+            position: relative;
+        }
+        
+        /* Text overlay for progress percentage - always centered and visible */
+        .progress-text-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+            text-shadow: 
+                -1px -1px 0 #fff,
+                1px -1px 0 #fff,
+                -1px 1px 0 #fff,
+                1px 1px 0 #fff,
+                0 0 3px #fff,
+                0 0 5px #fff;
+            z-index: 10;
+            pointer-events: none;
         }
         
         .badge-success {
@@ -171,7 +200,7 @@
             <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
                 {% load static %}
                 <img src="{% static 'images/bota_logo.png' %}" alt="BOTA" height="40" class="me-2">
-                <span>BOTA App</span>
+                <span>SP_BOTA App</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -207,6 +236,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'cluster' %}">
                             <i class="bi bi-broadcast-pin"></i> {% trans "Spots" %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'map' %}">
+                            <i class="bi bi-map"></i> {% trans "Map" %}
                         </a>
                     </li>
                     {% if user.is_authenticated %}
@@ -294,7 +328,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <h5><i class="bi bi-broadcast"></i> BOTA App</h5>
+                    <h5><i class="bi bi-broadcast"></i> SP_BOTA App</h5>
                     <p class="small">{% trans "Bunkers on the Air - Connecting amateur radio enthusiasts with military history." %}</p>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -317,7 +351,7 @@
             </div>
             <hr class="bg-white">
             <div class="text-center">
-                <p class="mb-0">&copy; 2025 BOTA App. {% trans "All rights reserved." %}</p>
+                <p class="mb-0">&copy; 2025 SP_BOTA App. {% trans "All rights reserved." %}</p>
             </div>
         </div>
     </footer>

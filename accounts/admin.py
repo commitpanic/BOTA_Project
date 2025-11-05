@@ -46,7 +46,7 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('email', 'callsign')
     ordering = ('-date_joined',)
     
-    actions = ['deactivate_users', 'activate_users', 'mark_as_team_member', 'unmark_as_team_member']
+    actions = ['deactivate_users', 'activate_users', 'mark_as_team_member', 'unmark_as_team_member', 'promote_to_superuser', 'demote_from_superuser']
     
     fieldsets = (
         (None, {
@@ -116,6 +116,18 @@ class UserAdmin(BaseUserAdmin):
         count = queryset.update(is_staff=False)
         self.message_user(request, _(f'{count} user(s) unmarked as team members.'))
     unmark_as_team_member.short_description = _('Remove team member status')
+    
+    def promote_to_superuser(self, request, queryset):
+        """Promote selected users to superuser status"""
+        count = queryset.update(is_superuser=True, is_staff=True)
+        self.message_user(request, _(f'{count} user(s) promoted to superuser.'))
+    promote_to_superuser.short_description = _('Promote to superuser')
+    
+    def demote_from_superuser(self, request, queryset):
+        """Remove superuser status from selected users"""
+        count = queryset.update(is_superuser=False)
+        self.message_user(request, _(f'{count} user(s) demoted from superuser.'))
+    demote_from_superuser.short_description = _('Remove superuser status')
 
 
 # UserStatistics is managed via inline in UserAdmin - no need for separate admin

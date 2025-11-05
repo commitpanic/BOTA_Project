@@ -1,0 +1,279 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Darker background for forms and options */
+    body {
+        background-color: #1a1a1a !important;
+    }
+    
+    #content {
+        background-color: #2b2b2b !important;
+    }
+    
+    .module {
+        background-color: #333 !important;
+        border: 1px solid #444 !important;
+    }
+    
+    .module h2, .module caption, .inline-group h2 {
+        background-color: #444 !important;
+        color: #f0f0f0 !important;
+    }
+    
+    /* Form backgrounds */
+    .form-row, .aligned label, fieldset {
+        background-color: transparent !important;
+    }
+    
+    /* Input fields */
+    input[type="text"], 
+    input[type="email"], 
+    input[type="password"], 
+    input[type="url"], 
+    input[type="number"], 
+    textarea, 
+    select {
+        background-color: #404040 !important;
+        border: 1px solid #555 !important;
+        color: #f0f0f0 !important;
+    }
+    
+    input[type="text"]:focus, 
+    input[type="email"]:focus, 
+    input[type="password"]:focus, 
+    textarea:focus, 
+    select:focus {
+        background-color: #4a4a4a !important;
+        border-color: #79aec8 !important;
+    }
+    
+    /* Tables */
+    table {
+        background-color: #333 !important;
+    }
+    
+    thead th {
+        background-color: #444 !important;
+        color: #f0f0f0 !important;
+    }
+    
+    tbody tr {
+        background-color: #2b2b2b !important;
+    }
+    
+    tbody tr:nth-child(even) {
+        background-color: #333 !important;
+    }
+    
+    tbody tr:hover {
+        background-color: #404040 !important;
+    }
+    
+    tbody td, tbody th {
+        border-bottom: 1px solid #444 !important;
+        color: #d0d0d0 !important;
+    }
+    
+    /* Links */
+    a, a:link, a:visited {
+        color: #79aec8 !important;
+    }
+    
+    a:hover, a:focus {
+        color: #a6d8f0 !important;
+    }
+    
+    /* Sidebar */
+    #changelist-filter {
+        background-color: #333 !important;
+        border-left: 1px solid #444 !important;
+    }
+    
+    #changelist-filter h2, #changelist-filter h3 {
+        background-color: #444 !important;
+        color: #f0f0f0 !important;
+    }
+    
+    #changelist-filter li {
+        background-color: transparent !important;
+    }
+    
+    #changelist-filter li a {
+        color: #79aec8 !important;
+    }
+    
+    #changelist-filter li.selected a {
+        color: #5b80b2 !important;
+        font-weight: bold;
+    }
+    
+    /* Breadcrumbs */
+    .breadcrumbs {
+        background-color: #3a3a3a !important;
+        border-bottom: 1px solid #444 !important;
+        color: #d0d0d0 !important;
+    }
+    
+    .breadcrumbs a {
+        color: #79aec8 !important;
+    }
+    
+    /* Header */
+    #header {
+        background-color: #2b2b2b !important;
+        border-bottom: 2px solid #417690 !important;
+    }
+    
+    #header a:link, #header a:visited {
+        color: #f0f0f0 !important;
+    }
+    
+    /* Messages */
+    .messagelist {
+        margin: 0 !important;
+    }
+    
+    .messagelist li {
+        background-color: #404040 !important;
+        border-bottom: 1px solid #555 !important;
+    }
+    
+    .success, .messagelist .success {
+        background-color: #2e5e3e !important;
+        color: #e0ffe0 !important;
+    }
+    
+    .error, .messagelist .error {
+        background-color: #5e2e2e !important;
+        color: #ffe0e0 !important;
+    }
+    
+    .warning, .messagelist .warning {
+        background-color: #5e4e2e !important;
+        color: #fff0e0 !important;
+    }
+    
+    /* Buttons */
+    .button, input[type="submit"], input[type="button"], .submit-row input {
+        background-color: #417690 !important;
+        color: #f0f0f0 !important;
+        border: none !important;
+    }
+    
+    .button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+        background-color: #5b90b0 !important;
+    }
+    
+    .button.default, input[type="submit"].default {
+        background-color: #5b80b2 !important;
+    }
+    
+    /* Checkboxes and radio buttons */
+    .checkbox-row, .radio-row {
+        background-color: transparent !important;
+    }
+    
+    /* Help text */
+    .help, .helptext, .help-block {
+        color: #b0b0b0 !important;
+    }
+    
+    /* Inlines */
+    .inline-group {
+        background-color: #2b2b2b !important;
+        border: 1px solid #444 !important;
+    }
+    
+    .inline-related {
+        background-color: #333 !important;
+        border: 1px solid #444 !important;
+    }
+    
+    /* Object tools */
+    .object-tools {
+        background-color: transparent !important;
+    }
+    
+    .object-tools a {
+        background-color: #417690 !important;
+        color: #f0f0f0 !important;
+    }
+    
+    .object-tools a:hover {
+        background-color: #5b90b0 !important;
+    }
+    
+    /* Results list */
+    #result_list {
+        border: 1px solid #444 !important;
+    }
+    
+    /* Paginator */
+    .paginator {
+        color: #d0d0d0 !important;
+        border-top: 1px solid #444 !important;
+    }
+    
+    .paginator a {
+        border: 1px solid #444 !important;
+        background-color: #333 !important;
+        color: #79aec8 !important;
+    }
+    
+    .paginator a:hover {
+        background-color: #404040 !important;
+    }
+    
+    .paginator .this-page {
+        background-color: #5b80b2 !important;
+        border: 1px solid #5b80b2 !important;
+        color: #f0f0f0 !important;
+    }
+    
+    /* Dashboard specific styles */
+    .stat-card {
+        background-color: #333 !important;
+        border: 1px solid #444 !important;
+    }
+    
+    .stat-card h3 {
+        color: #f0f0f0 !important;
+    }
+    
+    .stat-card .stat-value {
+        color: #79aec8 !important;
+    }
+    
+    /* Labels and text */
+    label, .form-row label, th, .vLargeTextField, .vTextField {
+        color: #d0d0d0 !important;
+    }
+    
+    /* Dropdown menus */
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple {
+        background-color: #404040 !important;
+        border: 1px solid #555 !important;
+    }
+    
+    .select2-container--default .select2-results__option {
+        background-color: #404040 !important;
+        color: #f0f0f0 !important;
+    }
+    
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #5b80b2 !important;
+    }
+</style>
+{% endblock %}

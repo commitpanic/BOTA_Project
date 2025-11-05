@@ -13,9 +13,9 @@ from cluster.models import Spot
 
 
 class BOTAAdminSite(admin.AdminSite):
-    site_header = "BOTA Admin Panel"
-    site_title = "BOTA Admin"
-    index_title = "BOTA Project Administration"
+    site_header = "Administracja SPBOTA App"
+    site_title = "SPBOTA Admin"
+    index_title = "Panel Administracyjny SPBOTA"
     
     def index(self, request, extra_context=None):
         """

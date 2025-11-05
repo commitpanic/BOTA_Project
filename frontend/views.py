@@ -113,10 +113,11 @@ def dashboard(request):
     special_progress = sorted([p for p in all_progress if p.diploma_type.category in ['special_event', 'cluster', 'other']], 
                               key=lambda p: p.diploma_type.display_order)[:2]
     
-    # Get recent activity
+    # Get recent activity - both as activator and hunter
+    from django.db.models import Q
     recent_logs = ActivationLog.objects.filter(
-        user=request.user
-    ).select_related('activation_key__bunker').order_by('-activation_date')[:10]
+        Q(user=request.user) | Q(activator=request.user)
+    ).select_related('bunker', 'activator', 'user').order_by('-activation_date').distinct()[:10]
     
     context = {
         'stats': stats,
@@ -1104,3 +1105,114 @@ def log_history_view(request):
     }
     
     return render(request, 'log_history.html', context)
+
+
+def map_view(request):
+    """
+    Interactive map showing all bunkers with color-coded markers.
+    
+    For anonymous users: Simple markers
+    For logged-in users: Color-coded by activation/hunted status:
+      - Gray: Not activated, not hunted
+      - Blue: Not activated, hunted
+      - Green: Activated, not hunted  
+      - Gold: Activated AND hunted
+      - Orange: Currently being activated (active spot)
+    """
+    from bunkers.models import Bunker
+    from activations.models import ActivationLog
+    from cluster.models import Spot
+    from django.db.models import Q
+    from django.utils import timezone
+    import json
+    
+    # Get all verified bunkers with coordinates
+    bunkers = Bunker.objects.filter(
+        is_verified=True,
+        latitude__isnull=False,
+        longitude__isnull=False
+    ).select_related().order_by('reference_number')
+    
+    # Get active spots (not expired)
+    active_spot_bunker_ids = set(
+        Spot.objects.filter(
+            is_active=True,
+            expires_at__gt=timezone.now(),
+            bunker__isnull=False
+        ).values_list('bunker_id', flat=True).distinct()
+    )
+    
+    bunkers_data = []
+    
+    if request.user.is_authenticated:
+        # Get user's activated and hunted bunkers
+        activated_bunker_ids = set(
+            ActivationLog.objects.filter(activator=request.user)
+            .values_list('bunker_id', flat=True)
+            .distinct()
+        )
+        
+        hunted_bunker_ids = set(
+            ActivationLog.objects.filter(user=request.user)
+            .values_list('bunker_id', flat=True)
+            .distinct()
+        )
+        
+        for bunker in bunkers:
+            is_activated = bunker.id in activated_bunker_ids
+            is_hunted = bunker.id in hunted_bunker_ids
+            is_under_activation = bunker.id in active_spot_bunker_ids
+            
+            # Determine color based on status (ignore under_activation for color)
+            if is_activated and is_hunted:
+                color = 'gold'  # Both activated and hunted
+                icon = 'trophy'
+            elif is_activated:
+                color = 'green'  # Only activated
+                icon = 'broadcast'
+            elif is_hunted:
+                color = 'blue'  # Only hunted
+                icon = 'binoculars'
+            else:
+                color = 'gray'  # Neither
+                icon = 'geo-alt'
+            
+            # If under activation, add orange border via CSS animation
+            # (handled in frontend with is_under_activation flag)
+            
+            bunkers_data.append({
+                'id': bunker.id,
+                'reference': bunker.reference_number,
+                'name': bunker.name_en,
+                'lat': float(bunker.latitude),
+                'lng': float(bunker.longitude),
+                'color': color,
+                'icon': icon,
+                'is_activated': is_activated,
+                'is_hunted': is_hunted,
+                'is_under_activation': is_under_activation,
+            })
+    else:
+        # Anonymous user - simple markers
+        for bunker in bunkers:
+            is_under_activation = bunker.id in active_spot_bunker_ids
+            
+            bunkers_data.append({
+                'id': bunker.id,
+                'reference': bunker.reference_number,
+                'name': bunker.name_en,
+                'lat': float(bunker.latitude),
+                'lng': float(bunker.longitude),
+                'color': 'red',  # Default red for anonymous
+                'icon': 'geo-alt',
+                'is_activated': False,
+                'is_hunted': False,
+                'is_under_activation': is_under_activation,
+            })
+    
+    context = {
+        'bunkers_json': json.dumps(bunkers_data),
+        'bunkers_count': len(bunkers_data),
+    }
+    
+    return render(request, 'map.html', context)

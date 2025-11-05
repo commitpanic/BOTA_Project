@@ -220,7 +220,9 @@
                          aria-valuenow="{{ progress.percentage_complete }}" 
                          aria-valuemin="0" 
                          aria-valuemax="100">
-                        <strong>{{ progress.percentage_complete|floatformat:0 }}%</strong>
+                    </div>
+                    <div class="progress-text-overlay">
+                        {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>
             </div>
@@ -288,7 +290,9 @@
                          aria-valuenow="{{ progress.percentage_complete }}" 
                          aria-valuemin="0" 
                          aria-valuemax="100">
-                        <strong>{{ progress.percentage_complete|floatformat:0 }}%</strong>
+                    </div>
+                    <div class="progress-text-overlay">
+                        {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>
             </div>
@@ -346,7 +350,9 @@
                          aria-valuenow="{{ progress.percentage_complete }}" 
                          aria-valuemin="0" 
                          aria-valuemax="100">
-                        <strong>{{ progress.percentage_complete|floatformat:0 }}%</strong>
+                    </div>
+                    <div class="progress-text-overlay">
+                        {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>
             </div>
@@ -414,7 +420,9 @@
                          aria-valuenow="{{ progress.percentage_complete }}" 
                          aria-valuemin="0" 
                          aria-valuemax="100">
-                        <strong>{{ progress.percentage_complete|floatformat:0 }}%</strong>
+                    </div>
+                    <div class="progress-text-overlay">
+                        {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>
             </div>
@@ -457,12 +465,18 @@
                         <tbody>
                             {% for log in recent_logs %}
                             <tr>
-                                <td>{{ log.timestamp|date:"Y-m-d H:i" }} UTC</td>
-                                <td>{{ log.activation_key.bunker.reference_number }}</td>
+                                <td>{{ log.activation_date|date:"Y-m-d H:i" }} UTC</td>
+                                <td>
+                                    {% if log.bunker %}
+                                        {{ log.bunker.reference_number }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
                                 <td>{{ log.mode|default:"N/A" }}</td>
                                 <td>{{ log.band|default:"N/A" }}</td>
                                 <td>
-                                    {% if log.activator %}
+                                    {% if log.activator == request.user %}
                                     <span class="badge bg-success">{% trans "Activator" %}</span>
                                     {% else %}
                                     <span class="badge bg-info">{% trans "Hunter" %}</span>

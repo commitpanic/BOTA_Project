@@ -1474,3 +1474,266 @@ msgstr " Pominięto {} duplikatów."
 msgid " B2B QSOs: {}."
 msgstr " QSO B2B: {}."
 
+# Map page
+msgid "Map"
+msgstr "Mapa"
+
+msgid "Bunkers Map"
+msgstr "Mapa Bunkrów"
+
+msgid "Interactive map showing all BOTA bunkers locations"
+msgstr "Interaktywna mapa pokazująca lokalizacje wszystkich bunkrów BOTA"
+
+msgid "Total Bunkers"
+msgstr "Wszystkie Bunkry"
+
+msgid "Activated by You"
+msgstr "Aktywowane przez Ciebie"
+
+msgid "Hunted by You"
+msgstr "Złowione przez Ciebie"
+
+msgid "Not Yet Worked"
+msgstr "Czekające na odkrycie"
+
+msgid "Legend"
+msgstr "Legenda"
+
+msgid "Filters"
+msgstr "Filtry"
+
+msgid "Gold"
+msgstr "Złoty"
+
+msgid "Activated AND Hunted"
+msgstr "Aktywowany I Złowiony"
+
+msgid "Green"
+msgstr "Zielony"
+
+msgid "Activated (not hunted)"
+msgstr "Aktywowany (nie złowiony)"
+
+msgid "Blue"
+msgstr "Niebieski"
+
+msgid "Hunted (not activated)"
+msgstr "Złowiony (nie aktywowany)"
+
+msgid "Gray"
+msgstr "Szary"
+
+msgid "Not yet worked"
+msgstr "Czekający na odkrycie"
+
+msgid "Activated"
+msgstr "Aktywowany"
+
+msgid "Hunted"
+msgstr "Złowiony"
+
+msgid "Not Worked"
+msgstr "Czekające na odkrycie"
+
+msgid "Show All"
+msgstr "Pokaż Wszystkie"
+
+msgid "Log in to see which bunkers you have activated or hunted!"
+msgstr "Zaloguj się, aby zobaczyć które bunkry aktywowałeś lub złowiłeś!"
+
+msgid "Details"
+msgstr "Szczegóły"
+
+msgid "Under Activation"
+msgstr "W trakcie aktywacji"
+
+msgid "Orange"
+msgstr "Pomarańczowy"
+
+msgid "select multiple"
+msgstr "wybierz wiele"
+
+msgid "Orange border"
+msgstr "Pomarańczowa ramka"
+
+msgid "active spot"
+msgstr "aktywny spot"
+
+msgid "Pulsating orange border indicates someone is currently activating this bunker"
+msgstr "Pulsująca pomarańczowa ramka oznacza, że ktoś właśnie aktywuje ten bunker"
+
+# Password Reset translations
+msgid "Reset Password"
+msgstr "Resetuj Hasło"
+
+msgid "Forgot your password?"
+msgstr "Zapomniałeś hasła?"
+
+msgid "Forgot your password? Enter your callsign and email address below, and we'll send you instructions to reset it."
+msgstr "Zapomniałeś hasła? Wprowadź swój znak wywoławczy i adres email poniżej, a wyślemy Ci instrukcje resetowania."
+
+msgid "Security Notice:"
+msgstr "Uwaga bezpieczeństwa:"
+
+msgid "You must provide both your callsign and the email address you used to register. The reset link will be valid for 5 minutes only."
+msgstr "Musisz podać zarówno swój znak wywoławczy jak i adres email użyty przy rejestracji. Link resetujący będzie ważny tylko przez 5 minut."
+
+msgid "Your amateur radio callsign (e.g., SP3XYZ)"
+msgstr "Twój znak wywoławczy (np. SP3XYZ)"
+
+msgid "The email address you used to register your account"
+msgstr "Adres email użyty przy rejestracji konta"
+
+msgid "Send Reset Link"
+msgstr "Wyślij Link Resetujący"
+
+msgid "Back to Login"
+msgstr "Wróć do Logowania"
+
+msgid "Don't have an account?"
+msgstr "Nie masz konta?"
+
+msgid "Register here"
+msgstr "Zarejestruj się tutaj"
+
+msgid "Password Reset Email Sent"
+msgstr "Email Resetujący Wysłany"
+
+msgid "Email Sent"
+msgstr "Email Wysłany"
+
+msgid "Check Your Email"
+msgstr "Sprawdź Swoją Skrzynkę Email"
+
+msgid "We've sent you an email with instructions to reset your password."
+msgstr "Wysłaliśmy Ci email z instrukcjami resetowania hasła."
+
+msgid "Important:"
+msgstr "Ważne:"
+
+msgid "The reset link is valid for 5 minutes only"
+msgstr "Link resetujący jest ważny tylko przez 5 minut"
+
+msgid "Check your spam folder if you don't see the email"
+msgstr "Sprawdź folder spam jeśli nie widzisz emaila"
+
+msgid "The link can only be used once"
+msgstr "Link może być użyty tylko raz"
+
+msgid "If you don't receive an email within a few minutes, please check that you entered the correct callsign and email address."
+msgstr "Jeśli nie otrzymasz emaila w ciągu kilku minut, sprawdź czy wprowadziłeś poprawny znak wywoławczy i adres email."
+
+msgid "Try Again"
+msgstr "Spróbuj Ponownie"
+
+msgid "Set New Password"
+msgstr "Ustaw Nowe Hasło"
+
+msgid "Please enter your new password twice so we can verify you typed it in correctly."
+msgstr "Wprowadź nowe hasło dwukrotnie aby upewnić się że wpisałeś je poprawnie."
+
+msgid "Password Requirements:"
+msgstr "Wymagania Hasła:"
+
+msgid "At least 8 characters long"
+msgstr "Minimum 8 znaków"
+
+msgid "Cannot be too similar to your other personal information"
+msgstr "Nie może być zbyt podobne do innych danych osobowych"
+
+msgid "Cannot be a commonly used password"
+msgstr "Nie może być powszechnie używanym hasłem"
+
+msgid "Cannot be entirely numeric"
+msgstr "Nie może składać się wyłącznie z cyfr"
+
+msgid "New Password"
+msgstr "Nowe Hasło"
+
+msgid "Confirm New Password"
+msgstr "Potwierdź Nowe Hasło"
+
+msgid "Change Password"
+msgstr "Zmień Hasło"
+
+msgid "Invalid or Expired Link"
+msgstr "Nieprawidłowy lub Wygasły Link"
+
+msgid "The password reset link is invalid or has expired. This can happen if:"
+msgstr "Link resetujący hasło jest nieprawidłowy lub wygasł. Może się tak stać jeśli:"
+
+msgid "The link is older than 5 minutes"
+msgstr "Link ma więcej niż 5 minut"
+
+msgid "The link has already been used"
+msgstr "Link został już użyty"
+
+msgid "The link was copied incorrectly"
+msgstr "Link został skopiowany niepoprawnie"
+
+msgid "Please request a new password reset link."
+msgstr "Poproś o nowy link resetujący hasło."
+
+msgid "Request New Reset Link"
+msgstr "Poproś o Nowy Link"
+
+msgid "Password Reset Complete"
+msgstr "Resetowanie Hasła Zakończone"
+
+msgid "Success!"
+msgstr "Sukces!"
+
+msgid "Your password has been successfully changed."
+msgstr "Twoje hasło zostało pomyślnie zmienione."
+
+msgid "You can now log in with your new password."
+msgstr "Możesz teraz zalogować się nowym hasłem."
+
+msgid "For security reasons, you've been logged out from all devices. Please log in again with your new password."
+msgstr "Ze względów bezpieczeństwa zostałeś wylogowany ze wszystkich urządzeń. Zaloguj się ponownie nowym hasłem."
+
+msgid "Log In Now"
+msgstr "Zaloguj Się Teraz"
+
+msgid "Go to Home"
+msgstr "Przejdź do Strony Głównej"
+
+msgid "Password Reset for"
+msgstr "Resetowanie Hasła dla"
+
+msgid "Hello"
+msgstr "Witaj"
+
+msgid "You're receiving this email because you requested a password reset for your BOTA account."
+msgstr "Otrzymujesz ten email ponieważ poprosiłeś o reset hasła do konta BOTA."
+
+msgid "Please click the link below to set a new password:"
+msgstr "Kliknij poniższy link aby ustawić nowe hasło:"
+
+msgid "This link is valid for 5 minutes only and can only be used once."
+msgstr "Ten link jest ważny tylko przez 5 minut i może być użyty tylko raz."
+
+msgid "If you didn't request this password reset, please ignore this email. Your password will remain unchanged."
+msgstr "Jeśli nie prosiłeś o reset hasła, zignoruj ten email. Twoje hasło pozostanie niezmienione."
+
+msgid "For security reasons, this link will expire shortly."
+msgstr "Ze względów bezpieczeństwa ten link wkrótce wygaśnie."
+
+msgid "This is an automated message. Please do not reply to this email."
+msgstr "To jest automatyczna wiadomość. Prosimy nie odpowiadać na ten email."
+
+msgid "Password Reset - SP_BOTA"
+msgstr "Resetowanie Hasła - SP_BOTA"
+
+msgid "No account found with this callsign and email combination."
+msgstr "Nie znaleziono konta z tym znakiem wywoławczym i emailem."
+
+msgid "This account is inactive. Please contact support."
+msgstr "To konto jest nieaktywne. Skontaktuj się z pomocą techniczną."
+
+msgid "Enter your callsign"
+msgstr "Wprowadź swój znak wywoławczy"
+
+msgid "Enter your email address"
+msgstr "Wprowadź swój adres email"
+

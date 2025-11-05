@@ -1,0 +1,464 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Bunkers Map" %} - BOTA Project{% endblock %}
+
+{% block extra_css %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #map {
+        height: calc(100vh - 200px);
+        min-height: 500px;
+        width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .map-legend {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    
+    .legend-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        color: white;
+        font-size: 14px;
+    }
+    
+    .legend-icon.gold {
+        background-color: #FFD700;
+        color: #000;
+    }
+    
+    .legend-icon.green {
+        background-color: #28a745;
+    }
+    
+    .legend-icon.blue {
+        background-color: #007bff;
+    }
+    
+    .legend-icon.gray {
+        background-color: #6c757d;
+    }
+    
+    .legend-icon.red {
+        background-color: #dc3545;
+    }
+    
+    .legend-icon.orange {
+        background-color: #fd7e14;
+    }
+    
+    .map-stats {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .leaflet-popup-content {
+        min-width: 200px;
+    }
+    
+    .popup-title {
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 8px;
+        color: var(--primary-color);
+    }
+    
+    .popup-reference {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+    
+    .popup-status {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .status-badge.activated {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .status-badge.hunted {
+        background-color: #007bff;
+        color: white;
+    }
+    
+    .map-controls {
+        margin-bottom: 15px;
+    }
+    
+    .filter-btn {
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    
+    /* Pulsating animation for active spots */
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(253, 126, 20, 0.7);
+        }
+        50% {
+            box-shadow: 0 0 0 10px rgba(253, 126, 20, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(253, 126, 20, 0);
+        }
+    }
+    
+    .marker-under-activation {
+        animation: pulse 2s infinite;
+        border: 3px solid #fd7e14 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-12">
+        <h1><i class="bi bi-map"></i> {% trans "Bunkers Map" %}</h1>
+        <p class="text-muted">
+            {% trans "Interactive map showing all BOTA bunkers locations" %}
+        </p>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="map-stats">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <h3 id="total-bunkers">{{ bunkers_count }}</h3>
+                    <small>{% trans "Total Bunkers" %}</small>
+                </div>
+                {% if user.is_authenticated %}
+                <div class="col-md-3">
+                    <h3 id="activated-count">-</h3>
+                    <small>{% trans "Activated by You" %}</small>
+                </div>
+                <div class="col-md-3">
+                    <h3 id="hunted-count">-</h3>
+                    <small>{% trans "Hunted by You" %}</small>
+                </div>
+                <div class="col-md-3">
+                    <h3 id="remaining-count">-</h3>
+                    <small>{% trans "Not Yet Worked" %}</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+<!-- Legend and Filters -->
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="map-legend">
+            <h5 class="mb-3"><i class="bi bi-info-circle"></i> {% trans "Legend" %}</h5>
+            <div class="legend-item">
+                <div class="legend-icon gold">
+                    <i class="bi bi-trophy"></i>
+                </div>
+                <span><strong>{% trans "Gold" %}</strong> - {% trans "Activated AND Hunted" %}</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon green">
+                    <i class="bi bi-broadcast"></i>
+                </div>
+                <span><strong>{% trans "Green" %}</strong> - {% trans "Activated (not hunted)" %}</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon blue">
+                    <i class="bi bi-binoculars"></i>
+                </div>
+                <span><strong>{% trans "Blue" %}</strong> - {% trans "Hunted (not activated)" %}</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon gray">
+                    <i class="bi bi-geo-alt"></i>
+                </div>
+                <span><strong>{% trans "Gray" %}</strong> - {% trans "Not yet worked" %}</span>
+            </div>
+            <hr>
+            <div class="legend-item">
+                <div class="legend-icon gold marker-under-activation">
+                    <i class="bi bi-broadcast-pin"></i>
+                </div>
+                <span><strong>🟠 {% trans "Orange border" %}</strong> - {% trans "Under Activation" %} ({% trans "active spot" %})</span>
+            </div>
+            <small class="text-muted">{% trans "Pulsating orange border indicates someone is currently activating this bunker" %}</small>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="map-legend">
+            <h5 class="mb-3"><i class="bi bi-funnel"></i> {% trans "Filters" %} <small class="text-muted">({% trans "select multiple" %})</small></h5>
+            <div class="map-controls">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input filter-checkbox" type="checkbox" id="filter-gold" value="gold">
+                    <label class="form-check-label" for="filter-gold">
+                        <i class="bi bi-trophy text-warning"></i> {% trans "Gold" %}
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input filter-checkbox" type="checkbox" id="filter-green" value="green">
+                    <label class="form-check-label" for="filter-green">
+                        <i class="bi bi-broadcast text-success"></i> {% trans "Activated" %}
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input filter-checkbox" type="checkbox" id="filter-blue" value="blue">
+                    <label class="form-check-label" for="filter-blue">
+                        <i class="bi bi-binoculars text-primary"></i> {% trans "Hunted" %}
+                    </label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input filter-checkbox" type="checkbox" id="filter-gray" value="gray">
+                    <label class="form-check-label" for="filter-gray">
+                        <i class="bi bi-geo-alt text-secondary"></i> {% trans "Not Worked" %}
+                    </label>
+                </div>
+                <br>
+                <div class="form-check form-check-inline mt-2">
+                    <input class="form-check-input" type="checkbox" id="filter-under-activation">
+                    <label class="form-check-label" for="filter-under-activation">
+                        <span style="display: inline-block; width: 20px; height: 20px; border-radius: 50%; background: #fd7e14; animation: pulse 2s infinite; vertical-align: middle;"></span>
+                        <i class="bi bi-broadcast-pin" style="color: #fd7e14;"></i> {% trans "Under Activation" %}
+                    </label>
+                </div>
+                <br>
+                <button class="btn btn-sm btn-danger mt-2" id="reset-filter">
+                    <i class="bi bi-x-circle"></i> {% trans "Show All" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Legend for anonymous users -->
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> 
+            {% trans "Log in to see which bunkers you have activated or hunted!" %}
+            <a href="{% url 'login' %}" class="alert-link">{% trans "Login" %}</a> | 
+            <a href="{% url 'register' %}" class="alert-link">{% trans "Register" %}</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Map -->
+<div class="row">
+    <div class="col-12">
+        <div id="map"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    // Bunkers data from Django
+    const bunkersData = {{ bunkers_json|safe }};
+    const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+    
+    // Initialize map centered on Poland
+    const map = L.map('map').setView([52.0, 19.0], 7);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+    }).addTo(map);
+    
+    // Store markers for filtering
+    const markers = [];
+    let activeFilters = new Set();
+    
+    // Color mapping
+    const colorMap = {
+        'gold': '#FFD700',
+        'green': '#28a745',
+        'blue': '#007bff',
+        'gray': '#6c757d',
+        'red': '#dc3545',
+        'orange': '#fd7e14'
+    };
+    
+    // Create custom marker icons
+    function createMarkerIcon(color, iconName, isUnderActivation = false) {
+        const iconColor = color === 'gold' ? '#000' : '#fff';
+        const pulseClass = isUnderActivation ? 'marker-under-activation' : '';
+        return L.divIcon({
+            className: 'custom-marker',
+            html: `<div class="${pulseClass}" style="background-color: ${colorMap[color]}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                    <i class="bi bi-${iconName}" style="color: ${iconColor}; font-size: 14px;"></i>
+                   </div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+            popupAnchor: [0, -15]
+        });
+    }
+    
+    // Add markers for each bunker
+    bunkersData.forEach(bunker => {
+        const icon = createMarkerIcon(bunker.color, bunker.icon, bunker.is_under_activation);
+        const marker = L.marker([bunker.lat, bunker.lng], { icon: icon });
+        
+        // Create popup content
+        let popupContent = `
+            <div class="popup-title">${bunker.name}</div>
+            <span class="popup-reference">${bunker.reference}</span>
+        `;
+        
+        if (isAuthenticated) {
+            popupContent += '<div class="popup-status">';
+            if (bunker.is_under_activation) {
+                popupContent += '<span class="status-badge" style="background-color: #fd7e14; color: white;"><i class="bi bi-broadcast-pin"></i> {% trans "Under Activation" %}</span>';
+            }
+            if (bunker.is_activated) {
+                popupContent += '<span class="status-badge activated"><i class="bi bi-broadcast"></i> {% trans "Activated" %}</span>';
+            }
+            if (bunker.is_hunted) {
+                popupContent += '<span class="status-badge hunted"><i class="bi bi-binoculars"></i> {% trans "Hunted" %}</span>';
+            }
+            if (!bunker.is_activated && !bunker.is_hunted && !bunker.is_under_activation) {
+                popupContent += '<span class="text-muted"><i class="bi bi-dash-circle"></i> {% trans "Not yet worked" %}</span>';
+            }
+            popupContent += '</div>';
+        } else if (bunker.is_under_activation) {
+            popupContent += '<div class="popup-status">';
+            popupContent += '<span class="status-badge" style="background-color: #fd7e14; color: white;"><i class="bi bi-broadcast-pin"></i> {% trans "Under Activation" %}</span>';
+            popupContent += '</div>';
+        }
+        
+        popupContent += `<div class="mt-2">
+            <a href="/bunkers/${bunker.reference}/" class="btn btn-sm btn-primary">
+                <i class="bi bi-info-circle"></i> {% trans "Details" %}
+            </a>
+        </div>`;
+        
+        marker.bindPopup(popupContent);
+        marker.addTo(map);
+        
+        // Store marker with data for filtering
+        markers.push({
+            marker: marker,
+            color: bunker.color,
+            data: bunker
+        });
+    });
+    
+    // Calculate statistics
+    if (isAuthenticated) {
+        const activatedCount = bunkersData.filter(b => b.is_activated).length;
+        const huntedCount = bunkersData.filter(b => b.is_hunted).length;
+        const notWorkedCount = bunkersData.filter(b => !b.is_activated && !b.is_hunted).length;
+        
+        document.getElementById('activated-count').textContent = activatedCount;
+        document.getElementById('hunted-count').textContent = huntedCount;
+        document.getElementById('remaining-count').textContent = notWorkedCount;
+    }
+    
+    // Fit map to show all markers
+    if (markers.length > 0) {
+        const group = L.featureGroup(markers.map(m => m.marker));
+        map.fitBounds(group.getBounds().pad(0.1));
+    }
+    
+    // Filter functionality - checkboxes allow multiple selections
+    let showOnlyUnderActivation = false;
+    
+    document.querySelectorAll('.filter-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const filter = this.value;
+            
+            if (this.checked) {
+                activeFilters.add(filter);
+            } else {
+                activeFilters.delete(filter);
+            }
+            
+            applyFilter();
+        });
+    });
+    
+    // Special filter for "Under Activation"
+    document.getElementById('filter-under-activation')?.addEventListener('change', function() {
+        showOnlyUnderActivation = this.checked;
+        applyFilter();
+    });
+    
+    document.getElementById('reset-filter')?.addEventListener('click', function() {
+        activeFilters.clear();
+        showOnlyUnderActivation = false;
+        document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
+        document.getElementById('filter-under-activation').checked = false;
+        applyFilter();
+    });
+    
+    function applyFilter() {
+        markers.forEach(item => {
+            let showByColor = activeFilters.size === 0 || activeFilters.has(item.color);
+            let showByActivation = !showOnlyUnderActivation || item.data.is_under_activation;
+            
+            // Show marker if it passes both filters (OR logic for colors, AND logic with under_activation)
+            if (showByColor && showByActivation) {
+                map.addLayer(item.marker);
+            } else {
+                map.removeLayer(item.marker);
+            }
+        });
+        
+        // Update visible count
+        const visibleCount = markers.filter(item => {
+            let showByColor = activeFilters.size === 0 || activeFilters.has(item.color);
+            let showByActivation = !showOnlyUnderActivation || item.data.is_under_activation;
+            return showByColor && showByActivation;
+        }).length;
+        
+        document.getElementById('total-bunkers').textContent = visibleCount;
+    }
+</script>
+{% endblock %}

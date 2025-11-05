@@ -232,3 +232,24 @@ LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'home'
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Email Configuration
+# Development: Console backend (prints emails to console)
+# Production: Configure SMTP settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# For production, use SMTP:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'  # or your SMTP server
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@gmail.com'
+# EMAIL_HOST_PASSWORD = 'your-app-password'
+# DEFAULT_FROM_EMAIL = 'SP_BOTA <noreply@spbota.pl>'
+
+DEFAULT_FROM_EMAIL = 'SP_BOTA <noreply@spbota.pl>'
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Password Reset Configuration
+# Token validity: 5 minutes (300 seconds)
+PASSWORD_RESET_TIMEOUT = 300  # 5 minutes in seconds
