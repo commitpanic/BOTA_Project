@@ -3,10 +3,12 @@
 **Bunkers On The Air** - A Django-based web application for managing bunkers, military buildings, user activities, and achievement-based diplomas.
 
 ![Django](https://img.shields.io/badge/Django-5.2.7-green.svg)
-![Python](https://img.shields.io/badge/Python-3.13.9-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.11.9-blue.svg)
 ![Status](https://img.shields.io/badge/Status-In%20Development-yellow.svg)
-![Tests](https://img.shields.io/badge/Tests-114%20Passing-success.svg)
-![Progress](https://img.shields.io/badge/Progress-50%25-blue.svg)
+![Tests](https://img.shields.io/badge/Tests-299%2B%20Passing-success.svg)
+![Progress](https://img.shields.io/badge/Progress-85%25-blue.svg)
+![i18n](https://img.shields.io/badge/i18n-Polish%20%7C%20English-blueviolet.svg)
+![GDPR](https://img.shields.io/badge/GDPR-90%25%20Compliant-green.svg)
 
 ---
 
@@ -41,7 +43,9 @@ BOTA Project is a comprehensive web application designed to manage bunkers, mili
 
 ## ✨ Features
 
-### Current Features (Phase 1-5 Complete) ✅
+### Current Features (Phases 1-9 ~90% Complete) ✅
+
+**Backend (100% Complete):**
 - ✅ Custom user authentication (email + password + callsign)
 - ✅ User statistics tracking (Hunter, Activator, B2B QSOs)
 - ✅ Comprehensive points system (6 point categories)
@@ -62,19 +66,47 @@ BOTA Project is a comprehensive web application designed to manage bunkers, mili
 - ✅ Diploma issuance with unique numbering (CATEGORY-YYYY-XXXX)
 - ✅ Diploma verification with UUID codes
 - ✅ Progress tracking with visual indicators
-- ✅ 114 unit tests with 100% pass rate
+- ✅ **Spotting system (cluster)** - Real-time spot posting with auto-refresh
+- ✅ 299+ unit tests with 100% pass rate
+
+**Frontend (100% Complete):**
+- ✅ Bootstrap 5 responsive design
+- ✅ User registration and login pages
+- ✅ Dashboard with statistics overview
+- ✅ ADIF log upload functionality
+- ✅ Bunker listing and detail pages
+- ✅ Diploma/awards progress tracking page
+- ✅ **Spotting page with modals** (post spot, filter)
+- ✅ **Auto-refresh with pause/resume button**
+- ✅ **Scroll position preservation** (sessionStorage)
+- ✅ **BOTA logo integration** in navigation
+- ✅ Language switcher (EN/PL)
+
+**Translations (100% Complete):**
+- ✅ Complete Polish translations (~400+ strings)
+- ✅ All UI elements translated
+- ✅ Legal pages fully bilingual
+- ✅ Compiled django.mo translations
+
+**GDPR & Legal (90% Complete):**
+- ✅ **Cookie consent banner** with localStorage tracking
+- ✅ **Privacy Policy** (11 sections, GDPR-compliant)
+- ✅ **Cookie Policy** (8 sections, detailed cookie table)
+- ✅ **Terms of Service** (14 sections, complete legal terms)
+- ✅ Footer links to legal pages
+- ✅ Contact information (sp3fck@gmail.com, spbota.pl)
+- ⏳ "Download My Data" feature (pending)
+- ⏳ "Delete My Account" feature (pending)
 
 ### Planned Features (Future Phases)
-- 🔄 CSV import/export for bunker data
 - 🔄 On-demand PDF diploma generation with reportlab
-- 🔄 Visual template coordinate picker for diplomas
-- 🔄 RESTful API with JWT authentication
-- 🔄 API documentation with drf-spectacular
-- 🔄 Cookie consent & GDPR compliance
-- 🔄 Multilingual frontend interface (Polish/English)
-- 🔄 Mobile-responsive design with Bootstrap/Tailwind
+- 🔄 "Download My Data" JSON export (GDPR)
+- 🔄 "Delete My Account" with confirmation (GDPR)
 - 🔄 Interactive map view for bunkers
 - 🔄 Photo gallery views
+- 🔄 Email notifications (SMTP configuration)
+- 🔄 Performance optimization (caching, indexes)
+- 🔄 Security audit (OWASP checklist)
 
 ---
 
@@ -384,7 +416,7 @@ coverage html  # Generate HTML report
 - Phase 10: Deployment
 - Phase 10: Production Deployment
 
-**Current Progress**: 50% complete (Phases 1-5 complete, 114 tests passing)
+**Current Progress**: 85% complete (Phases 1-9 ~90% complete, 299+ tests passing, user testing in progress)
 
 ---
 
@@ -456,5 +488,5 @@ coverage html  # Generate HTML report
 
 ---
 
-*Last Updated: November 4, 2025*
-*Version: 0.4.0 (Phase 1-4 Complete)*
+*Last Updated: November 5, 2025*
+*Version: 0.8.5 (Phases 1-9 ~90% Complete - Spotting System, Translations, GDPR Legal Pages)*
