@@ -111,7 +111,6 @@ def request_bunker(request):
     if request.method == 'POST':
         try:
             bunker_request = BunkerRequest.objects.create(
-                reference_number=request.POST.get('reference_number'),
                 name=request.POST.get('name'),
                 description=request.POST.get('description', ''),
                 bunker_type=request.POST.get('bunker_type', ''),
@@ -187,7 +186,7 @@ def approve_bunker_request(request, request_id):
     
     try:
         # Get or create default category
-        default_category, _ = BunkerCategory.objects.get_or_create(
+        default_category, created = BunkerCategory.objects.get_or_create(
             name_en='WW2 Bunker',
             defaults={
                 'name_pl': 'Bunkier z II WŚ',
@@ -196,9 +195,30 @@ def approve_bunker_request(request, request_id):
             }
         )
         
+        # Generate next reference number
+        # Find the last bunker with B/SP- prefix
+        last_bunker = Bunker.objects.filter(
+            reference_number__startswith='B/SP-'
+        ).order_by('-reference_number').first()
+        
+        if last_bunker:
+            # Extract number from reference like "B/SP-0258"
+            try:
+                last_number = int(last_bunker.reference_number.split('-')[1])
+                next_number = last_number + 1
+            except (IndexError, ValueError):
+                # If parsing fails, start from 1
+                next_number = 1
+        else:
+            # No bunkers yet, start from 1
+            next_number = 1
+        
+        # Format as B/SP-XXXX (4 digits with leading zeros)
+        reference_number = f"B/SP-{next_number:04d}"
+        
         # Create the bunker
         bunker = Bunker.objects.create(
-            reference_number=bunker_request.reference_number,
+            reference_number=reference_number,
             name_en=bunker_request.name,
             name_pl=bunker_request.name,
             description_en=f"{bunker_request.bunker_type}. {bunker_request.description}",
@@ -219,11 +239,11 @@ def approve_bunker_request(request, request_id):
         
         messages.success(
             request,
-            _(f'Bunker request approved and {bunker.reference_number} created.')
+            _('Bunker request approved and %(ref)s created.') % {'ref': bunker.reference_number}
         )
         
     except Exception as e:
-        messages.error(request, _(f'Error approving request: {str(e)}'))
+        messages.error(request, _('Error approving request: %(error)s') % {'error': str(e)})
     
     return redirect('manage_bunker_requests')
 

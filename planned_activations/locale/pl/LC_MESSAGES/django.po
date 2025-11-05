@@ -1,0 +1,230 @@
+# planned_activations/locale/pl/LC_MESSAGES/django.po
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: pl\n"
+
+msgid "User"
+msgstr "Użytkownik"
+
+msgid "Bunker"
+msgstr "Bunkier"
+
+msgid "Which bunker will be activated"
+msgstr "Który bunkier będzie aktywowany"
+
+msgid "Planned Date"
+msgstr "Planowana data"
+
+msgid "When do you plan to activate"
+msgstr "Kiedy planujesz aktywację"
+
+msgid "Start Time (UTC)"
+msgstr "Czas rozpoczęcia (UTC)"
+
+msgid "Approximate start time in UTC"
+msgstr "Przybliżony czas rozpoczęcia w UTC"
+
+msgid "End Time (UTC)"
+msgstr "Czas zakończenia (UTC)"
+
+msgid "Approximate end time in UTC"
+msgstr "Przybliżony czas zakończenia w UTC"
+
+msgid "Callsign"
+msgstr "Znak wywoławczy"
+
+msgid "Callsign that will be used during activation"
+msgstr "Znak wywoławczy używany podczas aktywacji"
+
+msgid "Bands"
+msgstr "Pasma"
+
+msgid "Which bands you plan to operate on (comma-separated)"
+msgstr "Na których pasmach planujesz pracować (oddzielone przecinkami)"
+
+msgid "Modes"
+msgstr "Emisje"
+
+msgid "Which modes you plan to use (comma-separated)"
+msgstr "Jakie emisje planujesz używać (oddzielone przecinkami)"
+
+msgid "Comments"
+msgstr "Komentarze"
+
+msgid "Additional information about the activation"
+msgstr "Dodatkowe informacje o aktywacji"
+
+msgid "Created At"
+msgstr "Utworzono"
+
+msgid "Updated At"
+msgstr "Zaktualizowano"
+
+msgid "Planned Activation"
+msgstr "Planowana aktywacja"
+
+msgid "Planned Activations"
+msgstr "Planowane aktywacje"
+
+msgid "Other"
+msgstr "Inne"
+
+msgid "e.g., SP3XYZ"
+msgstr "np. SP3XYZ"
+
+msgid "e.g., 20m, 40m, 80m"
+msgstr "np. 20m, 40m, 80m"
+
+msgid "e.g., CW, SSB, FT8"
+msgstr "np. CW, SSB, FT8"
+
+msgid "Additional information about your activation..."
+msgstr "Dodatkowe informacje o Twojej aktywacji..."
+
+msgid "Plan New Activation"
+msgstr "Zaplanuj nową aktywację"
+
+msgid "Search by callsign, bunker, operator..."
+msgstr "Szukaj po znaku, bunkrze, operatorze..."
+
+msgid "Upcoming only"
+msgstr "Tylko nadchodzące"
+
+msgid "Show all (including past)"
+msgstr "Pokaż wszystkie (w tym przeszłe)"
+
+msgid "Search"
+msgstr "Szukaj"
+
+msgid "Past"
+msgstr "Przeszłe"
+
+msgid "Upcoming"
+msgstr "Nadchodzące"
+
+msgid "Operator"
+msgstr "Operator"
+
+msgid "Date"
+msgstr "Data"
+
+msgid "Time"
+msgstr "Czas"
+
+msgid "Details"
+msgstr "Szczegóły"
+
+msgid "No planned activations found."
+msgstr "Nie znaleziono planowanych aktywacji."
+
+msgid "Previous"
+msgstr "Poprzednia"
+
+msgid "Page"
+msgstr "Strona"
+
+msgid "of"
+msgstr "z"
+
+msgid "Next"
+msgstr "Następna"
+
+msgid "Back to List"
+msgstr "Powrót do listy"
+
+msgid "Bunker Information"
+msgstr "Informacje o bunkrze"
+
+msgid "Reference"
+msgstr "Referencja"
+
+msgid "Name"
+msgstr "Nazwa"
+
+msgid "Location"
+msgstr "Lokalizacja"
+
+msgid "Operator Information"
+msgstr "Informacje o operatorze"
+
+msgid "Activation Callsign"
+msgstr "Znak aktywacyjny"
+
+msgid "Date & Time"
+msgstr "Data i czas"
+
+msgid "Time (UTC)"
+msgstr "Czas (UTC)"
+
+msgid "Operating Details"
+msgstr "Szczegóły operacyjne"
+
+msgid "Created"
+msgstr "Utworzono"
+
+msgid "Last updated"
+msgstr "Ostatnia aktualizacja"
+
+msgid "Edit"
+msgstr "Edytuj"
+
+msgid "Delete"
+msgstr "Usuń"
+
+msgid "Edit Activation"
+msgstr "Edytuj aktywację"
+
+msgid "Back"
+msgstr "Wróć"
+
+msgid "Create Activation"
+msgstr "Utwórz aktywację"
+
+msgid "Save Changes"
+msgstr "Zapisz zmiany"
+
+msgid "Cancel"
+msgstr "Anuluj"
+
+msgid "Tips"
+msgstr "Wskazówki"
+
+msgid "All times should be in UTC"
+msgstr "Wszystkie czasy powinny być w UTC"
+
+msgid "Separate multiple bands/modes with commas (e.g., 20m, 40m, 80m)"
+msgstr "Oddziel wiele pasm/emisji przecinkami (np. 20m, 40m, 80m)"
+
+msgid "Other operators can see your plans to coordinate QSOs"
+msgstr "Inni operatorzy mogą zobaczyć Twoje plany aby koordynować QSO"
+
+msgid "Delete Planned Activation"
+msgstr "Usuń planowaną aktywację"
+
+msgid "Are you sure you want to delete this planned activation? This action cannot be undone."
+msgstr "Czy na pewno chcesz usunąć tę planowaną aktywację? Tej operacji nie można cofnąć."
+
+msgid "Activation Details"
+msgstr "Szczegóły aktywacji"
+
+msgid "Yes, Delete"
+msgstr "Tak, usuń"
+
+msgid "No, Cancel"
+msgstr "Nie, anuluj"
+
+msgid "Planned activation created successfully!"
+msgstr "Planowana aktywacja została utworzona pomyślnie!"
+
+msgid "You do not have permission to edit this activation."
+msgstr "Nie masz uprawnień do edycji tej aktywacji."
+
+msgid "Planned activation updated successfully!"
+msgstr "Planowana aktywacja została zaktualizowana pomyślnie!"
+
+msgid "You do not have permission to delete this activation."
+msgstr "Nie masz uprawnień do usunięcia tej aktywacji."
+
+msgid "Planned activation deleted successfully!"
+msgstr "Planowana aktywacja została usunięta pomyślnie!"

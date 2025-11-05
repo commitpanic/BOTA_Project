@@ -41,6 +41,7 @@ urlpatterns = [
 # Frontend URLs with i18n
 urlpatterns += i18n_patterns(
     path('', include('frontend.urls')),
+    path('planned-activations/', include('planned_activations.urls')),
 )
 
 # Serve static and media files in development

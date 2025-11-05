@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}
+    {% if action == 'create' %}
+        {% trans "Plan New Activation" %}
+    {% else %}
+        {% trans "Edit Activation" %}
+    {% endif %} - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="mb-3">
+            <a href="{% url 'planned_activation_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> {% trans "Back to List" %}
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    {% if action == 'create' %}
+                        <i class="bi bi-plus-circle"></i> {% trans "Plan New Activation" %}
+                    {% else %}
+                        <i class="bi bi-pencil"></i> {% trans "Edit Activation" %}
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Bunker Selection -->
+                    <div class="mb-3">
+                        <label for="{{ form.bunker.id_for_label }}" class="form-label">
+                            <i class="bi bi-geo-alt"></i> {{ form.bunker.label }} *
+                        </label>
+                        {{ form.bunker }}
+                        {% if form.bunker.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.bunker.errors }}
+                            </div>
+                        {% endif %}
+                        {% if form.bunker.help_text %}
+                            <small class="form-text text-muted">{{ form.bunker.help_text }}</small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Date -->
+                    <div class="mb-3">
+                        <label for="{{ form.planned_date.id_for_label }}" class="form-label">
+                            <i class="bi bi-calendar-event"></i> {{ form.planned_date.label }} *
+                        </label>
+                        {{ form.planned_date }}
+                        {% if form.planned_date.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.planned_date.errors }}
+                            </div>
+                        {% endif %}
+                        {% if form.planned_date.help_text %}
+                            <small class="form-text text-muted">{{ form.planned_date.help_text }}</small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Time Range -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.planned_time_start.id_for_label }}" class="form-label">
+                                <i class="bi bi-clock"></i> {{ form.planned_time_start.label }}
+                            </label>
+                            {{ form.planned_time_start }}
+                            {% if form.planned_time_start.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.planned_time_start.errors }}
+                                </div>
+                            {% endif %}
+                            {% if form.planned_time_start.help_text %}
+                                <small class="form-text text-muted">{{ form.planned_time_start.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.planned_time_end.id_for_label }}" class="form-label">
+                                <i class="bi bi-clock-history"></i> {{ form.planned_time_end.label }}
+                            </label>
+                            {{ form.planned_time_end }}
+                            {% if form.planned_time_end.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.planned_time_end.errors }}
+                                </div>
+                            {% endif %}
+                            {% if form.planned_time_end.help_text %}
+                                <small class="form-text text-muted">{{ form.planned_time_end.help_text }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Callsign -->
+                    <div class="mb-3">
+                        <label for="{{ form.callsign.id_for_label }}" class="form-label">
+                            <i class="bi bi-broadcast"></i> {{ form.callsign.label }} *
+                        </label>
+                        {{ form.callsign }}
+                        {% if form.callsign.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.callsign.errors }}
+                            </div>
+                        {% endif %}
+                        {% if form.callsign.help_text %}
+                            <small class="form-text text-muted">{{ form.callsign.help_text }}</small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Bands & Modes -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.bands.id_for_label }}" class="form-label">
+                                <i class="bi bi-broadcast-pin"></i> {{ form.bands.label }} *
+                            </label>
+                            {{ form.bands }}
+                            {% if form.bands.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.bands.errors }}
+                                </div>
+                            {% endif %}
+                            {% if form.bands.help_text %}
+                                <small class="form-text text-muted">{{ form.bands.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.modes.id_for_label }}" class="form-label">
+                                <i class="bi bi-soundwave"></i> {{ form.modes.label }} *
+                            </label>
+                            {{ form.modes }}
+                            {% if form.modes.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.modes.errors }}
+                                </div>
+                            {% endif %}
+                            {% if form.modes.help_text %}
+                                <small class="form-text text-muted">{{ form.modes.help_text }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Comments -->
+                    <div class="mb-3">
+                        <label for="{{ form.comments.id_for_label }}" class="form-label">
+                            <i class="bi bi-chat-left-text"></i> {{ form.comments.label }}
+                        </label>
+                        {{ form.comments }}
+                        {% if form.comments.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.comments.errors }}
+                            </div>
+                        {% endif %}
+                        {% if form.comments.help_text %}
+                            <small class="form-text text-muted">{{ form.comments.help_text }}</small>
+                        {% endif %}
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> 
+                            {% if action == 'create' %}
+                                {% trans "Create Activation" %}
+                            {% else %}
+                                {% trans "Save Changes" %}
+                            {% endif %}
+                        </button>
+                        <a href="{% url 'planned_activation_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> {% trans "Cancel" %}
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="alert alert-info mt-4">
+            <h6><i class="bi bi-info-circle"></i> {% trans "Tips" %}:</h6>
+            <ul class="mb-0">
+                <li>{% trans "All times should be in UTC" %}</li>
+                <li>{% trans "Separate multiple bands/modes with commas (e.g., 20m, 40m, 80m)" %}</li>
+                <li>{% trans "Other operators can see your plans to coordinate QSOs" %}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

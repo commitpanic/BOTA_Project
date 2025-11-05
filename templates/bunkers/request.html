@@ -15,17 +15,12 @@
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i> 
                         {% trans "Your request will be reviewed by staff before the bunker is added to the database." %}
+                        <br>
+                        <strong>{% trans "Reference number will be assigned automatically upon approval." %}</strong>
                     </div>
 
                     <form method="post">
                         {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label for="reference_number" class="form-label">{% trans "Reference Number" %} *</label>
-                            <input type="text" class="form-control" id="reference_number" name="reference_number" 
-                                   required placeholder="B/SP-XXXX">
-                            <small class="form-text text-muted">{% trans "Proposed reference code (e.g., B/SP-0246)" %}</small>
-                        </div>
 
                         <div class="mb-3">
                             <label for="name" class="form-label">{% trans "Bunker Name" %} *</label>

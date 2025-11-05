@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Planned Activations" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-calendar-event"></i> {% trans "Planned Activations" %}</h2>
+            <a href="{% url 'planned_activation_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> {% trans "Plan New Activation" %}
+            </a>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-{% if can_see_past %}6{% else %}9{% endif %}">
+                        <input type="text" name="search" class="form-control" 
+                               placeholder="{% trans 'Search by callsign, bunker, operator...' %}" 
+                               value="{{ search }}">
+                    </div>
+                    {% if can_see_past %}
+                    <div class="col-md-3">
+                        <select name="show_past" class="form-select">
+                            <option value="no" {% if show_past == 'no' %}selected{% endif %}>{% trans "Upcoming only" %}</option>
+                            <option value="yes" {% if show_past == 'yes' %}selected{% endif %}>{% trans "Show all (including past)" %}</option>
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-secondary w-100">
+                            <i class="bi bi-search"></i> {% trans "Search" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Activations List -->
+        {% if page_obj %}
+            <div class="row">
+                {% for activation in page_obj %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 {% if activation.is_past %}bg-light{% endif %}">
+                        <div class="card-header {% if activation.is_past %}bg-secondary{% else %}bg-primary{% endif %} text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>{{ activation.bunker.reference_number }}</strong>
+                                {% if activation.is_past %}
+                                    <span class="badge bg-dark">{% trans "Past" %}</span>
+                                {% else %}
+                                    <span class="badge bg-success">{% trans "Upcoming" %}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="bi bi-geo-alt text-primary"></i> {{ activation.bunker.name_pl }}
+                            </h5>
+                            
+                            <div class="mb-2">
+                                <i class="bi bi-person-badge"></i> <strong>{% trans "Operator" %}:</strong> {{ activation.user.callsign }}
+                            </div>
+                            
+                            <div class="mb-2">
+                                <i class="bi bi-broadcast"></i> <strong>{% trans "Callsign" %}:</strong> {{ activation.callsign }}
+                            </div>
+                            
+                            <div class="mb-2">
+                                <i class="bi bi-calendar-event"></i> <strong>{% trans "Date" %}:</strong> {{ activation.planned_date|date:"Y-m-d" }}
+                            </div>
+                            
+                            {% if activation.planned_time_start %}
+                            <div class="mb-2">
+                                <i class="bi bi-clock"></i> <strong>{% trans "Time" %}:</strong> 
+                                {{ activation.planned_time_start|time:"H:i" }} UTC
+                                {% if activation.planned_time_end %} - {{ activation.planned_time_end|time:"H:i" }} UTC{% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mb-2">
+                                <i class="bi bi-broadcast-pin"></i> <strong>{% trans "Bands" %}:</strong> {{ activation.bands }}
+                            </div>
+                            
+                            <div class="mb-2">
+                                <i class="bi bi-soundwave"></i> <strong>{% trans "Modes" %}:</strong> {{ activation.modes }}
+                            </div>
+                            
+                            {% if activation.comments %}
+                            <div class="mt-3">
+                                <small class="text-muted">{{ activation.comments|truncatewords:15 }}</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{% url 'planned_activation_detail' activation.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> {% trans "Details" %}
+                                </a>
+                                {% if user == activation.user or user.is_staff or user.is_superuser %}
+                                <div>
+                                    <a href="{% url 'planned_activation_edit' activation.pk %}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'planned_activation_delete' activation.pk %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search }}&show_past={{ show_past }}">
+                                {% trans "Previous" %}
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">
+                            {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search }}&show_past={{ show_past }}">
+                                {% trans "Next" %}
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> {% trans "No planned activations found." %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

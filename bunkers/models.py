@@ -322,8 +322,10 @@ class BunkerRequest(models.Model):
     
     reference_number = models.CharField(
         max_length=50,
+        blank=True,
+        null=True,
         verbose_name=_("Reference Number"),
-        help_text=_("Proposed reference code for the bunker (e.g., B/SP-0246)")
+        help_text=_("Reference code will be assigned automatically upon approval")
     )
     name = models.CharField(
         max_length=200,

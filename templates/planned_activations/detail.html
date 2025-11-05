@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ activation.bunker.reference }} - {% trans "Planned Activation" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="mb-3">
+            <a href="{% url 'planned_activation_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> {% trans "Back to List" %}
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-header {% if activation.is_past %}bg-secondary{% else %}bg-primary{% endif %} text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="bi bi-calendar-event"></i> {% trans "Planned Activation" %}
+                    </h4>
+                    {% if activation.is_past %}
+                        <span class="badge bg-dark">{% trans "Past" %}</span>
+                    {% else %}
+                        <span class="badge bg-success">{% trans "Upcoming" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Bunker Information -->
+                <div class="mb-4">
+                    <h5 class="border-bottom pb-2">
+                        <i class="bi bi-geo-alt text-primary"></i> {% trans "Bunker Information" %}
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>{% trans "Reference" %}:</strong> {{ activation.bunker.reference_number }}</p>
+                            <p><strong>{% trans "Name" %}:</strong> {{ activation.bunker.name_pl }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            {% if activation.bunker.latitude and activation.bunker.longitude %}
+                            <p>
+                                <strong>{% trans "Location" %}:</strong> 
+                                {{ activation.bunker.latitude }}, {{ activation.bunker.longitude }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operator Information -->
+                <div class="mb-4">
+                    <h5 class="border-bottom pb-2">
+                        <i class="bi bi-person-badge text-primary"></i> {% trans "Operator Information" %}
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>{% trans "Operator" %}:</strong> {{ activation.user.callsign }}</p>
+                            <p><strong>{% trans "Activation Callsign" %}:</strong> {{ activation.callsign }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date & Time Information -->
+                <div class="mb-4">
+                    <h5 class="border-bottom pb-2">
+                        <i class="bi bi-clock text-primary"></i> {% trans "Date & Time" %}
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>{% trans "Date" %}:</strong> {{ activation.planned_date|date:"l, F j, Y" }}</p>
+                        </div>
+                        {% if activation.planned_time_start %}
+                        <div class="col-md-6">
+                            <p>
+                                <strong>{% trans "Time (UTC)" %}:</strong> 
+                                {{ activation.planned_time_start|time:"H:i" }}
+                                {% if activation.planned_time_end %}
+                                    - {{ activation.planned_time_end|time:"H:i" }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Operating Details -->
+                <div class="mb-4">
+                    <h5 class="border-bottom pb-2">
+                        <i class="bi bi-broadcast-pin text-primary"></i> {% trans "Operating Details" %}
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>{% trans "Bands" %}:</strong> {{ activation.bands }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>{% trans "Modes" %}:</strong> {{ activation.modes }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comments -->
+                {% if activation.comments %}
+                <div class="mb-4">
+                    <h5 class="border-bottom pb-2">
+                        <i class="bi bi-chat-left-text text-primary"></i> {% trans "Comments" %}
+                    </h5>
+                    <p>{{ activation.comments|linebreaks }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Metadata -->
+                <div class="text-muted small">
+                    <p class="mb-1">
+                        <i class="bi bi-clock-history"></i> {% trans "Created" %}: {{ activation.created_at|date:"Y-m-d H:i" }}
+                    </p>
+                    {% if activation.updated_at != activation.created_at %}
+                    <p class="mb-0">
+                        <i class="bi bi-pencil-square"></i> {% trans "Last updated" %}: {{ activation.updated_at|date:"Y-m-d H:i" }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            {% if user == activation.user or user.is_staff or user.is_superuser %}
+            <div class="card-footer">
+                <div class="d-flex gap-2">
+                    <a href="{% url 'planned_activation_edit' activation.pk %}" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> {% trans "Edit" %}
+                    </a>
+                    <a href="{% url 'planned_activation_delete' activation.pk %}" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> {% trans "Delete" %}
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

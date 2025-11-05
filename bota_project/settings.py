@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'cluster',
     'activations',
     'diplomas',
+    'planned_activations',
     'frontend',
 ]
 
