@@ -310,6 +310,11 @@ class Spot(models.Model):
         verbose_name=_("Active"),
         help_text=_("Is this spot still active?")
     )
+    respot_count = models.IntegerField(
+        default=0,
+        verbose_name=_("Respot Count"),
+        help_text=_("Number of times this spot has been re-spotted")
+    )
 
     class Meta:
         verbose_name = _("Spot")

@@ -165,6 +165,15 @@ class ActivationLog(models.Model):
         null=True,
         blank=True
     )
+    log_upload = models.ForeignKey(
+        'LogUpload',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='qsos',
+        verbose_name=_("Log Upload"),
+        help_text=_("The upload batch this QSO belongs to")
+    )
     activation_date = models.DateTimeField(
         verbose_name=_("Activation Date"),
         help_text=_("When did the activation occur?")
@@ -360,3 +369,72 @@ class License(models.Model):
             return True
         
         return self.bunkers.filter(pk=bunker.pk).exists()
+
+
+class LogUpload(models.Model):
+    """
+    Track log file uploads for audit and history purposes.
+    Each upload can contain multiple QSOs/ActivationLogs.
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='log_uploads',
+        verbose_name=_("User")
+    )
+    filename = models.CharField(
+        max_length=255,
+        verbose_name=_("Filename"),
+        help_text=_("Original filename of the uploaded log")
+    )
+    file_format = models.CharField(
+        max_length=20,
+        verbose_name=_("File Format"),
+        help_text=_("Format of the log file (ADIF, CSV, etc.)")
+    )
+    uploaded_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Uploaded At")
+    )
+    qso_count = models.IntegerField(
+        default=0,
+        verbose_name=_("QSO Count"),
+        help_text=_("Number of QSOs in this upload")
+    )
+    processed_qso_count = models.IntegerField(
+        default=0,
+        verbose_name=_("Processed QSO Count"),
+        help_text=_("Number of QSOs successfully processed")
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', _('Pending')),
+            ('processing', _('Processing')),
+            ('completed', _('Completed')),
+            ('failed', _('Failed')),
+        ],
+        default='completed',
+        verbose_name=_("Status")
+    )
+    error_message = models.TextField(
+        blank=True,
+        verbose_name=_("Error Message"),
+        help_text=_("Error details if upload failed")
+    )
+    notes = models.TextField(
+        blank=True,
+        verbose_name=_("Notes")
+    )
+
+    class Meta:
+        verbose_name = _("Log Upload")
+        verbose_name_plural = _("Log Uploads")
+        ordering = ['-uploaded_at']
+        indexes = [
+            models.Index(fields=['user', '-uploaded_at']),
+            models.Index(fields=['status']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.callsign} - {self.filename} ({self.uploaded_at.strftime('%Y-%m-%d %H:%M')})"

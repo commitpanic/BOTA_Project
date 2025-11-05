@@ -13,6 +13,7 @@ urlpatterns = [
     path('diplomas/<int:diploma_id>/download/', views.download_certificate, name='download_certificate'),
     path('verify-diploma/<str:diploma_number>/', views.verify_diploma_view, name='verify_diploma'),
     path('profile/', views.profile_view, name='profile'),
+    path('log-history/', views.log_history_view, name='log_history'),
     path('register/', views.register_view, name='register'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),

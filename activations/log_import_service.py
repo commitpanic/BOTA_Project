@@ -27,17 +27,29 @@ class LogImportService:
         self.warnings = []
     
     @transaction.atomic
-    def process_adif_upload(self, file_content: str, uploader_user: User) -> Dict:
+    def process_adif_upload(self, file_content: str, uploader_user: User, filename: str = None) -> Dict:
         """
         Process uploaded ADIF file
         
         Args:
             file_content: Content of .adi file as string
             uploader_user: User uploading the file
+            filename: Optional filename for logging
             
         Returns:
             Dictionary with processing results
         """
+        from .models import LogUpload
+        
+        # Create LogUpload record
+        log_upload = LogUpload.objects.create(
+            user=uploader_user,
+            filename=filename or 'unknown.adi',
+            file_format='ADIF',
+            status='processing'
+        )
+        self.log_upload = log_upload
+        
         # Parse ADIF file
         self.parser = ADIFParser(file_content)
         parse_result = self.parser.parse()
@@ -45,6 +57,9 @@ class LogImportService:
         # Validate
         validation = self.parser.validate()
         if not validation['valid']:
+            log_upload.status = 'failed'
+            log_upload.error_message = '; '.join(validation['errors'])
+            log_upload.save()
             return {
                 'success': False,
                 'errors': validation['errors'],
@@ -60,6 +75,9 @@ class LogImportService:
         try:
             self.bunker = Bunker.objects.get(reference_number=bunker_ref)
         except Bunker.DoesNotExist:
+            log_upload.status = 'failed'
+            log_upload.error_message = f"Bunker {bunker_ref} not found in database"
+            log_upload.save()
             return {
                 'success': False,
                 'errors': [f"Bunker {bunker_ref} not found in database"],
@@ -72,7 +90,9 @@ class LogImportService:
             self.activator = User.objects.get(callsign=activator_callsign)
         except User.DoesNotExist:
             # Create user if doesn't exist (optional - could require pre-registration)
-            self.warnings.append(f"Activator {activator_callsign} not found, will need to register")
+            log_upload.status = 'failed'
+            log_upload.error_message = f"Activator user {activator_callsign} not found"
+            log_upload.save()
             return {
                 'success': False,
                 'errors': [f"Activator user {activator_callsign} not found. Please register first."],
@@ -82,6 +102,9 @@ class LogImportService:
         
         # Verify uploader is the activator (security check)
         if uploader_user.callsign != activator_callsign and not uploader_user.is_staff:
+            log_upload.status = 'failed'
+            log_upload.error_message = "Security: You can only upload logs for your own callsign"
+            log_upload.save()
             return {
                 'success': False,
                 'errors': [f"You can only upload logs for your own callsign ({uploader_user.callsign})"],
@@ -91,6 +114,7 @@ class LogImportService:
         
         # Process QSOs
         qsos_processed = 0
+        qsos_duplicates = 0
         hunters_updated = set()
         b2b_qsos = 0
         
@@ -103,7 +127,11 @@ class LogImportService:
                 if result.get('is_b2b'):
                     b2b_qsos += 1
             else:
-                self.warnings.append(result.get('error', 'Unknown error processing QSO'))
+                # Only add warning if there's an actual error (not duplicate)
+                if result.get('error'):
+                    self.warnings.append(result['error'])
+                elif result.get('duplicate'):
+                    qsos_duplicates += 1
         
         # Update activator statistics
         self._update_activator_stats(qsos_processed, b2b_qsos)
@@ -119,15 +147,24 @@ class LogImportService:
             except User.DoesNotExist:
                 pass
         
+        # Update LogUpload with final statistics
+        total_qsos = qsos_processed + qsos_duplicates
+        log_upload.qso_count = total_qsos
+        log_upload.processed_qso_count = qsos_processed
+        log_upload.status = 'completed'
+        log_upload.save()
+        
         return {
             'success': True,
             'qsos_processed': qsos_processed,
+            'qsos_duplicates': qsos_duplicates,
             'hunters_updated': len(hunters_updated),
             'b2b_qsos': b2b_qsos,
             'bunker': bunker_ref,
             'activator': activator_callsign,
             'warnings': self.warnings,
-            'errors': []
+            'errors': [],
+            'log_upload_id': log_upload.id
         }
     
     def _process_qso(self, qso: Dict) -> Dict:
@@ -158,7 +195,8 @@ class LogImportService:
                 callsign=hunter_callsign,
                 defaults={
                     'email': f'{hunter_callsign.lower()}@temp.bota.invalid',  # Temporary email
-                    'is_active': False  # Inactive until they register properly
+                    'is_active': False,  # Inactive until they register properly
+                    'auto_created': True  # Mark as auto-created from log import
                 }
             )
             
@@ -173,9 +211,11 @@ class LogImportService:
             ).exists()
             
             if existing:
+                # Silently skip duplicates - don't show warnings
                 return {
                     'success': False, 
-                    'error': f'Duplicate QSO with {hunter_callsign} at {qso_datetime}'
+                    'error': None,  # No error message for duplicates
+                    'duplicate': True
                 }
             
             # Create activation log entry
@@ -188,7 +228,8 @@ class LogImportService:
                 mode=self.parser.get_qso_mode(qso),
                 band=self.parser.get_qso_band(qso),
                 notes=f"Imported from ADIF log",
-                verified=True  # Auto-verify activator-uploaded logs
+                verified=True,  # Auto-verify activator-uploaded logs
+                log_upload=self.log_upload  # Link to upload batch
             )
             
             # Award points to ACTIVATOR (person who uploaded the log = person who was at the bunker)

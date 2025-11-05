@@ -3,6 +3,7 @@ Frontend views for BOTA Project
 Handles user-facing pages with i18n support
 """
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
@@ -151,7 +152,7 @@ def upload_log(request):
             
             # Process upload
             service = LogImportService()
-            result = service.process_adif_upload(content, request.user)
+            result = service.process_adif_upload(content, request.user, filename=file.name)
             
             # Check if successful
             if not result.get('success'):
@@ -160,19 +161,22 @@ def upload_log(request):
                     messages.error(request, error)
                 return redirect('upload_log')
             
-            # Show success message
-            messages.success(
-                request,
-                _(f'Successfully processed {result["qsos_processed"]} QSOs from {result["bunker"]}. '
-                  f'Updated {result["hunters_updated"]} hunters. '
-                  f'B2B QSOs: {result["b2b_qsos"]}')
-            )
+            # Show success message with statistics
+            success_msg = _(f'Successfully processed {result["qsos_processed"]} new QSOs from {result["bunker"]}.')
+            if result.get('qsos_duplicates', 0) > 0:
+                success_msg += _(f' Skipped {result["qsos_duplicates"]} duplicates.')
+            if result.get('b2b_qsos', 0) > 0:
+                success_msg += _(f' B2B QSOs: {result["b2b_qsos"]}.')
             
-            # Show warnings if any
+            messages.success(request, success_msg)
+            
+            # Show warnings if any (but not for duplicates)
             for warning in result.get('warnings', []):
                 messages.warning(request, warning)
             
-            return redirect('dashboard')
+            # Redirect to log history with highlight of new upload
+            log_upload_id = result.get('log_upload_id')
+            return redirect(f"{reverse('log_history')}#upload-{log_upload_id}")
             
         except Exception as e:
             messages.error(request, _(f'Error processing file: {str(e)}'))
@@ -608,11 +612,169 @@ def verify_diploma_view(request, diploma_number):
 
 @login_required
 def profile_view(request):
-    """User profile page"""
+    """User profile page with detailed statistics"""
+    from activations.models import ActivationLog
+    from bunkers.models import Bunker
+    from django.db.models import Count, Q, Max
+    
     stats, created = UserStatistics.objects.get_or_create(user=request.user)
+    
+    # Get activated bunkers (as activator) with bunker id for detail queries
+    # Count distinct dates for actual activation count
+    from django.db.models import Count, Max, Sum
+    from django.db.models.functions import TruncDate
+    
+    activated_bunkers_raw = ActivationLog.objects.filter(
+        activator=request.user
+    ).annotate(
+        activation_date_only=TruncDate('activation_date')
+    ).values(
+        'bunker__id',
+        'bunker__reference_number', 
+        'bunker__name_en', 
+        'bunker__name_pl'
+    ).annotate(
+        activation_count=Count('activation_date_only', distinct=True),
+        total_qso=Count('id'),
+        last_activation=Max('activation_date')
+    ).order_by('-activation_count')
+    
+    activated_bunkers = list(activated_bunkers_raw)
+    
+    # Get all activations for each bunker (for expandable details)
+    # Group by date and aggregate modes and QSO counts
+    all_activations = {}
+    for bunker in activated_bunkers:
+        bunker_id = bunker['bunker__id']
+        from itertools import groupby
+        
+        # Get all activations for this bunker
+        activations_query = ActivationLog.objects.filter(
+            activator=request.user,
+            bunker__id=bunker_id
+        ).order_by('-activation_date')
+        
+        # Group by date (year-month-day) and aggregate
+        grouped_activations = []
+        for date_key, group_iter in groupby(activations_query, key=lambda x: x.activation_date.date()):
+            group_list = list(group_iter)
+            
+            # Collect unique modes and bands
+            modes = sorted(set(a.mode for a in group_list if a.mode))
+            bands = sorted(set(a.band for a in group_list if a.band))
+            
+            # Sum QSO counts - properly handle None and 0 values
+            total_qso = sum(a.qso_count if a.qso_count else 0 for a in group_list)
+            
+            # Check if any is B2B
+            is_b2b = any(a.is_b2b for a in group_list)
+            
+            grouped_activations.append({
+                'date': date_key,
+                'bands': bands,
+                'modes': modes,
+                'total_qso': total_qso,
+                'is_b2b': is_b2b,
+                'count': len(group_list)
+            })
+        
+        all_activations[bunker_id] = grouped_activations
+    
+    # Get hunted bunkers (as hunter/user)
+    hunted_bunkers = ActivationLog.objects.filter(
+        user=request.user
+    ).exclude(activator=request.user).values(
+        'bunker__id',
+        'bunker__reference_number', 
+        'bunker__name_en', 
+        'bunker__name_pl'
+    ).annotate(
+        qso_count=Count('id'),
+        last_qso=Max('activation_date')
+    ).order_by('-qso_count')
+    
+    # Get all hunted QSOs for each bunker
+    # Group by date and aggregate
+    all_hunted_qsos = {}
+    for bunker in hunted_bunkers:
+        bunker_id = bunker['bunker__id']
+        from django.db.models import Sum
+        from itertools import groupby
+        from operator import attrgetter
+        
+        # Get all hunted QSOs for this bunker
+        qsos_query = ActivationLog.objects.filter(
+            user=request.user,
+            bunker__id=bunker_id
+        ).exclude(activator=request.user).order_by('-activation_date')
+        
+        # Group by date (year-month-day) and aggregate
+        grouped_qsos = []
+        for date_key, group_iter in groupby(qsos_query, key=lambda x: x.activation_date.date()):
+            group_list = list(group_iter)
+            
+            # Collect unique activators, modes and bands
+            activators = sorted(set(a.activator.callsign for a in group_list if a.activator))
+            modes = sorted(set(a.mode for a in group_list if a.mode))
+            bands = sorted(set(a.band for a in group_list if a.band))
+            
+            # Count QSOs
+            total_qso = len(group_list)
+            
+            # Check if any is B2B
+            is_b2b = any(a.is_b2b for a in group_list)
+            
+            grouped_qsos.append({
+                'date': date_key,
+                'activators': activators,
+                'bands': bands,
+                'modes': modes,
+                'total_qso': total_qso,
+                'is_b2b': is_b2b
+            })
+        
+        all_hunted_qsos[bunker_id] = grouped_qsos
+    
+    # Activator statistics by band
+    activator_bands = ActivationLog.objects.filter(
+        activator=request.user
+    ).values('band').annotate(
+        count=Count('id'),
+        qso_sum=Count('qso_count')
+    ).order_by('-count')
+    
+    # Activator statistics by mode
+    activator_modes = ActivationLog.objects.filter(
+        activator=request.user
+    ).values('mode').annotate(
+        count=Count('id'),
+        qso_sum=Count('qso_count')
+    ).order_by('-count')
+    
+    # Hunter statistics by band
+    hunter_bands = ActivationLog.objects.filter(
+        user=request.user
+    ).exclude(activator=request.user).values('band').annotate(
+        count=Count('id')
+    ).order_by('-count')
+    
+    # Hunter statistics by mode
+    hunter_modes = ActivationLog.objects.filter(
+        user=request.user
+    ).exclude(activator=request.user).values('mode').annotate(
+        count=Count('id')
+    ).order_by('-count')
     
     context = {
         'stats': stats,
+        'activated_bunkers': activated_bunkers,
+        'hunted_bunkers': hunted_bunkers,
+        'all_activations': all_activations,
+        'all_hunted_qsos': all_hunted_qsos,
+        'activator_bands': activator_bands,
+        'activator_modes': activator_modes,
+        'hunter_bands': hunter_bands,
+        'hunter_modes': hunter_modes,
     }
     return render(request, 'profile.html', context)
 
@@ -641,16 +803,41 @@ def register_view(request):
             messages.error(request, _('Email already registered'))
             return redirect('register')
         
-        if User.objects.filter(callsign=callsign).exists():
-            messages.error(request, _('Callsign already taken'))
-            return redirect('register')
+        # Check if callsign exists
+        existing_user = User.objects.filter(callsign=callsign).first()
+        
+        if existing_user:
+            # If user was auto-created (from log import), allow them to "claim" the account
+            if existing_user.auto_created and not existing_user.is_active:
+                try:
+                    # Update the auto-created account with registration details
+                    existing_user.email = email
+                    existing_user.set_password(password)
+                    existing_user.is_active = True
+                    existing_user.auto_created = False  # Now it's a proper registered account
+                    existing_user.save()
+                    
+                    # Login user
+                    login(request, existing_user)
+                    messages.success(request, _('Account activated successfully! Welcome to BOTA!'))
+                    messages.info(request, _('Your previous hunting activity has been linked to your account.'))
+                    return redirect('dashboard')
+                    
+                except Exception as e:
+                    messages.error(request, _(f'Error activating account: {str(e)}'))
+                    return redirect('register')
+            else:
+                # Callsign is taken by an active/registered user
+                messages.error(request, _('Callsign already taken'))
+                return redirect('register')
         
         try:
-            # Create user
+            # Create new user
             user = User.objects.create_user(
                 email=email,
                 password=password,
-                callsign=callsign
+                callsign=callsign,
+                auto_created=False  # Explicitly mark as manually registered
             )
             
             # Login user
@@ -815,3 +1002,105 @@ def cookie_policy(request):
 def terms_of_service(request):
     """Terms of Service page"""
     return render(request, 'terms_of_service.html')
+
+
+@login_required
+def log_history_view(request):
+    """Log upload history page with filtering"""
+    from activations.models import LogUpload, ActivationLog
+    from django.db.models import Q, Count
+    
+    # Get all uploads for current user
+    uploads = LogUpload.objects.filter(user=request.user).prefetch_related('qsos')
+    
+    # Filters
+    callsign_filter = request.GET.get('callsign', '').strip()
+    bunker_ref_filter = request.GET.get('bunker_ref', '').strip()
+    mode_filter = request.GET.get('mode', '').strip()
+    band_filter = request.GET.get('band', '').strip()
+    date_from = request.GET.get('date_from', '').strip()
+    date_to = request.GET.get('date_to', '').strip()
+    
+    # Build QSOs query for filtering
+    qsos_query = ActivationLog.objects.filter(user=request.user)
+    
+    if callsign_filter:
+        qsos_query = qsos_query.filter(
+            Q(activator__callsign__icontains=callsign_filter) |
+            Q(user__callsign__icontains=callsign_filter)
+        )
+    
+    if bunker_ref_filter:
+        qsos_query = qsos_query.filter(bunker__reference_number__icontains=bunker_ref_filter)
+    
+    if mode_filter:
+        qsos_query = qsos_query.filter(mode__icontains=mode_filter)
+    
+    if band_filter:
+        qsos_query = qsos_query.filter(band__icontains=band_filter)
+    
+    if date_from:
+        from datetime import datetime
+        qsos_query = qsos_query.filter(activation_date__gte=datetime.strptime(date_from, '%Y-%m-%d'))
+    
+    if date_to:
+        from datetime import datetime
+        qsos_query = qsos_query.filter(activation_date__lte=datetime.strptime(date_to, '%Y-%m-%d'))
+    
+    filtered_qso_count = qsos_query.count()
+    
+    # Get unique values for filters
+    unique_modes = ActivationLog.objects.filter(user=request.user).exclude(mode='').values_list('mode', flat=True).distinct().order_by('mode')
+    unique_bands = ActivationLog.objects.filter(user=request.user).exclude(band='').values_list('band', flat=True).distinct().order_by('band')
+    
+    # Get QSOs grouped by upload
+    uploads_with_qsos = {}
+    for upload in uploads:
+        upload_qsos = upload.qsos.all().order_by('-activation_date')
+        
+        # Apply filters to this upload's QSOs
+        if callsign_filter or bunker_ref_filter or mode_filter or band_filter or date_from or date_to:
+            filtered_upload_qsos = upload_qsos
+            
+            if callsign_filter:
+                filtered_upload_qsos = filtered_upload_qsos.filter(
+                    Q(activator__callsign__icontains=callsign_filter) |
+                    Q(user__callsign__icontains=callsign_filter)
+                )
+            
+            if bunker_ref_filter:
+                filtered_upload_qsos = filtered_upload_qsos.filter(bunker__reference_number__icontains=bunker_ref_filter)
+            
+            if mode_filter:
+                filtered_upload_qsos = filtered_upload_qsos.filter(mode__icontains=mode_filter)
+            
+            if band_filter:
+                filtered_upload_qsos = filtered_upload_qsos.filter(band__icontains=band_filter)
+            
+            if date_from:
+                from datetime import datetime
+                filtered_upload_qsos = filtered_upload_qsos.filter(activation_date__gte=datetime.strptime(date_from, '%Y-%m-%d'))
+            
+            if date_to:
+                from datetime import datetime
+                filtered_upload_qsos = filtered_upload_qsos.filter(activation_date__lte=datetime.strptime(date_to, '%Y-%m-%d'))
+            
+            uploads_with_qsos[upload.id] = filtered_upload_qsos
+        else:
+            uploads_with_qsos[upload.id] = upload_qsos
+    
+    context = {
+        'uploads': uploads,
+        'uploads_with_qsos': uploads_with_qsos,
+        'filtered_qso_count': filtered_qso_count,
+        'callsign_filter': callsign_filter,
+        'bunker_ref_filter': bunker_ref_filter,
+        'mode_filter': mode_filter,
+        'band_filter': band_filter,
+        'date_from': date_from,
+        'date_to': date_to,
+        'unique_modes': unique_modes,
+        'unique_bands': unique_bands,
+    }
+    
+    return render(request, 'log_history.html', context)

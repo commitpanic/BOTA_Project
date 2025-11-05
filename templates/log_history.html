@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load profile_extras %}
+
+{% block title %}{% trans "Log History" %} - BOTA Project{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1><i class="bi bi-clock-history"></i> {% trans "Log Upload History" %}</h1>
+        <p class="text-muted">{% trans "View your uploaded logs and QSOs" %}</p>
+    </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="bi bi-funnel"></i> {% trans "Filter QSOs" %}
+        {% if filtered_qso_count %}
+        <span class="badge bg-primary ms-2">{{ filtered_qso_count }} {% trans "QSO(s) found" %}</span>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <form method="get" action="{% url 'log_history' %}" id="filterForm">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="callsign" class="form-label">{% trans "Callsign" %}</label>
+                    <input type="text" class="form-control" id="callsign" name="callsign" value="{{ callsign_filter }}" placeholder="{% trans 'Hunter/Activator' %}">
+                </div>
+                <div class="col-md-3">
+                    <label for="bunker_ref" class="form-label">{% trans "Bunker Reference" %}</label>
+                    <input type="text" class="form-control" id="bunker_ref" name="bunker_ref" value="{{ bunker_ref_filter }}" placeholder="B/SP-0001">
+                </div>
+                <div class="col-md-2">
+                    <label for="mode" class="form-label">{% trans "Mode" %}</label>
+                    <select class="form-select" id="mode" name="mode">
+                        <option value="">{% trans "All" %}</option>
+                        {% for mode in unique_modes %}
+                        <option value="{{ mode }}" {% if mode == mode_filter %}selected{% endif %}>{{ mode }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="band" class="form-label">{% trans "Band" %}</label>
+                    <select class="form-select" id="band" name="band">
+                        <option value="">{% trans "All" %}</option>
+                        {% for band in unique_bands %}
+                        <option value="{{ band }}" {% if band == band_filter %}selected{% endif %}>{{ band }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="date_from" class="form-label">{% trans "Date From" %}</label>
+                    <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from }}">
+                </div>
+            </div>
+            <div class="row g-3 mt-2">
+                <div class="col-md-2">
+                    <label for="date_to" class="form-label">{% trans "Date To" %}</label>
+                    <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to }}">
+                </div>
+                <div class="col-md-10 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-search"></i> {% trans "Filter" %}
+                    </button>
+                    <a href="{% url 'log_history' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> {% trans "Clear" %}
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Uploads List -->
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-file-earmark-text"></i> {% trans "Uploaded Logs" %} ({{ uploads|length }})
+    </div>
+    <div class="card-body p-0">
+        {% if uploads %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>{% trans "Uploaded At" %}</th>
+                        <th>{% trans "Filename" %}</th>
+                        <th>{% trans "Format" %}</th>
+                        <th class="text-end">{% trans "QSOs" %}</th>
+                        <th class="text-center">{% trans "Status" %}</th>
+                        <th class="text-center">{% trans "Details" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for upload in uploads %}
+                    <tr class="upload-row" id="upload-{{ upload.id }}">
+                        <td>{{ upload.uploaded_at|date:"Y-m-d H:i" }}</td>
+                        <td><strong>{{ upload.filename }}</strong></td>
+                        <td><span class="badge bg-secondary">{{ upload.file_format }}</span></td>
+                        <td class="text-end">
+                            <span class="badge bg-info">{{ upload.processed_qso_count }}/{{ upload.qso_count }}</span>
+                        </td>
+                        <td class="text-center">
+                            {% if upload.status == 'completed' %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> {% trans "Completed" %}</span>
+                            {% elif upload.status == 'failed' %}
+                            <span class="badge bg-danger"><i class="bi bi-x-circle"></i> {% trans "Failed" %}</span>
+                            {% elif upload.status == 'processing' %}
+                            <span class="badge bg-warning"><i class="bi bi-hourglass-split"></i> {% trans "Processing" %}</span>
+                            {% else %}
+                            <span class="badge bg-secondary"><i class="bi bi-clock"></i> {% trans "Pending" %}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-primary toggle-qsos" data-upload-id="{{ upload.id }}">
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="qsos-row" id="qsos-{{ upload.id }}" style="display: none;">
+                        <td colspan="6" class="bg-light">
+                            <div class="p-3">
+                                <strong>{% trans "QSOs in this upload" %}:</strong>
+                                {% with qsos=uploads_with_qsos|get_item:upload.id %}
+                                {% if qsos %}
+                                <div class="table-responsive mt-2">
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>{% trans "Date/Time" %}</th>
+                                                <th>{% trans "Bunker" %}</th>
+                                                <th>{% trans "Activator" %}</th>
+                                                <th>{% trans "Hunter" %}</th>
+                                                <th>{% trans "Band" %}</th>
+                                                <th>{% trans "Mode" %}</th>
+                                                <th class="text-center">{% trans "B2B" %}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for qso in qsos %}
+                                            <tr>
+                                                <td>{{ qso.activation_date|date:"Y-m-d H:i" }}</td>
+                                                <td>
+                                                    {% if qso.bunker %}
+                                                    <strong>{{ qso.bunker.reference_number }}</strong><br>
+                                                    <small>{{ qso.bunker.name_en }}</small>
+                                                    {% else %}
+                                                    —
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ qso.activator.callsign|default:"—" }}</td>
+                                                <td>{{ qso.user.callsign }}</td>
+                                                <td>{{ qso.band|default:"—" }}</td>
+                                                <td>{{ qso.mode|default:"—" }}</td>
+                                                <td class="text-center">
+                                                    {% if qso.is_b2b %}
+                                                    <i class="bi bi-check-circle text-success"></i>
+                                                    {% else %}
+                                                    —
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <p class="text-muted mt-2">{% trans "No QSOs match the current filters." %}</p>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 3rem; color: #999;"></i>
+            <p class="text-muted mt-3">{% trans "No logs uploaded yet." %}</p>
+            <a href="{% url 'upload_log' %}" class="btn btn-primary">
+                <i class="bi bi-upload"></i> {% trans "Upload Your First Log" %}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+    .upload-row.highlight {
+        animation: highlight-fade 3s ease-out;
+    }
+    
+    @keyframes highlight-fade {
+        0% {
+            background-color: #fff3cd;
+        }
+        100% {
+            background-color: transparent;
+        }
+    }
+    
+    .upload-row.highlight td {
+        border-top: 2px solid #ffc107;
+        border-bottom: 2px solid #ffc107;
+    }
+    
+    .upload-row.highlight:first-child td:first-child {
+        border-left: 2px solid #ffc107;
+    }
+    
+    .upload-row.highlight:last-child td:last-child {
+        border-right: 2px solid #ffc107;
+    }
+</style>
+
+<script>
+    // Toggle QSOs display
+    document.querySelectorAll('.toggle-qsos').forEach(button => {
+        button.addEventListener('click', function() {
+            const uploadId = this.dataset.uploadId;
+            const qsosRow = document.getElementById(`qsos-${uploadId}`);
+            const icon = this.querySelector('i');
+            
+            if (qsosRow.style.display === 'none') {
+                qsosRow.style.display = 'table-row';
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-up');
+            } else {
+                qsosRow.style.display = 'none';
+                icon.classList.remove('bi-chevron-up');
+                icon.classList.add('bi-chevron-down');
+            }
+        });
+    });
+    
+    // Highlight newly uploaded log if hash is present
+    window.addEventListener('load', function() {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#upload-')) {
+            const uploadRow = document.querySelector(hash);
+            if (uploadRow) {
+                // Add highlight class
+                uploadRow.classList.add('highlight');
+                
+                // Scroll to the row with smooth animation
+                setTimeout(() => {
+                    uploadRow.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }, 100);
+                
+                // Auto-expand QSOs for this upload
+                const uploadId = hash.replace('#upload-', '');
+                const toggleButton = document.querySelector(`[data-upload-id="${uploadId}"]`);
+                if (toggleButton) {
+                    setTimeout(() => {
+                        toggleButton.click();
+                    }, 500);
+                }
+                
+                // Remove highlight class after animation
+                setTimeout(() => {
+                    uploadRow.classList.remove('highlight');
+                }, 3000);
+            }
+        }
+    });
+</script>
+{% endblock %}

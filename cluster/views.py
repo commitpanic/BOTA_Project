@@ -137,6 +137,32 @@ class SpotViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(spots, many=True)
         return Response(serializer.data)
     
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def respot(self, request, pk=None):
+        """
+        Re-spot an existing spot with optional new spotter callsign and comment.
+        This updates the spot, resets the expiration time, and increments respot_count.
+        """
+        original_spot = self.get_object()
+        
+        # Get new spotter callsign and comment from request
+        new_spotter_callsign = request.data.get('spotter_callsign', request.user.callsign)
+        new_comment = request.data.get('comment', original_spot.comment or '')
+        
+        # Update the spot
+        original_spot.spotter = request.user
+        original_spot.comment = new_comment
+        original_spot.respot_count += 1
+        original_spot.refresh_expiration()  # Extends by 30 minutes
+        original_spot.save()  # Save changes to database
+        
+        serializer = self.get_serializer(original_spot)
+        return Response({
+            'message': 'Spot re-posted successfully',
+            'respot_count': original_spot.respot_count,
+            'spot': serializer.data
+        })
+    
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def cleanup_expired(self, request):
         """Mark expired spots as inactive (admin only)"""

@@ -1301,4 +1301,176 @@ msgstr "NIE zbieramy wrażliwych danych osobowych takich jak: informacje finanso
 msgid "Your callsign and activity statistics are publicly visible to all users as part of the normal operation of the amateur radio program. Your email address is NEVER shared with third parties or made public."
 msgstr "Twój znak wywoławczy i statystyki aktywności są publicznie widoczne dla wszystkich użytkowników w ramach normalnego działania programu krótkofalarskiego. Twój adres email NIGDY nie jest udostępniany osobom trzecim ani upubliczniany."
 
+# Respot functionality
+msgid "You will be registered as the spotter"
+msgstr "Zostaniesz zarejestrowany jako spotter"
+
+msgid "Your Callsign"
+msgstr "Twój znak wywoławczy"
+
+msgid "Add or update information about this activation"
+msgstr "Dodaj lub zaktualizuj informacje o tej aktywacji"
+
+msgid "Respot"
+msgstr "Respot"
+
+msgid "Respot Activation"
+msgstr "Respot Aktywacji"
+
+msgid "Respot this activation"
+msgstr "Zrób respot tej aktywacji"
+
+msgid "Respots"
+msgstr "Respoty"
+
+msgid "Actions"
+msgstr "Akcje"
+
+msgid "Respot count"
+msgstr "Licznik respotów"
+
+msgid "Error reposting spot"
+msgstr "Błąd podczas repostowania spota"
+
+msgid "Error submitting respot. Please try again."
+msgstr "Błąd podczas wysyłania respota. Spróbuj ponownie."
+
+# Profile detailed statistics
+msgid "Activator Detailed Statistics"
+msgstr "Szczegółowe Statystyki Aktywatora"
+
+msgid "Activated Bunkers"
+msgstr "Aktywowane Bunkry"
+
+msgid "Activations by Band"
+msgstr "Aktywacje według Pasma"
+
+msgid "Activations by Mode"
+msgstr "Aktywacje według Emisji"
+
+msgid "Hunter Detailed Statistics"
+msgstr "Szczegółowe Statystyki Łowcy"
+
+msgid "Hunted Bunkers"
+msgstr "Złowione Bunkry"
+
+msgid "Hunter QSOs by Band"
+msgstr "QSO Łowcy według Pasma"
+
+msgid "Hunter QSOs by Mode"
+msgstr "QSO Łowcy według Emisji"
+
+msgid "Reference"
+msgstr "Referencja"
+
+msgid "Name"
+msgstr "Nazwa"
+
+msgid "Activations"
+msgstr "Aktywacje"
+
+msgid "QSOs"
+msgstr "QSO"
+
+msgid "No activations yet"
+msgstr "Brak aktywacji"
+
+msgid "No hunted bunkers yet"
+msgstr "Brak złowionych bunkrów"
+
+msgid "No band data"
+msgstr "Brak danych o pasmach"
+
+msgid "No mode data"
+msgstr "Brak danych o emisjach"
+
+msgid "Filter..."
+msgstr "Filtruj..."
+
+msgid "Count"
+msgstr "Ilość"
+
+msgid "Details"
+msgstr "Szczegóły"
+
+msgid "Activation History"
+msgstr "Historia Aktywacji"
+
+msgid "QSO History"
+msgstr "Historia QSO"
+
+msgid "Date"
+msgstr "Data"
+
+msgid "Band"
+msgstr "Pasmo"
+
+msgid "Mode"
+msgstr "Emisja"
+
+msgid "B2B"
+msgstr "B2B"
+
+msgid "Activated"
+msgstr "Aktywowany"
+
+msgid "Hunted"
+msgstr "Złowiony"
+
+msgid "Activated - click to see details"
+msgstr "Aktywowany - kliknij aby zobaczyć szczegóły"
+
+msgid "Hunted - click to see details"
+msgstr "Złowiony - kliknij aby zobaczyć szczegóły"
+
+msgid "Not activated yet"
+msgstr "Jeszcze nie aktywowany"
+
+msgid "Not hunted yet"
+msgstr "Jeszcze nie złowiony"
+
+msgid "Activator"
+msgstr "Aktywator"
+
+msgid "Activators"
+msgstr "Aktywatorzy"
+
+msgid "Bands"
+msgstr "Pasma"
+
+msgid "Modes"
+msgstr "Emisje"
+
+msgid "Total QSOs"
+msgstr "Suma QSO"
+
+msgid "Account activated successfully! Welcome to BOTA!"
+msgstr "Konto aktywowane pomyślnie! Witamy w BOTA!"
+
+msgid "Your previous hunting activity has been linked to your account."
+msgstr "Twoja poprzednia aktywność łowiecka została połączona z Twoim kontem."
+
+msgid "Error activating account: {}"
+msgstr "Błąd podczas aktywacji konta: {}"
+
+msgid "Callsign already taken"
+msgstr "Znak wywoławczy jest już zajęty"
+
+msgid "Registration successful! Welcome to BOTA!"
+msgstr "Rejestracja pomyślna! Witamy w BOTA!"
+
+msgid "Note:"
+msgstr "Uwaga:"
+
+msgid "If you were previously mentioned in someone's log, you can claim your existing activity by registering with your callsign."
+msgstr "Jeśli byłeś wcześniej wymieniony w czyimś logu, możesz przejąć swoją istniejącą aktywność rejestrując się z twoim znakiem wywoławczym."
+
+msgid "Successfully processed {} new QSOs from {}."
+msgstr "Pomyślnie przetworzono {} nowych QSO z {}."
+
+msgid " Skipped {} duplicates."
+msgstr " Pominięto {} duplikatów."
+
+msgid " B2B QSOs: {}."
+msgstr " QSO B2B: {}."
 

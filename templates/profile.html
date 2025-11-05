@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load profile_extras %}
 
 {% block title %}{% trans "Profile" %} - BOTA Project{% endblock %}
 
@@ -113,6 +114,285 @@
     </div>
 </div>
 
+<!-- Activator Detailed Statistics -->
+<div class="row mb-4">
+    <div class="col-12 mb-3">
+        <h3>{% trans "Activator Detailed Statistics" %}</h3>
+    </div>
+    
+    <!-- Activated Bunkers List -->
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-geo-alt-fill"></i> {% trans "Activated Bunkers" %} 
+                    <small class="text-white">({{ activated_bunkers|length }})</small>
+                </h5>
+                <input type="text" class="form-control form-control-sm" id="activatedBunkersFilter" placeholder="{% trans 'Filter...' %}" style="max-width: 200px;">
+            </div>
+            <div class="card-body">
+                {% if activated_bunkers %}
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <table class="table table-sm table-hover" id="activatedBunkersTable">
+                        <thead class="sticky-top bg-white">
+                            <tr>
+                                <th>{% trans "Reference" %}</th>
+                                <th>{% trans "Name" %}</th>
+                                <th class="text-end">{% trans "Activations" %}</th>
+                                <th class="text-end">{% trans "QSOs" %}</th>
+                                <th class="text-center">{% trans "Details" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bunker in activated_bunkers %}
+                            <tr class="bunker-row">
+                                <td><strong>{{ bunker.bunker__reference_number }}</strong></td>
+                                <td>{{ bunker.bunker__name_en }}</td>
+                                <td class="text-end"><span class="badge bg-success">{{ bunker.activation_count }}</span></td>
+                                <td class="text-end"><span class="badge bg-info">{{ bunker.total_qso|default:0 }}</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary toggle-details" data-bunker-id="{{ bunker.bunker__id }}" data-target="activations">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="details-row" id="activations-{{ bunker.bunker__id }}" style="display: none;">
+                                <td colspan="5" class="bg-light">
+                                    <div class="p-2">
+                                        <strong>{% trans "Activation History" %}:</strong>
+                                        <table class="table table-sm table-bordered mt-2 mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>{% trans "Date" %}</th>
+                                                    <th>{% trans "Bands" %}</th>
+                                                    <th>{% trans "Modes" %}</th>
+                                                    <th class="text-end">{% trans "Total QSOs" %}</th>
+                                                    <th class="text-center">{% trans "B2B" %}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for activation in all_activations|get_item:bunker.bunker__id %}
+                                                <tr>
+                                                    <td>{{ activation.date }}</td>
+                                                    <td>
+                                                        {% if activation.bands %}
+                                                            {{ activation.bands|join:", " }}
+                                                        {% else %}
+                                                            —
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if activation.modes %}
+                                                            {{ activation.modes|join:", " }}
+                                                        {% else %}
+                                                            —
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="text-end"><strong>{{ activation.total_qso }}</strong></td>
+                                                    <td class="text-center">{% if activation.is_b2b %}<i class="bi bi-check-circle text-success"></i>{% else %}—{% endif %}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">{% trans "No activations yet" %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Activator Bands and Modes -->
+    <div class="col-md-6 mb-3">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> {% trans "Activations by Band" %}</h5>
+            </div>
+            <div class="card-body">
+                {% if activator_bands %}
+                <ul class="list-group list-group-flush">
+                    {% for band in activator_bands %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ band.band|default:"Unknown" }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ band.count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">{% trans "No band data" %}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-broadcast"></i> {% trans "Activations by Mode" %}</h5>
+            </div>
+            <div class="card-body">
+                {% if activator_modes %}
+                <ul class="list-group list-group-flush">
+                    {% for mode in activator_modes %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ mode.mode|default:"Unknown" }}</span>
+                        <span class="badge bg-success rounded-pill">{{ mode.count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">{% trans "No mode data" %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hunter Detailed Statistics -->
+<div class="row mb-4">
+    <div class="col-12 mb-3">
+        <h3>{% trans "Hunter Detailed Statistics" %}</h3>
+    </div>
+    
+    <!-- Hunted Bunkers List -->
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-binoculars-fill"></i> {% trans "Hunted Bunkers" %}</h5>
+                <input type="text" class="form-control form-control-sm" id="huntedBunkersFilter" placeholder="{% trans 'Filter...' %}" style="max-width: 200px;">
+            </div>
+            <div class="card-body">
+                {% if hunted_bunkers %}
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                    <table class="table table-sm table-hover" id="huntedBunkersTable">
+                        <thead class="sticky-top bg-white">
+                            <tr>
+                                <th>{% trans "Reference" %}</th>
+                                <th>{% trans "Name" %}</th>
+                                <th class="text-end">{% trans "Count" %}</th>
+                                <th class="text-center">{% trans "Details" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bunker in hunted_bunkers %}
+                            <tr class="bunker-row">
+                                <td><strong>{{ bunker.bunker__reference_number }}</strong></td>
+                                <td>{{ bunker.bunker__name_en }}</td>
+                                <td class="text-end"><span class="badge bg-info">{{ bunker.qso_count }}</span></td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary toggle-details" data-bunker-id="{{ bunker.bunker__id }}" data-target="hunted">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="details-row" id="hunted-{{ bunker.bunker__id }}" style="display: none;">
+                                <td colspan="4" class="bg-light">
+                                    <div class="p-2">
+                                        <strong>{% trans "QSO History" %}:</strong>
+                                        <table class="table table-sm table-bordered mt-2 mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>{% trans "Date" %}</th>
+                                                    <th>{% trans "Activators" %}</th>
+                                                    <th>{% trans "Bands" %}</th>
+                                                    <th>{% trans "Modes" %}</th>
+                                                    <th class="text-end">{% trans "QSOs" %}</th>
+                                                    <th class="text-center">{% trans "B2B" %}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for qso in all_hunted_qsos|get_item:bunker.bunker__id %}
+                                                <tr>
+                                                    <td>{{ qso.date }}</td>
+                                                    <td>
+                                                        {% if qso.activators %}
+                                                            {{ qso.activators|join:", " }}
+                                                        {% else %}
+                                                            —
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if qso.bands %}
+                                                            {{ qso.bands|join:", " }}
+                                                        {% else %}
+                                                            —
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if qso.modes %}
+                                                            {{ qso.modes|join:", " }}
+                                                        {% else %}
+                                                            —
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="text-end"><strong>{{ qso.total_qso }}</strong></td>
+                                                    <td class="text-center">{% if qso.is_b2b %}<i class="bi bi-check-circle text-success"></i>{% else %}—{% endif %}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">{% trans "No hunted bunkers yet" %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hunter Bands and Modes -->
+    <div class="col-md-6 mb-3">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-bar-chart"></i> {% trans "Hunter QSOs by Band" %}</h5>
+            </div>
+            <div class="card-body">
+                {% if hunter_bands %}
+                <ul class="list-group list-group-flush">
+                    {% for band in hunter_bands %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ band.band|default:"Unknown" }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ band.count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">{% trans "No band data" %}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-broadcast"></i> {% trans "Hunter QSOs by Mode" %}</h5>
+            </div>
+            <div class="card-body">
+                {% if hunter_modes %}
+                <ul class="list-group list-group-flush">
+                    {% for mode in hunter_modes %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ mode.mode|default:"Unknown" }}</span>
+                        <span class="badge bg-info rounded-pill">{{ mode.count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">{% trans "No mode data" %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Account Actions -->
 <div class="row">
     <div class="col-12">
@@ -130,4 +410,99 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Toggle details functionality
+    document.querySelectorAll('.toggle-details').forEach(button => {
+        button.addEventListener('click', function() {
+            const bunkerId = this.dataset.bunkerId;
+            const target = this.dataset.target;
+            const detailsRow = document.getElementById(`${target}-${bunkerId}`);
+            const icon = this.querySelector('i');
+            
+            if (detailsRow.style.display === 'none') {
+                detailsRow.style.display = 'table-row';
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-up');
+            } else {
+                detailsRow.style.display = 'none';
+                icon.classList.remove('bi-chevron-up');
+                icon.classList.add('bi-chevron-down');
+            }
+        });
+    });
+    
+    // Filter activated bunkers
+    document.getElementById('activatedBunkersFilter')?.addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const table = document.getElementById('activatedBunkersTable');
+        const rows = table.querySelectorAll('tbody .bunker-row');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const detailsRow = row.nextElementSibling;
+            
+            if (text.includes(filter)) {
+                row.style.display = '';
+                // Keep details row hidden unless it was expanded
+                if (detailsRow && !detailsRow.querySelector('.bi-chevron-up')) {
+                    detailsRow.style.display = 'none';
+                }
+            } else {
+                row.style.display = 'none';
+                if (detailsRow) {
+                    detailsRow.style.display = 'none';
+                }
+            }
+        });
+    });
+    
+    // Filter hunted bunkers
+    document.getElementById('huntedBunkersFilter')?.addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const table = document.getElementById('huntedBunkersTable');
+        const rows = table.querySelectorAll('tbody .bunker-row');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const detailsRow = row.nextElementSibling;
+            
+            if (text.includes(filter)) {
+                row.style.display = '';
+                // Keep details row hidden unless it was expanded
+                if (detailsRow && !detailsRow.querySelector('.bi-chevron-up')) {
+                    detailsRow.style.display = 'none';
+                }
+            } else {
+                row.style.display = 'none';
+                if (detailsRow) {
+                    detailsRow.style.display = 'none';
+                }
+            }
+        });
+    });
+    
+    // Scroll to specific bunker if hash is present (for linking from bunker list)
+    window.addEventListener('load', function() {
+        const hash = window.location.hash;
+        if (hash) {
+            const element = document.querySelector(hash);
+            if (element) {
+                // Expand the details
+                const bunkerId = hash.split('-')[1];
+                const target = hash.split('-')[0].substring(1);
+                const button = document.querySelector(`[data-bunker-id="${bunkerId}"][data-target="${target}"]`);
+                if (button) {
+                    button.click();
+                }
+                // Scroll to element
+                setTimeout(() => {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
+        }
+    });
+</script>
 {% endblock %}

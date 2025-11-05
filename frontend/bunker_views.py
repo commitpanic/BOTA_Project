@@ -65,6 +65,27 @@ def bunker_list(request):
     verified_count = Bunker.objects.filter(is_verified=True).count()
     pending_count = Bunker.objects.filter(is_verified=False).count()
     
+    # For logged-in users, get activated and hunted bunkers
+    activated_bunker_ids = set()
+    hunted_bunker_ids = set()
+    
+    if request.user.is_authenticated:
+        from activations.models import ActivationLog
+        
+        # Get bunkers activated by user
+        activated_bunker_ids = set(
+            ActivationLog.objects.filter(
+                activator=request.user
+            ).values_list('bunker_id', flat=True).distinct()
+        )
+        
+        # Get bunkers hunted by user (as hunter, not activator)
+        hunted_bunker_ids = set(
+            ActivationLog.objects.filter(
+                user=request.user
+            ).exclude(activator=request.user).values_list('bunker_id', flat=True).distinct()
+        )
+    
     context = {
         'bunkers': bunkers,
         'categories': categories,
@@ -76,6 +97,8 @@ def bunker_list(request):
         'total_bunkers': total_bunkers,
         'verified_count': verified_count,
         'pending_count': pending_count,
+        'activated_bunker_ids': activated_bunker_ids,
+        'hunted_bunker_ids': hunted_bunker_ids,
     }
     return render(request, 'bunkers/list.html', context)
 

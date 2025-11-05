@@ -1,0 +1,295 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .sql-console-container {
+        max-width: 1400px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+    
+    .query-editor {
+        margin-bottom: 20px;
+    }
+    
+    .query-textarea {
+        width: 100%;
+        min-height: 150px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+    }
+    
+    .btn-execute {
+        background-color: #417690;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+    
+    .btn-execute:hover {
+        background-color: #2e5266;
+    }
+    
+    .btn-clear {
+        background-color: #ba2121;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .btn-clear:hover {
+        background-color: #941a1a;
+    }
+    
+    .results-container {
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    
+    .results-table th {
+        background-color: #417690;
+        color: white;
+        padding: 10px;
+        text-align: left;
+        font-weight: bold;
+    }
+    
+    .results-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .results-table tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .error-box {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        margin: 20px 0;
+    }
+    
+    .info-box {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        padding: 15px;
+        border: 1px solid #bee5eb;
+        border-radius: 4px;
+        margin: 20px 0;
+    }
+    
+    .sidebar {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+    
+    .sidebar h3 {
+        margin-top: 0;
+        color: #417690;
+    }
+    
+    .table-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .table-list li {
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 3px;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+    }
+    
+    .table-list li:hover {
+        background-color: #e9ecef;
+    }
+    
+    .query-examples {
+        margin-top: 20px;
+    }
+    
+    .example-query {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-left: 3px solid #417690;
+        margin: 10px 0;
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+        cursor: pointer;
+    }
+    
+    .example-query:hover {
+        background-color: #e9ecef;
+    }
+    
+    .stats-bar {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sql-console-container">
+    <h1>🛠️ SQL Console</h1>
+    <p><strong>⚠️ Superuser Only</strong> - Execute safe SELECT queries on the database</p>
+    
+    <div class="info-box">
+        <strong>ℹ️ Security Notice:</strong> Only SELECT queries are allowed. 
+        Dangerous operations (DROP, DELETE, UPDATE, INSERT, ALTER, etc.) are blocked for safety.
+    </div>
+    
+    <div class="row">
+        <div class="col-md-3">
+            <div class="sidebar">
+                <h3>📋 Available Tables</h3>
+                <ul class="table-list">
+                    {% for table in tables %}
+                    <li onclick="insertTableName('{{ table }}')">{{ table }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div class="sidebar query-examples">
+                <h3>💡 Example Queries</h3>
+                <div class="example-query" onclick="setQuery(this.textContent)">
+                    SELECT * FROM accounts_user LIMIT 10;
+                </div>
+                <div class="example-query" onclick="setQuery(this.textContent)">
+                    SELECT COUNT(*) as total FROM bunkers_bunker;
+                </div>
+                <div class="example-query" onclick="setQuery(this.textContent)">
+                    SELECT callsign, email, is_active FROM accounts_user WHERE auto_created = 1;
+                </div>
+                <div class="example-query" onclick="setQuery(this.textContent)">
+                    SELECT u.callsign, COUNT(a.id) as activation_count 
+FROM accounts_user u 
+LEFT JOIN activations_activationlog a ON u.id = a.activator_id 
+GROUP BY u.callsign 
+ORDER BY activation_count DESC 
+LIMIT 10;
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <form method="post" class="query-editor">
+                {% csrf_token %}
+                <label for="query"><strong>SQL Query:</strong></label>
+                <textarea 
+                    name="query" 
+                    id="query" 
+                    class="query-textarea" 
+                    placeholder="Enter your SELECT query here...">{{ query }}</textarea>
+                
+                <div style="margin-top: 10px;">
+                    <button type="submit" class="btn-execute">▶️ Execute Query</button>
+                    <button type="button" class="btn-clear" onclick="clearQuery()">🗑️ Clear</button>
+                </div>
+            </form>
+            
+            {% if results %}
+            <div class="stats-bar">
+                ✅ Query successful: <strong>{{ results.row_count }}</strong> rows returned in <strong>{{ results.execution_time }}ms</strong>
+            </div>
+            
+            <div class="results-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            {% for col in results.columns %}
+                            <th>{{ col }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in results.rows %}
+                        <tr>
+                            {% for cell in row %}
+                            <td>{{ cell|default:"-" }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="{{ results.columns|length }}" style="text-align: center; color: #999;">
+                                No results found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            
+            {% if error %}
+            <div class="error-box">
+                <strong>❌ Error:</strong> {{ error }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function clearQuery() {
+    document.getElementById('query').value = '';
+}
+
+function setQuery(queryText) {
+    document.getElementById('query').value = queryText.trim();
+}
+
+function insertTableName(tableName) {
+    const textarea = document.getElementById('query');
+    const cursorPos = textarea.selectionStart;
+    const textBefore = textarea.value.substring(0, cursorPos);
+    const textAfter = textarea.value.substring(cursorPos);
+    
+    textarea.value = textBefore + tableName + textAfter;
+    textarea.focus();
+    textarea.selectionStart = cursorPos + tableName.length;
+    textarea.selectionEnd = cursorPos + tableName.length;
+}
+
+// Add keyboard shortcut (Ctrl+Enter or Cmd+Enter to execute)
+document.getElementById('query').addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        this.form.submit();
+    }
+});
+</script>
+{% endblock %}

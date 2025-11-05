@@ -181,6 +181,79 @@
 </div>
 {% endif %}
 
+<!-- Modal: Respot (only for authenticated users) -->
+{% if user.is_authenticated %}
+<div class="modal fade" id="respotModal" tabindex="-1" aria-labelledby="respotModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="respotModalLabel">
+                    <i class="bi bi-arrow-repeat"></i> {% trans "Respot Activation" %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="respotForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="respot_spot_id" name="spot_id">
+                    
+                    <!-- Read-only fields (pre-filled) -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                {% trans "Activator Callsign" %}
+                            </label>
+                            <input type="text" class="form-control" id="respot_activator" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                {% trans "Frequency (MHz)" %}
+                            </label>
+                            <input type="text" class="form-control" id="respot_frequency" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label class="form-label">
+                                {% trans "Bunker Reference" %}
+                            </label>
+                            <input type="text" class="form-control" id="respot_bunker_ref" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <label for="respot_comment" class="form-label">
+                                {% trans "Comment" %} ({% trans "optional" %})
+                            </label>
+                            <input type="text" class="form-control" id="respot_comment" name="comment" maxlength="200" placeholder="CW, QRS">
+                            <div class="form-text">
+                                <i class="bi bi-info-circle"></i> {% trans "Add or update information about this activation" %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="bi bi-person-check"></i> {% trans "You will be registered as the spotter" %}: <strong>{{ user.callsign }}</strong>
+                    </div>
+                    
+                    <div id="respotResult" class="mt-3"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> {% trans "Cancel" %}
+                </button>
+                <button type="submit" form="respotForm" class="btn btn-primary">
+                    <i class="bi bi-arrow-repeat"></i> {% trans "Respot" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Modal: Filters -->
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -250,7 +323,9 @@
                                 <th>{% trans "Bunker" %}</th>
                                 <th>{% trans "Comment" %}</th>
                                 <th>{% trans "Spotter" %}</th>
+                                <th>{% trans "Respots" %}</th>
                                 <th>{% trans "Last Heard" %}</th>
+                                {% if user.is_authenticated %}<th>{% trans "Actions" %}</th>{% endif %}
                             </tr>
                         </thead>
                         <tbody>
@@ -273,7 +348,25 @@
                                 </td>
                                 <td>{{ spot.comment|default:"—" }}</td>
                                 <td>{{ spot.spotter.callsign }}</td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        <i class="bi bi-arrow-repeat"></i> {{ spot.respot_count }}
+                                    </span>
+                                </td>
                                 <td><span class="spot-time">{{ spot.time_since_update }}</span></td>
+                                {% if user.is_authenticated %}
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary respot-btn" 
+                                            data-spot-id="{{ spot.id }}"
+                                            data-activator="{{ spot.activator_callsign }}"
+                                            data-frequency="{{ spot.frequency }}"
+                                            data-bunker-ref="{{ spot.bunker_reference|default:'' }}"
+                                            data-comment="{{ spot.comment|default:'' }}"
+                                            title="{% trans 'Respot this activation' %}">
+                                        <i class="bi bi-arrow-repeat"></i> {% trans "Respot" %}
+                                    </button>
+                                </td>
+                                {% endif %}
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -441,6 +534,88 @@
     // Clear result message when modal is opened
     document.getElementById('spotModal').addEventListener('show.bs.modal', function() {
         document.getElementById('spotResult').innerHTML = '';
+    });
+    
+    // Respot button handler
+    document.querySelectorAll('.respot-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const spotId = this.dataset.spotId;
+            const activator = this.dataset.activator;
+            const frequency = this.dataset.frequency;
+            const bunkerRef = this.dataset.bunkerRef;
+            const comment = this.dataset.comment;
+            
+            // Fill modal with data
+            document.getElementById('respot_spot_id').value = spotId;
+            document.getElementById('respot_activator').value = activator;
+            document.getElementById('respot_frequency').value = frequency;
+            document.getElementById('respot_bunker_ref').value = bunkerRef || '—';
+            document.getElementById('respot_comment').value = '';  // Clear comment field
+            
+            // Clear result message
+            document.getElementById('respotResult').innerHTML = '';
+            
+            // Show modal
+            const respotModal = new bootstrap.Modal(document.getElementById('respotModal'));
+            respotModal.show();
+        });
+    });
+    
+    // Respot form submission handler
+    document.getElementById('respotForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const spotId = document.getElementById('respot_spot_id').value;
+        const comment = document.getElementById('respot_comment').value;
+        const resultDiv = document.getElementById('respotResult');
+        
+        try {
+            const response = await fetch(`/api/spots/${spotId}/respot/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    comment: comment
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle"></i> ${data.message} ({% trans "Respot count" %}: ${data.respot_count})
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                
+                // Close modal and refresh spots after 1 second
+                setTimeout(() => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('respotModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    refreshSpots();
+                }, 1000);
+            } else {
+                let errorMessage = data.detail || data.error || '{% trans "Error reposting spot" %}';
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i> ${errorMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> {% trans "Error submitting respot. Please try again." %}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
     });
     {% endif %}
     

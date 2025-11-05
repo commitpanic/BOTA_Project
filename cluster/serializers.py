@@ -93,9 +93,9 @@ class SpotSerializer(serializers.ModelSerializer):
             'id', 'activator_callsign', 'spotter', 'spotter_callsign',
             'frequency', 'band', 'bunker_reference', 'bunker', 'bunker_name',
             'comment', 'created_at', 'updated_at', 'expires_at',
-            'is_active', 'time_since_update', 'is_expired'
+            'is_active', 'time_since_update', 'is_expired', 'respot_count'
         ]
-        read_only_fields = ['id', 'spotter', 'band', 'bunker', 'created_at', 'updated_at', 'expires_at', 'is_active']
+        read_only_fields = ['id', 'spotter', 'band', 'bunker', 'created_at', 'updated_at', 'expires_at', 'is_active', 'respot_count']
     
     def get_time_since_update(self, obj):
         """Get human-readable time since last update"""

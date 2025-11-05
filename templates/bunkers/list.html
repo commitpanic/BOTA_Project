@@ -137,6 +137,10 @@
                             <th>{% trans "Type" %}</th>
                             <th>{% trans "Coordinates" %}</th>
                             <th>{% trans "Status" %}</th>
+                            {% if user.is_authenticated %}
+                            <th class="text-center" title="{% trans 'Activated' %}">A</th>
+                            <th class="text-center" title="{% trans 'Hunted' %}">H</th>
+                            {% endif %}
                             <th>{% trans "Actions" %}</th>
                         </tr>
                     </thead>
@@ -162,6 +166,30 @@
                                 </span>
                                 {% endif %}
                             </td>
+                            {% if user.is_authenticated %}
+                            <td class="text-center">
+                                {% if bunker.id in activated_bunker_ids %}
+                                <a href="{% url 'profile' %}#activations-{{ bunker.id }}" class="text-success" title="{% trans 'Activated - click to see details' %}">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </a>
+                                {% else %}
+                                <span class="text-danger" title="{% trans 'Not activated yet' %}" style="cursor: help;">
+                                    <i class="bi bi-x-circle"></i>
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if bunker.id in hunted_bunker_ids %}
+                                <a href="{% url 'profile' %}#hunted-{{ bunker.id }}" class="text-info" title="{% trans 'Hunted - click to see details' %}">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </a>
+                                {% else %}
+                                <span class="text-danger" title="{% trans 'Not hunted yet' %}" style="cursor: help;">
+                                    <i class="bi bi-x-circle"></i>
+                                </span>
+                                {% endif %}
+                            </td>
+                            {% endif %}
                             <td>
                                 <a href="{% url 'bunker_detail' bunker.reference_number %}" class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i> {% trans "View" %}
@@ -170,7 +198,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center py-4">
+                            <td colspan="{% if user.is_authenticated %}8{% else %}6{% endif %}" class="text-center py-4">
                                 <i class="bi bi-inbox" style="font-size: 2rem;"></i>
                                 <p class="mt-2">{% trans "No bunkers found matching your filters." %}</p>
                             </td>

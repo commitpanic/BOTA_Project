@@ -59,6 +59,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     
     # System fields
+    auto_created = models.BooleanField(
+        _('auto created'),
+        default=False,
+        help_text=_('True if user was automatically created from log import, not manually registered.')
+    )
     is_active = models.BooleanField(
         _('active'),
         default=True,

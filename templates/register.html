@@ -13,6 +13,12 @@
                 </h4>
             </div>
             <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>{% trans "Note:" %}</strong>
+                    {% trans "If you were previously mentioned in someone's log, you can claim your existing activity by registering with your callsign." %}
+                </div>
+                
                 <form method="post">
                     {% csrf_token %}
                     
