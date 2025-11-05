@@ -214,14 +214,19 @@
                 
                 <!-- Progress bar -->
                 <div class="progress" style="height: 25px;">
-                    <div class="progress-bar {% if progress.percentage_complete >= 75 %}bg-success{% elif progress.percentage_complete >= 50 %}bg-info{% elif progress.percentage_complete >= 25 %}bg-warning{% else %}bg-secondary{% endif %}" 
+                    <div class="progress-bar" 
                          role="progressbar" 
-                         style="width: {{ progress.percentage_complete }}%"
+                         style="width: {{ progress.percentage_complete|stringformat:"d" }}%; background-color: {% if progress.percentage_complete >= 75 %}#28a745{% elif progress.percentage_complete >= 50 %}#17a2b8{% elif progress.percentage_complete >= 25 %}#ffc107{% else %}#6c757d{% endif %};"
                          aria-valuenow="{{ progress.percentage_complete }}" 
                          aria-valuemin="0" 
                          aria-valuemax="100">
                     </div>
                     <div class="progress-text-overlay">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}:
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}:
+                        {% endif %}
                         {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>
@@ -292,6 +297,11 @@
                          aria-valuemax="100">
                     </div>
                     <div class="progress-text-overlay">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}:
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}:
+                        {% endif %}
                         {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>
@@ -352,6 +362,11 @@
                          aria-valuemax="100">
                     </div>
                     <div class="progress-text-overlay">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}:
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}:
+                        {% endif %}
                         {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>
@@ -422,6 +437,11 @@
                          aria-valuemax="100">
                     </div>
                     <div class="progress-text-overlay">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}:
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}:
+                        {% endif %}
                         {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>

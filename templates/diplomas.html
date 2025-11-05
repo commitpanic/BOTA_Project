@@ -201,6 +201,11 @@
                          aria-valuemax="100">
                     </div>
                     <div class="progress-text-overlay">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}:
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}:
+                        {% endif %}
                         {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>
@@ -317,6 +322,11 @@
                          aria-valuemax="100">
                     </div>
                     <div class="progress-text-overlay">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}:
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}:
+                        {% endif %}
                         {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>
@@ -433,6 +443,11 @@
                          aria-valuemax="100">
                     </div>
                     <div class="progress-text-overlay">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}:
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}:
+                        {% endif %}
                         {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>
@@ -549,6 +564,11 @@
                          aria-valuemax="100">
                     </div>
                     <div class="progress-text-overlay">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}:
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}:
+                        {% endif %}
                         {{ progress.percentage_complete|floatformat:0 }}%
                     </div>
                 </div>

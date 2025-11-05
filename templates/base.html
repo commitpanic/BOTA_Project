@@ -111,11 +111,33 @@
             height: 25px;
             border-radius: 12px;
             position: relative;
+            background-color: #e9ecef !important;
         }
         
         /* Progress bar with centered percentage text */
         .progress .progress-bar {
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.6s ease;
+        }
+        
+        /* Ensure Bootstrap color classes work */
+        .progress .progress-bar.bg-success {
+            background-color: #28a745 !important;
+        }
+        
+        .progress .progress-bar.bg-info {
+            background-color: #17a2b8 !important;
+        }
+        
+        .progress .progress-bar.bg-warning {
+            background-color: #ffc107 !important;
+        }
+        
+        .progress .progress-bar.bg-secondary {
+            background-color: #6c757d !important;
         }
         
         /* Text overlay for progress percentage - always centered and visible */
@@ -129,16 +151,16 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            font-size: 0.85rem;
             color: #000;
             text-shadow: 
-                -1px -1px 0 #fff,
-                1px -1px 0 #fff,
-                -1px 1px 0 #fff,
-                1px 1px 0 #fff,
-                0 0 3px #fff,
-                0 0 5px #fff;
+                1px 1px 2px #fff,
+                -1px -1px 2px #fff,
+                1px -1px 2px #fff,
+                -1px 1px 2px #fff;
             z-index: 10;
             pointer-events: none;
+            padding: 0 5px;
         }
         
         .badge-success {

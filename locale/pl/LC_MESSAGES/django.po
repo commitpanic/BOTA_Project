@@ -1737,3 +1737,58 @@ msgstr "Wprowadź swój znak wywoławczy"
 msgid "Enter your email address"
 msgstr "Wprowadź swój adres email"
 
+# Force Password Change
+msgid "Password Change Required"
+msgstr "Wymagana Zmiana Hasła"
+
+msgid "Security Notice"
+msgstr "Uwaga Bezpieczeństwa"
+
+msgid "For security reasons, you must change your password before continuing to use the application."
+msgstr "Ze względów bezpieczeństwa musisz zmienić hasło zanim będziesz mógł korzystać z aplikacji."
+
+msgid "New Password"
+msgstr "Nowe Hasło"
+
+msgid "Your password must:"
+msgstr "Twoje hasło musi:"
+
+msgid "Be at least 8 characters long"
+msgstr "Mieć co najmniej 8 znaków"
+
+msgid "Not be too common"
+msgstr "Nie być zbyt powszechnym"
+
+msgid "Not be entirely numeric"
+msgstr "Nie składać się wyłącznie z cyfr"
+
+msgid "Not be too similar to your personal information"
+msgstr "Nie być zbyt podobnym do twoich danych osobowych"
+
+msgid "Confirm New Password"
+msgstr "Potwierdź Nowe Hasło"
+
+msgid "Enter the same password again for verification"
+msgstr "Wprowadź to samo hasło ponownie dla weryfikacji"
+
+msgid "Change Password"
+msgstr "Zmień Hasło"
+
+msgid "After changing your password, you'll be able to access all features."
+msgstr "Po zmianie hasła będziesz mógł korzystać ze wszystkich funkcji."
+
+msgid "Logout Instead"
+msgstr "Wyloguj Się Zamiast Tego"
+
+msgid "Why do I need to change my password?"
+msgstr "Dlaczego muszę zmienić hasło?"
+
+msgid "You received a temporary password when your account was created. For security, this temporary password must be changed to one that only you know."
+msgstr "Otrzymałeś tymczasowe hasło podczas tworzenia konta. Ze względów bezpieczeństwa to tymczasowe hasło musi zostać zmienione na takie, które znasz tylko ty."
+
+msgid "Your password has been changed successfully!"
+msgstr "Twoje hasło zostało pomyślnie zmienione!"
+
+msgid "You must change your password before continuing."
+msgstr "Musisz zmienić hasło zanim będziesz mógł kontynuować."
+

@@ -83,6 +83,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Timestamps
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     last_login = models.DateTimeField(_('last login'), blank=True, null=True)
+    
+    # Security fields
+    force_password_change = models.BooleanField(
+        _('force password change'),
+        default=False,
+        help_text=_('User must change password on next login')
+    )
 
     objects = UserManager()
 

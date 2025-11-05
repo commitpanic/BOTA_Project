@@ -1216,3 +1216,35 @@ def map_view(request):
     }
     
     return render(request, 'map.html', context)
+
+
+@login_required
+def change_password_required(request):
+    """Force password change view for users with force_password_change=True"""
+    from django.contrib.auth.forms import SetPasswordForm
+    
+    # If user doesn't need to change password, redirect to dashboard
+    if not request.user.force_password_change:
+        return redirect('dashboard')
+    
+    if request.method == 'POST':
+        form = SetPasswordForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Clear force_password_change flag
+            user.force_password_change = False
+            user.save()
+            
+            # Update session to prevent logout
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, user)
+            
+            messages.success(request, _('Your password has been changed successfully!'))
+            return redirect('dashboard')
+    else:
+        form = SetPasswordForm(request.user)
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'change_password_required.html', context)

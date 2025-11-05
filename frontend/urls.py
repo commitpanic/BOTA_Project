@@ -47,6 +47,9 @@ urlpatterns = [
          ),
          name='password_reset_complete'),
     
+    # Force password change
+    path('change-password-required/', views.change_password_required, name='change_password_required'),
+    
     # Legal pages
     path('privacy/', views.privacy_policy, name='privacy_policy'),
     path('cookies/', views.cookie_policy, name='cookie_policy'),
