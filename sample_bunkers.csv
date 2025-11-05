@@ -1,0 +1,4 @@
+reference_number,name_en,name_pl,description_en,description_pl,category,latitude,longitude,locator
+B/SP-001,Test Bunker 1,Testowy Bunkier 1,A military fortification from WW2,Fortyfikacja wojskowa z czasów II WŚ,Military,52.2297,21.0122,KO02ff
+B/SP-002,Observation Post,Posterunek Obserwacyjny,Observation tower near the forest,Wieża obserwacyjna przy lesie,Observation,52.4064,16.9252,JO82fj
+B/SP-003,Command Bunker,Bunkier Dowodzenia,Underground command center,Podziemne centrum dowodzenia,Command,50.0647,19.9450,JN99xv

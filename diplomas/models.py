@@ -62,6 +62,32 @@ class DiplomaType(models.Model):
         help_text=_("Each bunker-to-bunker QSO = 1 point")
     )
     
+    # Unique bunker requirements (NEW)
+    min_unique_activations = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Minimum Unique Bunkers Activated"),
+        help_text=_("Number of different bunkers activated")
+    )
+    min_total_activations = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Minimum Total Activations"),
+        help_text=_("Total number of bunker activations (can repeat same bunker)")
+    )
+    min_unique_hunted = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Minimum Unique Bunkers Hunted"),
+        help_text=_("Number of different bunkers hunted")
+    )
+    min_total_hunted = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Minimum Total Hunted"),
+        help_text=_("Total number of bunkers hunted (can repeat same bunker)")
+    )
+    
     # Date range for special/time-limited diplomas
     valid_from = models.DateField(
         null=True,
@@ -280,6 +306,27 @@ class DiplomaProgress(models.Model):
         validators=[MinValueValidator(0)],
         verbose_name=_("B2B Points")
     )
+    # Bunker count totals (NEW)
+    unique_activations = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Unique Bunkers Activated")
+    )
+    total_activations = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Total Activations")
+    )
+    unique_hunted = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Unique Bunkers Hunted")
+    )
+    total_hunted = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+        verbose_name=_("Total Hunted")
+    )
     percentage_complete = models.DecimalField(
         max_digits=5,
         decimal_places=2,
@@ -307,7 +354,7 @@ class DiplomaProgress(models.Model):
         return f"{self.user.callsign} - {self.diploma_type.name_en} ({self.percentage_complete}%)"
 
     def calculate_progress(self):
-        """Calculate progress percentage based on point requirements"""
+        """Calculate progress percentage based on all requirements"""
         diploma_type = self.diploma_type
         
         # Check if diploma is time-limited and currently valid
@@ -316,62 +363,59 @@ class DiplomaProgress(models.Model):
             self.is_eligible = False
             return Decimal('0.00')
         
-        # Get required points for each category
-        required_activator = diploma_type.min_activator_points
-        required_hunter = diploma_type.min_hunter_points
-        required_b2b = diploma_type.min_b2b_points
+        # Collect all requirements
+        requirements = {
+            'activator_points': (self.activator_points, diploma_type.min_activator_points),
+            'hunter_points': (self.hunter_points, diploma_type.min_hunter_points),
+            'b2b_points': (self.b2b_points, diploma_type.min_b2b_points),
+            'unique_activations': (self.unique_activations, diploma_type.min_unique_activations),
+            'total_activations': (self.total_activations, diploma_type.min_total_activations),
+            'unique_hunted': (self.unique_hunted, diploma_type.min_unique_hunted),
+            'total_hunted': (self.total_hunted, diploma_type.min_total_hunted),
+        }
         
-        # If all requirements are 0, diploma is 100% (no requirements)
-        total_required = required_activator + required_hunter + required_b2b
-        if total_required == 0:
-            percentage = Decimal('100.00')
-            self.percentage_complete = percentage
+        # Calculate progress for each requirement
+        percentages = []
+        all_met = True
+        
+        for req_name, (current, required) in requirements.items():
+            if required > 0:  # Only count requirements that are set
+                pct = min(100, (current / required * 100))
+                percentages.append(pct)
+                if current < required:
+                    all_met = False
+        
+        # If no requirements are set, diploma is automatically earned
+        if not percentages:
+            self.percentage_complete = Decimal('100.00')
             self.is_eligible = True
-            return percentage
+            return Decimal('100.00')
         
-        # Calculate percentage for each category
-        activator_pct = min(100, (self.activator_points / required_activator * 100)) if required_activator > 0 else 100
-        hunter_pct = min(100, (self.hunter_points / required_hunter * 100)) if required_hunter > 0 else 100
-        b2b_pct = min(100, (self.b2b_points / required_b2b * 100)) if required_b2b > 0 else 100
+        # Calculate average percentage across all requirements
+        avg_percentage = sum(percentages) / len(percentages)
+        self.percentage_complete = Decimal(str(avg_percentage))
+        self.is_eligible = all_met
         
-        # Calculate weighted average (only count categories with requirements)
-        categories_with_requirements = sum([
-            1 if required_activator > 0 else 0,
-            1 if required_hunter > 0 else 0,
-            1 if required_b2b > 0 else 0
-        ])
-        
-        if categories_with_requirements > 0:
-            total_percentage = 0
-            if required_activator > 0:
-                total_percentage += activator_pct
-            if required_hunter > 0:
-                total_percentage += hunter_pct
-            if required_b2b > 0:
-                total_percentage += b2b_pct
-            
-            percentage = Decimal(str(total_percentage / categories_with_requirements))
-        else:
-            percentage = Decimal('100.00')
-        
-        # Check if all individual requirements are met
-        activator_met = self.activator_points >= required_activator
-        hunter_met = self.hunter_points >= required_hunter
-        b2b_met = self.b2b_points >= required_b2b
-        
-        self.percentage_complete = percentage
-        self.is_eligible = activator_met and hunter_met and b2b_met
-        
-        return percentage
+        return self.percentage_complete
     
-    def update_points(self, activator=None, hunter=None, b2b=None):
-        """Update point values and recalculate progress"""
+    def update_points(self, activator=None, hunter=None, b2b=None, 
+                      unique_activations=None, total_activations=None,
+                      unique_hunted=None, total_hunted=None):
+        """Update all progress values and recalculate percentage"""
         if activator is not None:
             self.activator_points = activator
         if hunter is not None:
             self.hunter_points = hunter
         if b2b is not None:
             self.b2b_points = b2b
+        if unique_activations is not None:
+            self.unique_activations = unique_activations
+        if total_activations is not None:
+            self.total_activations = total_activations
+        if unique_hunted is not None:
+            self.unique_hunted = unique_hunted
+        if total_hunted is not None:
+            self.total_hunted = total_hunted
         
         self.calculate_progress()
         self.save()

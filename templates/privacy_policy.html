@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Privacy Policy" %} - BOTA App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h1><i class="bi bi-shield-lock"></i> {% trans "Privacy Policy" %}</h1>
+            </div>
+            <div class="card-body">
+                <p class="lead">{% trans "Last updated: November 5, 2025" %}</p>
+                
+                <h3>{% trans "1. Introduction" %}</h3>
+                <p>
+                    {% trans "Welcome to BOTA App, the official application for the \"Bunkers On The Air\" (SPBOTA) program. This privacy policy explains how we collect, use, and protect your personal information when you use our service." %}
+                </p>
+                <p>
+                    {% trans "BOTA App is a supplementary tool for the main SPBOTA program. For complete information about the program, please visit" %}
+                    <a href="https://www.spbota.pl" target="_blank">www.spbota.pl</a>.
+                </p>
+
+                <h3>{% trans "2. Data Controller" %}</h3>
+                <p>
+                    {% trans "The data controller for this application is the SPBOTA Coordinator. For any inquiries regarding the SPBOTA program, please refer to the contact information at" %}
+                    <a href="https://www.spbota.pl" target="_blank">www.spbota.pl</a>.
+                </p>
+                <p>
+                    {% trans "For technical issues related to BOTA App, please contact:" %} 
+                    <a href="mailto:sp3fck@gmail.com">sp3fck@gmail.com</a>
+                </p>
+
+                <h3>{% trans "3. Data We Collect" %}</h3>
+                <p>{% trans "We collect only the following personal information:" %}</p>
+                <ul>
+                    <li><strong>{% trans "Email address" %}</strong> - {% trans "Used for account creation and communication" %}</li>
+                    <li><strong>{% trans "Amateur radio callsign" %}</strong> - {% trans "Your unique radio amateur identifier" %}</li>
+                    <li><strong>{% trans "Activity data" %}</strong> - {% trans "Bunker activations, QSO logs, and earned awards" %}</li>
+                </ul>
+                <p>
+                    <strong>{% trans "Important:" %}</strong> 
+                    {% trans "We do NOT collect sensitive personal data such as: financial information, health data, political opinions, or any other sensitive categories defined by GDPR." %}
+                </p>
+
+                <h3>{% trans "4. How We Use Your Data" %}</h3>
+                <p>{% trans "Your data is used for:" %}</p>
+                <ul>
+                    <li>{% trans "Managing your BOTA App account" %}</li>
+                    <li>{% trans "Tracking your bunker activations and contacts" %}</li>
+                    <li>{% trans "Calculating progress toward awards/diplomas" %}</li>
+                    <li>{% trans "Displaying public leaderboards and statistics" %}</li>
+                    <li>{% trans "Communicating important updates about the service" %}</li>
+                </ul>
+
+                <h3>{% trans "5. Data Sharing" %}</h3>
+                <p>
+                    {% trans "Your callsign and activity statistics are publicly visible to all users as part of the normal operation of the amateur radio program. Your email address is NEVER shared with third parties or made public." %}
+                </p>
+
+                <h3>{% trans "6. Data Retention" %}</h3>
+                <p>
+                    {% trans "We retain your account data as long as your account is active. You may request account deletion at any time by contacting" %}
+                    <a href="mailto:sp3fck@gmail.com">sp3fck@gmail.com</a>.
+                </p>
+
+                <h3>{% trans "7. Your Rights (GDPR)" %}</h3>
+                <p>{% trans "Under GDPR, you have the right to:" %}</p>
+                <ul>
+                    <li>{% trans "Access your personal data" %}</li>
+                    <li>{% trans "Rectify incorrect data" %}</li>
+                    <li>{% trans "Request data deletion" %}</li>
+                    <li>{% trans "Export your data (data portability)" %}</li>
+                    <li>{% trans "Withdraw consent at any time" %}</li>
+                </ul>
+                <p>
+                    {% trans "To exercise these rights, contact:" %} 
+                    <a href="mailto:sp3fck@gmail.com">sp3fck@gmail.com</a>
+                </p>
+
+                <h3>{% trans "8. Cookies" %}</h3>
+                <p>
+                    {% trans "We use essential cookies for website functionality (login sessions, language preferences). For detailed information, see our" %}
+                    <a href="{% url 'cookie_policy' %}">{% trans "Cookie Policy" %}</a>.
+                </p>
+
+                <h3>{% trans "9. Security" %}</h3>
+                <p>
+                    {% trans "We implement appropriate technical and organizational measures to protect your data against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the Internet is 100% secure." %}
+                </p>
+
+                <h3>{% trans "10. Changes to This Policy" %}</h3>
+                <p>
+                    {% trans "We may update this privacy policy from time to time. Significant changes will be announced on the website and via email." %}
+                </p>
+
+                <h3>{% trans "11. Contact" %}</h3>
+                <p>
+                    {% trans "For questions about this privacy policy:" %}<br>
+                    <strong>{% trans "Technical issues" %}:</strong> <a href="mailto:sp3fck@gmail.com">sp3fck@gmail.com</a><br>
+                    <strong>{% trans "Program inquiries" %}:</strong> <a href="https://www.spbota.pl" target="_blank">www.spbota.pl</a>
+                </p>
+
+                <hr class="my-4">
+                <div class="text-center">
+                    <a href="{% url 'home' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> {% trans "Back to Home" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

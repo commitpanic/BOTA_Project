@@ -102,6 +102,12 @@ class Bunker(models.Model):
         verbose_name=_("Longitude"),
         help_text=_("GPS longitude coordinate (-180 to 180)")
     )
+    locator = models.CharField(
+        max_length=10,
+        blank=True,
+        verbose_name=_("Locator"),
+        help_text=_("Maidenhead grid locator (e.g., JO72RI)")
+    )
     is_verified = models.BooleanField(
         default=False,
         verbose_name=_("Verified"),

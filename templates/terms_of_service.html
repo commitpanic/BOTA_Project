@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Terms of Service" %} - BOTA App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h1><i class="bi bi-file-text"></i> {% trans "Terms of Service" %}</h1>
+            </div>
+            <div class="card-body">
+                <p class="lead">{% trans "Last updated: November 5, 2025" %}</p>
+                
+                <h3>{% trans "1. Acceptance of Terms" %}</h3>
+                <p>
+                    {% trans "By accessing and using BOTA App, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use this application." %}
+                </p>
+
+                <h3>{% trans "2. About BOTA App" %}</h3>
+                <p>
+                    {% trans "BOTA App is a supplementary tool for the \\\"Bunkers On The Air\\\" (SPBOTA) amateur radio program. The main program is managed and coordinated through" %}
+                    <a href="https://www.spbota.pl" target="_blank">www.spbota.pl</a>, 
+                    {% trans "which is the authoritative source for all program rules and regulations." %}
+                </p>
+                <p>
+                    {% trans "This application provides:" %}
+                </p>
+                <ul>
+                    <li>{% trans "Online log submission (ADIF format)" %}</li>
+                    <li>{% trans "Activity tracking and statistics" %}</li>
+                    <li>{% trans "Award/diploma progress tracking" %}</li>
+                    <li>{% trans "Real-time spotting system" %}</li>
+                    <li>{% trans "Bunker database and management" %}</li>
+                </ul>
+
+                <h3>{% trans "3. User Accounts" %}</h3>
+                <h4>3.1. {% trans "Registration" %}</h4>
+                <p>
+                    {% trans "To use BOTA App, you must:" %}
+                </p>
+                <ul>
+                    <li>{% trans "Be a licensed amateur radio operator" %}</li>
+                    <li>{% trans "Provide a valid email address and callsign" %}</li>
+                    <li>{% trans "Create a secure password" %}</li>
+                    <li>{% trans "Accept these Terms of Service" %}</li>
+                </ul>
+
+                <h4>3.2. {% trans "Account Security" %}</h4>
+                <p>
+                    {% trans "You are responsible for:" %}
+                </p>
+                <ul>
+                    <li>{% trans "Maintaining the confidentiality of your password" %}</li>
+                    <li>{% trans "All activities that occur under your account" %}</li>
+                    <li>{% trans "Notifying us immediately of any unauthorized access" %}</li>
+                </ul>
+
+                <h4>3.3. {% trans "Account Termination" %}</h4>
+                <p>
+                    {% trans "We reserve the right to suspend or terminate accounts that:" %}
+                </p>
+                <ul>
+                    <li>{% trans "Violate these Terms of Service" %}</li>
+                    <li>{% trans "Engage in fraudulent activity or data manipulation" %}</li>
+                    <li>{% trans "Upload false or misleading information" %}</li>
+                    <li>{% trans "Harass or abuse other users" %}</li>
+                </ul>
+
+                <h3>{% trans "4. User Conduct" %}</h3>
+                <p>{% trans "You agree NOT to:" %}</p>
+                <ul>
+                    <li>{% trans "Upload false QSO logs or manipulate data" %}</li>
+                    <li>{% trans "Use another person's callsign without authorization" %}</li>
+                    <li>{% trans "Attempt to gain unauthorized access to the system" %}</li>
+                    <li>{% trans "Distribute malware or harmful code" %}</li>
+                    <li>{% trans "Scrape or harvest data without permission" %}</li>
+                    <li>{% trans "Use the service for commercial purposes without authorization" %}</li>
+                </ul>
+
+                <h3>{% trans "5. ADIF Log Uploads" %}</h3>
+                <p>
+                    {% trans "When uploading ADIF logs:" %}
+                </p>
+                <ul>
+                    <li>{% trans "You certify that all contacts are genuine and accurate" %}</li>
+                    <li>{% trans "Logs must be in standard ADIF format with required fields" %}</li>
+                    <li>{% trans "You are responsible for the accuracy of submitted data" %}</li>
+                    <li>{% trans "Duplicate QSOs will be automatically filtered" %}</li>
+                </ul>
+
+                <h3>{% trans "6. Spotting System" %}</h3>
+                <p>
+                    {% trans "The real-time spotting system is for legitimate activity reports only:" %}
+                </p>
+                <ul>
+                    <li>{% trans "Spots must represent actual on-air activations" %}</li>
+                    <li>{% trans "False or spam spots may result in account suspension" %}</li>
+                    <li>{% trans "Spots expire automatically after 30 minutes" %}</li>
+                </ul>
+
+                <h3>{% trans "7. Intellectual Property" %}</h3>
+                <p>
+                    {% trans "The SPBOTA program name, logo, and concept are property of the SPBOTA organization. BOTA App source code and design are protected by copyright. You may not:" %}
+                </p>
+                <ul>
+                    <li>{% trans "Copy, modify, or redistribute the application code" %}</li>
+                    <li>{% trans "Use SPBOTA branding for unauthorized purposes" %}</li>
+                    <li>{% trans "Reverse engineer the application" %}</li>
+                </ul>
+
+                <h3>{% trans "8. Disclaimer of Warranties" %}</h3>
+                <p>
+                    {% trans "BOTA App is provided \\\"AS IS\\\" without warranties of any kind. We do not guarantee:" %}
+                </p>
+                <ul>
+                    <li>{% trans "Uninterrupted or error-free service" %}</li>
+                    <li>{% trans "Accuracy or completeness of data" %}</li>
+                    <li>{% trans "That the service will meet your requirements" %}</li>
+                </ul>
+
+                <h3>{% trans "9. Limitation of Liability" %}</h3>
+                <p>
+                    {% trans "We are not liable for:" %}
+                </p>
+                <ul>
+                    <li>{% trans "Data loss or corruption" %}</li>
+                    <li>{% trans "Service interruptions or downtime" %}</li>
+                    <li>{% trans "Incorrect award calculations or statistics" %}</li>
+                    <li>{% trans "Third-party actions or content" %}</li>
+                </ul>
+
+                <h3>{% trans "10. Program Rules" %}</h3>
+                <p>
+                    {% trans "All SPBOTA program rules and regulations are defined on" %}
+                    <a href="https://www.spbota.pl" target="_blank">www.spbota.pl</a>. 
+                    {% trans "This application is a tool to support those rules, not to replace them. In case of any conflict, the official SPBOTA rules prevail." %}
+                </p>
+
+                <h3>{% trans "11. Contact & Support" %}</h3>
+                <p>
+                    <strong>{% trans "Program Questions & Coordination" %}:</strong><br>
+                    {% trans "Please refer to contact information at" %} 
+                    <a href="https://www.spbota.pl" target="_blank">www.spbota.pl</a>
+                </p>
+                <p>
+                    <strong>{% trans "Technical Issues with BOTA App" %}:</strong><br>
+                    <a href="mailto:sp3fck@gmail.com">sp3fck@gmail.com</a>
+                </p>
+
+                <h3>{% trans "12. Governing Law" %}</h3>
+                <p>
+                    {% trans "These Terms are governed by the laws of Poland. Any disputes shall be resolved in Polish courts." %}
+                </p>
+
+                <h3>{% trans "13. Changes to Terms" %}</h3>
+                <p>
+                    {% trans "We reserve the right to modify these Terms at any time. Continued use of the service after changes constitutes acceptance of the new terms. Significant changes will be announced via email and on the website." %}
+                </p>
+
+                <h3>{% trans "14. Severability" %}</h3>
+                <p>
+                    {% trans "If any provision of these Terms is found to be unenforceable, the remaining provisions will remain in full effect." %}
+                </p>
+
+                <hr class="my-4">
+                <div class="alert alert-info">
+                    <h5><i class="bi bi-info-circle"></i> {% trans "Summary" %}</h5>
+                    <p class="mb-0">
+                        {% trans "By using BOTA App, you agree to use it honestly for legitimate amateur radio activity, follow SPBOTA program rules, and respect other users. We provide this tool as-is to support the ham radio community." %}
+                    </p>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="{% url 'home' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> {% trans "Back to Home" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

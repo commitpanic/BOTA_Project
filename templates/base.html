@@ -129,6 +129,33 @@
                 margin-bottom: 1rem;
             }
         }
+        
+        /* Cookie & Terms Consent Banner */
+        .consent-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, rgba(44, 95, 45, 0.98), rgba(151, 188, 98, 0.98));
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+        
+        .consent-banner.hidden {
+            display: none;
+        }
+        
+        .consent-banner a {
+            color: #FFD700;
+            text-decoration: underline;
+        }
+        
+        .consent-banner a:hover {
+            color: #FFF;
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -137,8 +164,10 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="bi bi-broadcast"></i> BOTA Project
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                {% load static %}
+                <img src="{% static 'images/bota_logo.png' %}" alt="BOTA" height="40" class="me-2">
+                <span>BOTA App</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -177,9 +206,16 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'diplomas' %}">
-                            <i class="bi bi-trophy"></i> {% trans "Diplomas" %}
+                            <i class="bi bi-trophy"></i> {% trans "Awards" %}
                         </a>
                     </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cluster' %}">
+                            <i class="bi bi-broadcast-pin"></i> {% trans "Spots" %}
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i> {{ user.callsign }}
@@ -257,30 +293,76 @@
                 <div class="col-md-4 mb-3">
                     <h5>{% trans "Quick Links" %}</h5>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-white text-decoration-none">{% trans "About" %}</a></li>
-                        <li><a href="#" class="text-white text-decoration-none">{% trans "Rules" %}</a></li>
-                        <li><a href="#" class="text-white text-decoration-none">{% trans "Map" %}</a></li>
+                        <li><a href="https://www.spbota.pl/index.html" class="text-white text-decoration-none">{% trans "About" %}</a></li>
+                        <li><a href="https://www.spbota.pl/o_programie.html" class="text-white text-decoration-none">{% trans "Rules" %}</a></li>
+                        <li><a href="https://www.spbota.pl/mapa.html" class="text-white text-decoration-none">{% trans "Map" %}</a></li>
                         <li><a href="/admin/" class="text-white text-decoration-none">{% trans "Admin" %}</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4 mb-3">
                     <h5>{% trans "Legal" %}</h5>
                     <ul class="list-unstyled">
-                        <li><a href="#" class="text-white text-decoration-none">{% trans "Privacy Policy" %}</a></li>
-                        <li><a href="#" class="text-white text-decoration-none">{% trans "Cookie Policy" %}</a></li>
-                        <li><a href="#" class="text-white text-decoration-none">{% trans "Terms of Service" %}</a></li>
+                        <li><a href="{% url 'privacy_policy' %}" class="text-white text-decoration-none">{% trans "Privacy Policy" %}</a></li>
+                        <li><a href="{% url 'cookie_policy' %}" class="text-white text-decoration-none">{% trans "Cookie Policy" %}</a></li>
+                        <li><a href="{% url 'terms_of_service' %}" class="text-white text-decoration-none">{% trans "Terms of Service" %}</a></li>
                     </ul>
                 </div>
             </div>
             <hr class="bg-white">
             <div class="text-center">
-                <p class="mb-0">&copy; 2025 BOTA Project. {% trans "All rights reserved." %}</p>
+                <p class="mb-0">&copy; 2025 BOTA App. {% trans "All rights reserved." %}</p>
             </div>
         </div>
     </footer>
 
+    <!-- Cookie & Terms Consent Banner -->
+    <div id="consentBanner" class="consent-banner hidden">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-9 mb-3 mb-lg-0">
+                    <h5><i class="bi bi-shield-check"></i> {% trans "Cookies & Terms of Service" %}</h5>
+                    <p class="mb-0">
+                        {% trans "We use cookies to improve your experience. By using this website, you accept our" %}
+                        <a href="{% url 'cookie_policy' %}" target="_blank">{% trans "Cookie Policy" %}</a>, 
+                        <a href="{% url 'privacy_policy' %}" target="_blank">{% trans "Privacy Policy" %}</a>, {% trans "and" %}
+                        <a href="{% url 'terms_of_service' %}" target="_blank">{% trans "Terms of Service" %}</a>.
+                    </p>
+                </div>
+                <div class="col-lg-3 text-lg-end">
+                    <button onclick="acceptConsent()" class="btn btn-light btn-lg w-100">
+                        <i class="bi bi-check-circle"></i> {% trans "Accept" %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Consent Banner Script -->
+    <script>
+        // Check if user has already consented
+        function checkConsent() {
+            const consent = localStorage.getItem('botaConsent');
+            const banner = document.getElementById('consentBanner');
+            
+            if (!consent) {
+                banner.classList.remove('hidden');
+            }
+        }
+        
+        // Accept consent
+        function acceptConsent() {
+            localStorage.setItem('botaConsent', 'accepted');
+            localStorage.setItem('botaConsentDate', new Date().toISOString());
+            document.getElementById('consentBanner').classList.add('hidden');
+        }
+        
+        // Check consent on page load
+        document.addEventListener('DOMContentLoaded', checkConsent);
+    </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>

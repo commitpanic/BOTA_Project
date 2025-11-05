@@ -1,11 +1,17 @@
-# BOTA Diploma System - Point-Based Architecture
+# BOTA Diploma System - Comprehensive Requirements Architecture
 
 ## Overview
-The BOTA diploma system uses a simple point-based approach where diplomas are automatically awarded when users reach specific point thresholds. No manual verification is needed.
+The BOTA diploma system uses a flexible requirements-based approach where diplomas are automatically awarded when users meet specific criteria. Requirements can include:
+- **Point-based requirements** (QSO counts)
+- **Bunker count requirements** (unique and total bunkers)
 
-## Point System
+No manual verification is needed - diplomas are automatically issued when all requirements are met.
 
-### How Points Are Earned
+## Requirements System
+
+### Point-Based Requirements
+
+Points are earned through QSO activities:
 
 1. **Activator Points**
    - Each QSO made as an activator = **1 point**
@@ -18,6 +24,36 @@ The BOTA diploma system uses a simple point-based approach where diplomas are au
 3. **B2B Points (Bunker-to-Bunker)**
    - Each B2B QSO (activator-to-activator contact) = **1 point**
    - Example: While activating, work 3 other activators = 3 B2B points
+
+### Bunker Count Requirements
+
+Count requirements track unique bunkers or total activations/hunts:
+
+1. **Unique Activations**
+   - Number of **different bunkers** activated
+   - Example: Activate B/SP-0001 and B/SP-0002 = 2 unique activations
+   - Multiple visits to same bunker = still counts as 1
+
+2. **Total Activations**
+   - Total number of **activation sessions** (including repeats)
+   - Example: Activate B/SP-0001 three times + B/SP-0002 once = 4 total activations
+
+3. **Unique Hunted**
+   - Number of **different bunkers** hunted
+   - Example: Work activators from B/SP-0001 and B/SP-0002 = 2 unique hunted
+   - Multiple contacts with same bunker = still counts as 1
+
+4. **Total Hunted**
+   - Total number of **hunting QSOs** (including repeats)
+   - Example: Work B/SP-0001 ten times + B/SP-0002 once = 11 total hunted
+
+### Requirement Combinations
+
+Diplomas can mix point and count requirements:
+- **Pure Point-Based**: "50 activator points" (50 QSOs as activator)
+- **Pure Count-Based**: "Activate 10 unique bunkers"
+- **Combined**: "25 activator points AND 5 unique activations"
+- **Complex**: "50 activator points + 10 unique activations + 20 hunter points + 5 unique hunted"
 
 ## Diploma Configuration
 
@@ -38,11 +74,22 @@ Each diploma type has the following configuration in Django admin:
    - Minimum B2B Points (0-∞)
    
    **Requirements Logic:**
-   - All three categories must meet their minimums
+   - All active categories must meet their minimums
    - Set to 0 to ignore that category
-   - Example diploma requiring 50 activator + 100 hunter + 0 B2B points
+   - Example: 50 activator + 100 hunter + 0 B2B points
 
-3. **Time Limitation (Optional - for Special Diplomas)**
+3. **Bunker Count Requirements** (Collapsed by default)
+   - Minimum Unique Activations (0-∞) - Different bunkers activated
+   - Minimum Total Activations (0-∞) - All activation sessions including repeats
+   - Minimum Unique Hunted (0-∞) - Different bunkers hunted
+   - Minimum Total Hunted (0-∞) - All hunting QSOs including repeats
+   
+   **Count Logic:**
+   - Set to 0 to ignore that requirement
+   - Can be combined with point requirements
+   - Example: 5 unique activations + 20 total activations
+
+4. **Time Limitation (Optional - for Special Diplomas)**
    - Valid From: Start date (nullable)
    - Valid To: End date (nullable)
    - Leave both empty for permanent diplomas
@@ -50,45 +97,90 @@ Each diploma type has the following configuration in Django admin:
 
 ### Example Diploma Configurations
 
-**Hunter Bronze**
+#### Point-Based Examples
+
+**Hunter Bronze** (Simple Hunter Diploma)
+
 - Min Activator Points: 0
 - Min Hunter Points: 10
 - Min B2B Points: 0
-- Valid From: (empty)
-- Valid To: (empty)
-- Result: Earned when user hunts 10 bunkers
+- All count requirements: 0
+- Result: Earned when user makes 10 hunter QSOs
 
-**Activator Silver**
+**Activator Silver** (Simple Activator Diploma)
+
 - Min Activator Points: 50
 - Min Hunter Points: 0
 - Min B2B Points: 0
-- Valid From: (empty)
-- Valid To: (empty)
+- All count requirements: 0
 - Result: Earned when user makes 50 QSOs as activator
 
-**B2B Expert**
+**B2B Expert** (B2B Specialist)
+
 - Min Activator Points: 0
 - Min Hunter Points: 0
 - Min B2B Points: 25
-- Valid From: (empty)
-- Valid To: (empty)
+- All count requirements: 0
 - Result: Earned when user makes 25 B2B contacts
 
-**Combo Master**
+#### Count-Based Examples
+
+**Explorer** (Visit Different Bunkers)
+
+- All point requirements: 0
+- Min Unique Activations: 10
+- Min Total Activations: 0
+- Min Unique Hunted: 0
+- Min Total Hunted: 0
+- Result: Earned when user activates 10 different bunkers (any number of QSOs per bunker)
+
+**Marathon Hunter** (Hunt Different Bunkers)
+
+- All point requirements: 0
+- Min Unique Activations: 0
+- Min Total Activations: 0
+- Min Unique Hunted: 25
+- Min Total Hunted: 0
+- Result: Earned when user hunts 25 different bunkers
+
+**Dedicated Activator** (Repeat Activations)
+
+- All point requirements: 0
+- Min Unique Activations: 0
+- Min Total Activations: 50
+- Min Unique Hunted: 0
+- Min Total Hunted: 0
+- Result: Earned when user completes 50 activation sessions (can be same bunker multiple times)
+
+#### Combined Requirements Examples
+
+**Combo Master** (Points + Counts)
+
 - Min Activator Points: 100
 - Min Hunter Points: 100
 - Min B2B Points: 50
-- Valid From: (empty)
-- Valid To: (empty)
-- Result: Earned when user meets ALL three requirements
+- Min Unique Activations: 5
+- Min Unique Hunted: 10
+- Result: Earned when user meets ALL requirements (points AND counts)
 
-**Summer Special 2025**
+**Versatile Operator** (Balanced Achievement)
+
+- Min Activator Points: 50
+- Min Hunter Points: 50
+- Min Unique Activations: 10
+- Min Unique Hunted: 10
+- Result: Must activate 10 bunkers with 50 QSOs AND hunt 10 bunkers with 50 QSOs
+
+#### Time-Limited Examples
+
+**Summer Special 2025** (Seasonal Event)
+
 - Min Activator Points: 20
 - Min Hunter Points: 20
-- Min B2B Points: 0
+- Min Unique Activations: 5
 - Valid From: 2025-06-21
 - Valid To: 2025-09-22
-- Result: Only earnable during summer 2025, requires 20 activator + 20 hunter points
+- Result: Only earnable during summer 2025, requires both points and unique bunker activations
 
 ## Automatic Awarding Process
 
@@ -116,6 +208,10 @@ DiplomaProgress
   - activator_points: Current activator point total
   - hunter_points: Current hunter point total
   - b2b_points: Current B2B point total
+  - unique_activations: Current unique bunkers activated
+  - total_activations: Current total activation sessions
+  - unique_hunted: Current unique bunkers hunted
+  - total_hunted: Current total hunting QSOs
   - percentage_complete: Overall percentage (0-100%)
   - is_eligible: Boolean (all requirements met?)
   - last_updated: Timestamp
@@ -123,27 +219,49 @@ DiplomaProgress
 
 ### Percentage Calculation
 
-The system calculates percentage completion as a weighted average:
+The system calculates percentage completion as an average across **all active requirements**:
 
 ```python
-# Example: Diploma requires 50 activator + 100 hunter + 0 B2B
-# User has: 30 activator, 75 hunter, 0 B2B
+# Example 1: Point-Based Diploma
+# Requires: 50 activator + 100 hunter points
+# User has: 30 activator, 75 hunter
 
-activator_pct = min(100, (30 / 50) * 100) = 60%
-hunter_pct = min(100, (75 / 100) * 100) = 75%
-b2b_pct = 100% (not required, so 100%)
+activator_pct = (30 / 50) * 100 = 60%
+hunter_pct = (75 / 100) * 100 = 75%
 
-# Only count categories with requirements (2 in this case)
+# Average of 2 active requirements
 overall = (60% + 75%) / 2 = 67.5%
+is_eligible = False (must reach 100% in BOTH)
 
-# is_eligible = False (both activator AND hunter must reach 100%)
+# Example 2: Mixed Requirements
+# Requires: 50 activator points + 10 unique activations + 5 unique hunted
+# User has: 40 activator points, 8 unique activations, 5 unique hunted
+
+activator_pct = (40 / 50) * 100 = 80%
+unique_act_pct = (8 / 10) * 100 = 80%
+unique_hunt_pct = (5 / 5) * 100 = 100%
+
+# Average of 3 active requirements
+overall = (80% + 80% + 100%) / 3 = 86.7%
+is_eligible = False (activator points and unique activations not at 100%)
+
+# Example 3: Count-Only Diploma
+# Requires: 15 unique activations
+# User has: 15 unique activations
+
+unique_act_pct = (15 / 15) * 100 = 100%
+
+# Only 1 active requirement
+overall = 100%
+is_eligible = True (diploma awarded!)
 ```
 
 ### Eligibility vs Percentage
 
-- **Percentage**: Shows overall progress (can be 90% but not eligible)
-- **Eligibility**: TRUE only when ALL individual requirements are met
-- User must reach 100% in EACH required category to earn diploma
+- **Percentage**: Shows overall progress across all requirements (can be 90% but not eligible)
+- **Eligibility**: TRUE only when ALL individual requirements reach 100%
+- User must meet **every single active requirement** (any field > 0) to earn diploma
+- Requirements set to 0 are ignored completely
 
 ## Database Schema
 
@@ -154,11 +272,19 @@ overall = (60% + 75%) / 2 = 67.5%
 - name_pl, name_en
 - description_pl, description_en
 - category (choice field)
+-- Point Requirements --
 - min_activator_points (integer, default 0)
 - min_hunter_points (integer, default 0)
 - min_b2b_points (integer, default 0)
+-- Bunker Count Requirements --
+- min_unique_activations (integer, default 0)
+- min_total_activations (integer, default 0)
+- min_unique_hunted (integer, default 0)
+- min_total_hunted (integer, default 0)
+-- Time Limitation --
 - valid_from (date, nullable)
 - valid_to (date, nullable)
+-- Display --
 - template_image (file)
 - is_active (boolean)
 - display_order (integer)
@@ -188,9 +314,16 @@ overall = (60% + 75%) / 2 = 67.5%
 - id
 - user_id (FK)
 - diploma_type_id (FK)
+-- Point Progress --
 - activator_points (integer)
 - hunter_points (integer)
 - b2b_points (integer)
+-- Bunker Count Progress --
+- unique_activations (integer)
+- total_activations (integer)
+- unique_hunted (integer)
+- total_hunted (integer)
+-- Completion Status --
 - percentage_complete (decimal)
 - is_eligible (boolean)
 - last_updated
@@ -220,14 +353,17 @@ def update_diploma_progress(user):
             diploma_type=diploma_type
         )
         
-        # Update points based on user statistics
-        # Each QSO as activator = 1 activator point
-        # Each QSO hunting bunkers = 1 hunter point
-        # Each B2B QSO = 1 B2B point
+        # Update all progress values from user statistics
+        # Points: Each QSO = 1 point in respective category
+        # Counts: Tracked separately from UserStatistics
         progress.update_points(
-            activator=stats.total_activator_qso,    # Total QSOs as activator
-            hunter=stats.total_hunter_qso,          # Total QSOs hunting bunkers
-            b2b=stats.activator_b2b_qso             # Total B2B QSOs
+            activator=stats.total_activator_qso,            # Total QSOs as activator
+            hunter=stats.total_hunter_qso,                  # Total QSOs hunting bunkers
+            b2b=stats.activator_b2b_qso,                    # Total B2B QSOs
+            unique_activations=stats.unique_activations,     # Unique bunkers activated
+            total_activations=stats.total_activator_qso,     # Total activation sessions
+            unique_hunted=stats.unique_bunkers_hunted,       # Unique bunkers hunted
+            total_hunted=stats.total_hunter_qso             # Total hunting QSOs
         )
         
         # Check if eligible and not already awarded
@@ -269,26 +405,68 @@ Administrators can:
 
 ## Testing Checklist
 
-- [ ] Create diploma with only activator requirement
-- [ ] Create diploma with only hunter requirement
-- [ ] Create diploma with only B2B requirement
-- [ ] Create diploma with combined requirements
+### Point-Based Testing
+- [ ] Create diploma with only activator points requirement
+- [ ] Create diploma with only hunter points requirement
+- [ ] Create diploma with only B2B points requirement
+- [ ] Create diploma with combined point requirements
+- [ ] Upload ADIF file and verify points increase
+- [ ] Verify diploma auto-awards when point threshold reached
+
+### Count-Based Testing
+- [ ] Create diploma requiring unique activations only
+- [ ] Create diploma requiring total activations only
+- [ ] Create diploma requiring unique hunted only
+- [ ] Create diploma requiring total hunted only
+- [ ] Verify unique counts don't increase when activating same bunker twice
+- [ ] Verify total counts DO increase with repeat activations
+- [ ] Upload ADIF file and verify counts update correctly
+
+### Mixed Requirements Testing
+- [ ] Create diploma with points + counts requirements
+- [ ] Verify percentage calculation includes all active requirements
+- [ ] Verify eligibility requires ALL requirements at 100%
+- [ ] Test diploma with 6 out of 7 requirements met (should not award)
+- [ ] Test diploma awards when final requirement is met
+
+### Time-Limited Testing
 - [ ] Create time-limited diploma (future dates)
 - [ ] Create time-limited diploma (past dates)
-- [ ] Upload ADIF file and verify points increase
-- [ ] Verify diploma auto-awards at threshold
-- [ ] Verify percentage calculation
-- [ ] Verify eligibility logic (all requirements must be met)
 - [ ] Test expired time-limited diplomas don't award
+- [ ] Test future time-limited diplomas don't award yet
+
+### General Testing
 - [ ] Test inactive diplomas don't award
+- [ ] Verify percentage calculation formula (average of active requirements)
+- [ ] Test progress bars/circles display correctly
+- [ ] Verify admin interface shows all 7 requirement types
+- [ ] Test manual progress recalculation in admin
+
+## Recent Updates
+
+### November 2025 - Extended Requirements System
+- ✅ Added bunker count requirements (4 new fields)
+- ✅ Enhanced progress calculation to handle 7 requirement types
+- ✅ Updated admin interface with organized fieldsets
+- ✅ Automatic progress updates via ADIF log import
+- ✅ Backward compatible (existing point-only diplomas work unchanged)
+
+### Key Changes
+1. **DiplomaType Model**: Added `min_unique_activations`, `min_total_activations`, `min_unique_hunted`, `min_total_hunted`
+2. **DiplomaProgress Model**: Added corresponding tracking fields
+3. **Migrations**: `0003_add_bunker_count_requirements.py` and `0004_add_progress_bunker_counts.py`
+4. **Progress Calculation**: Now averages across all active requirements (not just points)
+5. **Admin Interface**: New "Bunker Count Requirements" fieldset with clear descriptions
 
 ## Future Enhancements
 
 1. **Email Notifications** - Send email when diploma is earned
-2. **PDF Generation** - Auto-generate certificate PDFs
+2. **PDF Generation** - Auto-generate certificate PDFs with all requirement details
 3. **Social Sharing** - Share diploma achievements
-4. **Leaderboards** - Show top diploma earners
+4. **Leaderboards** - Show top diploma earners per category
 5. **Badges** - Visual badges for earned diplomas
 6. **Diploma Levels** - Bronze/Silver/Gold tiers for same diploma type
 7. **Endorsements** - Peer endorsements for diplomas
-8. **Special Conditions** - Additional requirements (specific bunkers, date ranges)
+8. **Special Conditions** - Additional requirements (specific bunkers, date ranges, band/mode restrictions)
+9. **Progress Circles** - Convert linear progress bars to circular indicators (UI enhancement)
+10. **Diploma Chains** - Require earning one diploma before another (prerequisites)

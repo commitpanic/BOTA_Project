@@ -11,7 +11,7 @@ from bunkers.views import (
     BunkerResourceViewSet, BunkerInspectionViewSet
 )
 from cluster.views import (
-    ClusterViewSet, ClusterMemberViewSet, ClusterAlertViewSet
+    ClusterViewSet, ClusterMemberViewSet, ClusterAlertViewSet, SpotViewSet
 )
 from activations.views import (
     ActivationKeyViewSet, ActivationLogViewSet, LicenseViewSet
@@ -40,6 +40,7 @@ router.register(r'bunker-inspections', BunkerInspectionViewSet, basename='bunker
 router.register(r'clusters', ClusterViewSet, basename='cluster')
 router.register(r'cluster-members', ClusterMemberViewSet, basename='clustermember')
 router.register(r'cluster-alerts', ClusterAlertViewSet, basename='clusteralert')
+router.register(r'spots', SpotViewSet, basename='spot')
 
 # Register activations viewsets
 router.register(r'activation-keys', ActivationKeyViewSet, basename='activationkey')

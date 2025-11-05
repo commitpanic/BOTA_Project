@@ -21,8 +21,8 @@ The original implementation had the logic **backwards**:
 **When SP3FCK uploads this log:**
 
 1. **SP3FCK (the activator) gets:**
-   - ✅ +3 activator points (3 QSOs made from bunker)
-   - ✅ `total_activator_qso` = 3
+   - ✅ +1 activator point (1 activation session: B/SP-0001 on 2025-11-04)
+   - ✅ `total_activator_qso` = 3 (for statistics only)
    - ✅ +1 B2B point (SP3DEF was also at a bunker)
    - ✅ `activator_b2b_qso` = 1
 
@@ -50,11 +50,16 @@ The original implementation had the logic **backwards**:
 ```python
 # When updating diploma progress after ADIF import:
 progress.update_points(
-    activator=stats.total_activator_qso,    # Count of QSOs made FROM bunkers
+    activator=total_activations,            # Count of activation sessions (distinct bunker+date)
     hunter=stats.total_hunter_qso,          # Count of QSOs working bunkers
     b2b=stats.activator_b2b_qso             # Count of B2B contacts
 )
 ```
+
+**Key Point:** Activator points are NOT based on QSO count, but on activation sessions.
+- If you activate B/SP-0001 on 2025-01-04 and make 10 QSOs = **1 activator point**
+- If you activate B/SP-0001 on 2025-01-05 and make 5 QSOs = **1 activator point** (different day)
+- If you activate B/SP-0002 on 2025-01-04 and make 8 QSOs = **1 activator point** (different bunker)
 
 ### Example Diploma Requirements:
 
@@ -72,7 +77,7 @@ min_activator_points: 50
 min_hunter_points: 0
 min_b2b_points: 0
 ```
-✅ Earned when user makes 50 QSOs from bunkers (activates and works 50 stations)
+✅ Earned when user completes 50 activation sessions (50 distinct bunker+date combinations)
 
 **B2B Expert Diploma:**
 ```

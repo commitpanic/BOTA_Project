@@ -1,0 +1,4 @@
+reference_number,name,description,category,latitude,longitude,locator
+B/SP-004,Simple Bunker Name,This is a simple bunker with single name and description fields,Military,52.1234,21.5678,KO02aa
+B/SP-005,Another Test Bunker,Single field for both languages works now,Observation,50.0647,19.9450,JN99xv
+B/SP-006,Command Center,Underground command facility,Command,51.7592,19.4560,JO91ss

@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Cookie Policy" %} - BOTA App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h1><i class="bi bi-cookie"></i> {% trans "Cookie Policy" %}</h1>
+            </div>
+            <div class="card-body">
+                <p class="lead">{% trans "Last updated: November 5, 2025" %}</p>
+                
+                <h3>{% trans "1. What Are Cookies?" %}</h3>
+                <p>
+                    {% trans "Cookies are small text files stored on your device when you visit our website. They help us provide you with a better experience by remembering your preferences and keeping you logged in." %}
+                </p>
+
+                <h3>{% trans "2. Types of Cookies We Use" %}</h3>
+                
+                <h4 class="mt-4">{% trans "Essential Cookies (Strictly Necessary)" %}</h4>
+                <p>{% trans "These cookies are required for the website to function properly:" %}</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Cookie Name" %}</th>
+                                <th>{% trans "Purpose" %}</th>
+                                <th>{% trans "Duration" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>sessionid</code></td>
+                                <td>{% trans "Maintains your login session" %}</td>
+                                <td>{% trans "2 weeks" %}</td>
+                            </tr>
+                            <tr>
+                                <td><code>csrftoken</code></td>
+                                <td>{% trans "Security protection against CSRF attacks" %}</td>
+                                <td>{% trans "1 year" %}</td>
+                            </tr>
+                            <tr>
+                                <td><code>django_language</code></td>
+                                <td>{% trans "Remembers your language preference (PL/EN)" %}</td>
+                                <td>{% trans "1 year" %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4 class="mt-4">{% trans "Preference Cookies (Functional)" %}</h4>
+                <p>{% trans "These cookies remember your choices and preferences:" %}</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Storage Name" %}</th>
+                                <th>{% trans "Purpose" %}</th>
+                                <th>{% trans "Type" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>botaConsent</code></td>
+                                <td>{% trans "Remembers that you accepted cookies/terms" %}</td>
+                                <td>{% trans "Local Storage" %}</td>
+                            </tr>
+                            <tr>
+                                <td><code>clusterScrollPos</code></td>
+                                <td>{% trans "Remembers scroll position on Spots page" %}</td>
+                                <td>{% trans "Session Storage" %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>{% trans "3. Cookies We Do NOT Use" %}</h3>
+                <p>{% trans "We do not use:" %}</p>
+                <ul>
+                    <li>{% trans "Analytics cookies (Google Analytics, etc.)" %}</li>
+                    <li>{% trans "Advertising/marketing cookies" %}</li>
+                    <li>{% trans "Social media tracking cookies" %}</li>
+                    <li>{% trans "Third-party tracking cookies" %}</li>
+                </ul>
+
+                <h3>{% trans "4. Managing Cookies" %}</h3>
+                <p>
+                    {% trans "You can control cookies through your browser settings. However, disabling essential cookies may affect website functionality (e.g., you won't be able to log in)." %}
+                </p>
+                
+                <h4 class="mt-3">{% trans "How to Delete Cookies:" %}</h4>
+                <ul>
+                    <li><strong>Chrome:</strong> {% trans "Settings → Privacy and Security → Clear browsing data" %}</li>
+                    <li><strong>Firefox:</strong> {% trans "Options → Privacy & Security → Cookies and Site Data" %}</li>
+                    <li><strong>Safari:</strong> {% trans "Preferences → Privacy → Manage Website Data" %}</li>
+                    <li><strong>Edge:</strong> {% trans "Settings → Privacy & Security → Clear browsing data" %}</li>
+                </ul>
+
+                <h3>{% trans "5. Local Storage & Session Storage" %}</h3>
+                <p>
+                    {% trans "We use browser Local Storage and Session Storage for:" %}
+                </p>
+                <ul>
+                    <li>{% trans "Remembering your consent (cookies/terms acceptance)" %}</li>
+                    <li>{% trans "Preserving scroll position during auto-refresh" %}</li>
+                </ul>
+                <p>
+                    {% trans "This data stays on your device and is never transmitted to our servers." %}
+                </p>
+
+                <h3>{% trans "6. Your Consent" %}</h3>
+                <p>
+                    {% trans "By clicking \\\"Accept\\\" on the consent banner, you agree to our use of essential and functional cookies. You can withdraw consent at any time by clearing your browser cookies and local storage." %}
+                </p>
+
+                <h3>{% trans "7. Updates to This Policy" %}</h3>
+                <p>
+                    {% trans "We may update this cookie policy. Check this page periodically for changes." %}
+                </p>
+
+                <h3>{% trans "8. Contact" %}</h3>
+                <p>
+                    {% trans "Questions about cookies?" %}<br>
+                    <strong>{% trans "Email" %}:</strong> <a href="mailto:sp3fck@gmail.com">sp3fck@gmail.com</a>
+                </p>
+
+                <hr class="my-4">
+                <div class="text-center">
+                    <a href="{% url 'home' %}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> {% trans "Back to Home" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

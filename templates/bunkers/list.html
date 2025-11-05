@@ -114,11 +114,18 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span>{% trans "Results" %} ({{ bunkers|length }})</span>
-            {% if user.is_authenticated %}
-            <a href="{% url 'request_bunker' %}" class="btn btn-sm btn-accent">
-                <i class="bi bi-plus-circle"></i> {% trans "Request New Bunker" %}
-            </a>
-            {% endif %}
+            <div>
+                {% if user.is_staff %}
+                <a href="{% url 'upload_bunkers_csv' %}" class="btn btn-sm btn-success me-2">
+                    <i class="bi bi-file-earmark-arrow-up"></i> {% trans "Upload CSV" %}
+                </a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="{% url 'request_bunker' %}" class="btn btn-sm btn-accent">
+                    <i class="bi bi-plus-circle"></i> {% trans "Request New Bunker" %}
+                </a>
+                {% endif %}
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">

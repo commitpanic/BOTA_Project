@@ -350,9 +350,25 @@ coverage html  # Generate HTML report
 - [x] DiplomaProgress model with automatic calculation
 - [x] DiplomaVerification model with audit trail
 - [x] Category system (hunter, activator, b2b, special_event, cluster)
-- [x] JSON requirements for flexible achievement tracking
+- [x] Point-based requirements system (activator, hunter, B2B points)
 - [x] Admin interface with visual progress bars
 - [x] 25 unit tests for diploma models (all passing)
+
+### ✅ Phase 5.1: Extended Diploma System (COMPLETED - November 5, 2025)
+- [x] **Bunker count requirements** - unique and total activations/hunts
+- [x] **7 requirement types** - 3 point-based + 4 bunker count-based
+- [x] **Flexible diploma creation** - mix points and counts freely
+- [x] **Smart progress calculation** - averages only active requirements
+- [x] **Updated API serializers** - new fields in REST responses
+- [x] **Enhanced templates** - display all requirement types
+- [x] **Comprehensive tests** - 9 new test cases for count requirements
+- [x] **Full documentation** - DIPLOMA_SYSTEM.md and IMPLEMENTATION_GUIDE.md updated
+
+**New Diploma Types Possible:**
+- **Explorer**: Activate X different bunkers (unique count)
+- **Marathon**: Complete Y total activations (with repeats)
+- **Versatile**: Mix of points AND counts (e.g., 50 points + 10 unique bunkers)
+- **Specialist**: Any combination of 7 requirement types
 
 ### 🔄 Phase 6: REST API (NEXT)
 - [ ] Django REST Framework integration

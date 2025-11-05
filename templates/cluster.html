@@ -1,0 +1,468 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Spots" %} - BOTA App{% endblock %}
+
+{% block extra_css %}
+<style>
+    .spot-card {
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 0.5rem;
+        transition: all 0.2s;
+    }
+    
+    .spot-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateX(5px);
+    }
+    
+    .band-badge {
+        font-weight: bold;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+    
+    .pause-btn {
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .pause-btn:hover {
+        transform: scale(1.1);
+    }
+    
+    .band-160m { background-color: #8b4513; color: white; }
+    .band-80m { background-color: #dc143c; color: white; }
+    .band-60m { background-color: #ff8c00; color: white; }
+    .band-40m { background-color: #ffd700; color: black; }
+    .band-30m { background-color: #32cd32; color: white; }
+    .band-20m { background-color: #1e90ff; color: white; }
+    .band-17m { background-color: #4169e1; color: white; }
+    .band-15m { background-color: #8a2be2; color: white; }
+    .band-12m { background-color: #9370db; color: white; }
+    .band-10m { background-color: #ff1493; color: white; }
+    .band-6m { background-color: #ff69b4; color: white; }
+    .band-2m { background-color: #db7093; color: white; }
+    .band-70cm { background-color: #bc8f8f; color: white; }
+    
+    .countdown-timer {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+    
+    .spot-time {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .spot-frequency {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--primary-color);
+    }
+    
+    .spot-callsign {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #999;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="bi bi-broadcast-pin"></i> {% trans "Spots" %} / {% trans "Klaster" %}</h1>
+        <p class="lead">{% trans "Real-time spotting system for BOTA activations" %}</p>
+    </div>
+</div>
+
+<!-- Auto-refresh countdown and action buttons -->
+<div class="row mb-3">
+    <div class="col-md-8">
+        <div class="alert alert-info d-flex justify-content-between align-items-center mb-0">
+            <span>
+                <i class="bi bi-arrow-clockwise" id="refreshIcon"></i> 
+                {% trans "Auto-refresh" %}:
+                <button id="pauseBtn" class="btn btn-sm btn-outline-primary pause-btn ms-2" title="{% trans 'Pause/Resume' %}">
+                    <i class="bi bi-pause-fill" id="pauseIcon"></i>
+                </button>
+            </span>
+            <span class="countdown-timer">
+                {% trans "Next refresh in:" %} <span id="countdown">30</span>s
+            </span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="d-flex gap-2 h-100">
+            {% if user.is_authenticated %}
+            <button type="button" class="btn btn-primary flex-fill" data-bs-toggle="modal" data-bs-target="#spotModal">
+                <i class="bi bi-plus-circle"></i> {% trans "Post Spot" %}
+            </button>
+            {% endif %}
+            <button type="button" class="btn btn-secondary flex-fill" data-bs-toggle="modal" data-bs-target="#filterModal">
+                <i class="bi bi-funnel"></i> {% trans "Filter" %}
+                {% if activator_filter or spotter_filter or band_filter %}
+                <span class="badge bg-warning text-dark">!</span>
+                {% endif %}
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Post Spot (only for authenticated users) -->
+{% if user.is_authenticated %}
+<div class="modal fade" id="spotModal" tabindex="-1" aria-labelledby="spotModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="spotModalLabel">
+                    <i class="bi bi-broadcast"></i> {% trans "Post a Spot" %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="spotForm">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="activator_callsign" class="form-label">
+                                {% trans "Activator Callsign" %} <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="activator_callsign" name="activator_callsign" required maxlength="20" placeholder="SP3XYZ">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="frequency" class="form-label">
+                                {% trans "Frequency (MHz)" %} <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" class="form-control" id="frequency" name="frequency" required step="0.001" min="1.8" max="450" placeholder="14.250">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="bunker_reference" class="form-label">
+                                {% trans "Bunker Reference" %} ({% trans "optional" %})
+                            </label>
+                            <input type="text" class="form-control" id="bunker_reference" name="bunker_reference" maxlength="20" placeholder="B/SP-0001">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="comment" class="form-label">
+                                {% trans "Comment" %} ({% trans "optional" %})
+                            </label>
+                            <input type="text" class="form-control" id="comment" name="comment" maxlength="200" placeholder="CW, QRS">
+                        </div>
+                    </div>
+                    <div id="spotResult" class="mt-3"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> {% trans "Cancel" %}
+                </button>
+                <button type="submit" form="spotForm" class="btn btn-primary">
+                    <i class="bi bi-broadcast"></i> {% trans "Post Spot" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal: Filters -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">
+                    <i class="bi bi-funnel"></i> {% trans "Filter" %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="get" id="filterForm">
+                    <div class="mb-3">
+                        <label for="activator" class="form-label">
+                            <i class="bi bi-person"></i> {% trans "Filter by Activator" %}
+                        </label>
+                        <input type="text" class="form-control" id="activator" name="activator" value="{{ activator_filter }}" placeholder="{% trans 'Enter callsign' %}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="spotter" class="form-label">
+                            <i class="bi bi-eye"></i> {% trans "Filter by Spotter" %}
+                        </label>
+                        <input type="text" class="form-control" id="spotter" name="spotter" value="{{ spotter_filter }}" placeholder="{% trans 'Enter callsign' %}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="band" class="form-label">
+                            <i class="bi bi-bar-chart"></i> {% trans "Filter by Band" %}
+                        </label>
+                        <select class="form-select" id="band" name="band">
+                            <option value="">{% trans "All Bands" %}</option>
+                            {% for band in unique_bands %}
+                            <option value="{{ band }}" {% if band == band_filter %}selected{% endif %}>{{ band }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="{% url 'cluster' %}" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> {% trans "Clear Filters" %}
+                </a>
+                <button type="submit" form="filterForm" class="btn btn-primary">
+                    <i class="bi bi-funnel"></i> {% trans "Apply Filters" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Spots -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-broadcast"></i> {% trans "Active Spots" %}</span>
+                <span class="badge bg-success">{{ spots.count }} {% trans "spot(s)" %}</span>
+            </div>
+            <div class="card-body" id="spotsContainer">
+                {% if spots %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Activator" %}</th>
+                                <th>{% trans "Frequency" %}</th>
+                                <th>{% trans "Band" %}</th>
+                                <th>{% trans "Bunker" %}</th>
+                                <th>{% trans "Comment" %}</th>
+                                <th>{% trans "Spotter" %}</th>
+                                <th>{% trans "Last Heard" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for spot in spots %}
+                            <tr>
+                                <td><strong class="spot-callsign">{{ spot.activator_callsign }}</strong></td>
+                                <td><span class="spot-frequency">{{ spot.frequency }} MHz</span></td>
+                                <td>
+                                    <span class="band-badge band-{{ spot.band|lower }}">{{ spot.band }}</span>
+                                </td>
+                                <td>
+                                    {% if spot.bunker %}
+                                    <strong>{{ spot.bunker_reference }}</strong><br>
+                                    <small class="text-muted">{{ spot.bunker.name_en }}</small>
+                                    {% elif spot.bunker_reference %}
+                                    {{ spot.bunker_reference }}
+                                    {% else %}
+                                    <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ spot.comment|default:"—" }}</td>
+                                <td>{{ spot.spotter.callsign }}</td>
+                                <td><span class="spot-time">{{ spot.time_since_update }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-broadcast-pin text-muted"></i>
+                    <h4>{% trans "No Active Spots" %}</h4>
+                    <p>{% trans "No spots are currently active. Be the first to post one!" %}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Countdown timer for auto-refresh
+    let countdown = 30;
+    let countdownInterval;
+    let isPaused = false;
+    
+    function startCountdown() {
+        countdown = 30;
+        updateCountdownDisplay();
+        
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+        }
+        
+        countdownInterval = setInterval(() => {
+            if (!isPaused) {
+                countdown--;
+                updateCountdownDisplay();
+                
+                if (countdown <= 0) {
+                    refreshSpots();
+                }
+            }
+        }, 1000);
+    }
+    
+    function updateCountdownDisplay() {
+        document.getElementById('countdown').textContent = countdown;
+    }
+    
+    function togglePause() {
+        isPaused = !isPaused;
+        const pauseIcon = document.getElementById('pauseIcon');
+        const refreshIcon = document.getElementById('refreshIcon');
+        const pauseBtn = document.getElementById('pauseBtn');
+        
+        if (isPaused) {
+            // Change to play icon
+            pauseIcon.className = 'bi bi-play-fill';
+            pauseBtn.classList.remove('btn-outline-primary');
+            pauseBtn.classList.add('btn-warning');
+            refreshIcon.style.opacity = '0.5';
+        } else {
+            // Change to pause icon
+            pauseIcon.className = 'bi bi-pause-fill';
+            pauseBtn.classList.remove('btn-warning');
+            pauseBtn.classList.add('btn-outline-primary');
+            refreshIcon.style.opacity = '1';
+        }
+    }
+    
+    function saveScrollPosition() {
+        // Save current scroll position
+        sessionStorage.setItem('clusterScrollPos', window.scrollY);
+    }
+    
+    function restoreScrollPosition() {
+        // Restore scroll position after page load
+        const scrollPos = sessionStorage.getItem('clusterScrollPos');
+        if (scrollPos) {
+            window.scrollTo(0, parseInt(scrollPos));
+        }
+    }
+    
+    function refreshSpots() {
+        // Save scroll position before refresh
+        saveScrollPosition();
+        
+        // Get current filters
+        const params = new URLSearchParams(window.location.search);
+        const activator = params.get('activator') || '';
+        const spotter = params.get('spotter') || '';
+        const band = params.get('band') || '';
+        
+        // Build URL with filters
+        let url = window.location.pathname;
+        const queryParams = [];
+        if (activator) queryParams.push(`activator=${encodeURIComponent(activator)}`);
+        if (spotter) queryParams.push(`spotter=${encodeURIComponent(spotter)}`);
+        if (band) queryParams.push(`band=${encodeURIComponent(band)}`);
+        
+        if (queryParams.length > 0) {
+            url += '?' + queryParams.join('&');
+        }
+        
+        // Reload page to refresh spots
+        window.location.href = url;
+    }
+    
+    // Spot submission form handler
+    {% if user.is_authenticated %}
+    document.getElementById('spotForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const resultDiv = document.getElementById('spotResult');
+        
+        try {
+            const response = await fetch(window.location.pathname, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="bi bi-check-circle"></i> ${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+                
+                // Clear form
+                this.reset();
+                
+                // Close modal and refresh spots after 1 second
+                setTimeout(() => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('spotModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    refreshSpots();
+                }, 1000);
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i> ${data.error}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> {% trans "Error submitting spot. Please try again." %}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+    });
+    
+    // Clear result message when modal is opened
+    document.getElementById('spotModal').addEventListener('show.bs.modal', function() {
+        document.getElementById('spotResult').innerHTML = '';
+    });
+    {% endif %}
+    
+    // Save scroll position before applying filters
+    document.getElementById('filterForm').addEventListener('submit', function() {
+        saveScrollPosition();
+    });
+    
+    // Pause/Resume button handler
+    document.getElementById('pauseBtn').addEventListener('click', function() {
+        togglePause();
+    });
+    
+    // Start countdown on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        startCountdown();
+        
+        // Restore scroll position after page loads
+        restoreScrollPosition();
+        
+        // Clear saved scroll position after restoration (optional)
+        // sessionStorage.removeItem('clusterScrollPos');
+    });
+</script>
+{% endblock %}

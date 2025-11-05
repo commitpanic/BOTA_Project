@@ -8,6 +8,8 @@ from django.contrib import messages
 from django.db.models import Q, Count
 from django.utils.translation import gettext as _
 from decimal import Decimal
+import csv
+import io
 
 from bunkers.models import Bunker, BunkerCategory, BunkerRequest
 
@@ -250,3 +252,144 @@ def bunker_detail(request, reference):
         'unique_activators': unique_activators,
     }
     return render(request, 'bunkers/detail.html', context)
+
+
+@staff_member_required
+def upload_bunkers_csv(request):
+    """
+    Upload bunkers from CSV file (Admin only)
+    
+    Expected CSV format:
+    reference_number,name_en,name_pl,description_en,description_pl,category,latitude,longitude,locator
+    """
+    if request.method == 'POST' and request.FILES.get('file'):
+        try:
+            csv_file = request.FILES['file']
+            
+            # Check file extension
+            if not csv_file.name.endswith('.csv'):
+                messages.error(request, _('File must be a CSV file (.csv)'))
+                return redirect('upload_bunkers_csv')
+            
+            # Read and decode the file
+            file_data = csv_file.read().decode('utf-8')
+            io_string = io.StringIO(file_data)
+            reader = csv.DictReader(io_string)
+            
+            created_count = 0
+            updated_count = 0
+            error_count = 0
+            errors = []
+            
+            for row_num, row in enumerate(reader, start=2):  # start=2 because row 1 is header
+                try:
+                    # Support multiple column name variations for reference
+                    reference = (row.get('reference_number') or 
+                                row.get('Reference') or 
+                                row.get('reference') or 
+                                row.get('ref') or '').strip()
+                    if not reference:
+                        errors.append(f"Row {row_num}: Missing reference_number (or Reference)")
+                        error_count += 1
+                        continue
+                    
+                    # Get or create category - support multiple column names
+                    category_name = (row.get('category') or 
+                                    row.get('Category') or 
+                                    row.get('Type') or 
+                                    row.get('type') or 
+                                    'Military').strip()
+                    category, cat_created = BunkerCategory.objects.get_or_create(
+                        name_en=category_name,
+                        defaults={
+                            'name_pl': category_name,
+                            'description_en': f'{category_name} bunkers',
+                            'description_pl': f'Bunkry typu {category_name}',
+                        }
+                    )
+                    
+                    # Parse coordinates - support multiple column names
+                    try:
+                        lat_value = (row.get('latitude') or row.get('Lat') or 
+                                    row.get('lat') or '0').strip()
+                        lon_value = (row.get('longitude') or row.get('Long') or 
+                                    row.get('lon') or row.get('lng') or '0').strip()
+                        latitude = Decimal(lat_value)
+                        longitude = Decimal(lon_value)
+                    except:
+                        errors.append(f"Row {row_num}: Invalid coordinates for {reference}")
+                        error_count += 1
+                        continue
+                    
+                    # Handle flexible naming - support Name, name, name_en, name_pl
+                    name_value = (row.get('Name') or row.get('name') or 
+                                 row.get('name_en') or row.get('name_pl') or 
+                                 reference).strip()
+                    
+                    if row.get('name_en') or row.get('name_pl'):
+                        name_en = row.get('name_en', name_value).strip()
+                        name_pl = row.get('name_pl', name_value).strip()
+                    else:
+                        name_en = name_value
+                        name_pl = name_value
+                    
+                    # Handle flexible description - support Type, description, description_en, description_pl
+                    desc_value = (row.get('description') or row.get('Description') or 
+                                 row.get('Type') or row.get('type') or '').strip()
+                    
+                    if row.get('description_en') or row.get('description_pl'):
+                        desc_en = row.get('description_en', desc_value).strip()
+                        desc_pl = row.get('description_pl', desc_value).strip()
+                    else:
+                        desc_en = desc_value
+                        desc_pl = desc_value
+                    
+                    # Get locator - support multiple column names
+                    locator_value = (row.get('locator') or row.get('Locator') or 
+                                    row.get('grid') or row.get('Grid') or '').strip()
+                    
+                    # Create or update bunker
+                    bunker, created = Bunker.objects.update_or_create(
+                        reference_number=reference,
+                        defaults={
+                            'name_en': name_en,
+                            'name_pl': name_pl,
+                            'description_en': desc_en,
+                            'description_pl': desc_pl,
+                            'category': category,
+                            'latitude': latitude,
+                            'longitude': longitude,
+                            'locator': locator_value,
+                            'is_verified': True,
+                            'verified_by': request.user,
+                            'created_by': request.user,
+                        }
+                    )
+                    
+                    if created:
+                        created_count += 1
+                    else:
+                        updated_count += 1
+                        
+                except Exception as e:
+                    errors.append(f"Row {row_num}: {str(e)}")
+                    error_count += 1
+            
+            # Show results
+            if created_count > 0:
+                messages.success(request, _(f'Successfully created {created_count} bunker(s).'))
+            if updated_count > 0:
+                messages.info(request, _(f'Updated {updated_count} existing bunker(s).'))
+            if error_count > 0:
+                messages.warning(request, _(f'Failed to process {error_count} row(s).'))
+                for error in errors[:5]:  # Show first 5 errors
+                    messages.error(request, error)
+                if len(errors) > 5:
+                    messages.error(request, _(f'...and {len(errors) - 5} more errors.'))
+            
+            return redirect('bunker_list')
+            
+        except Exception as e:
+            messages.error(request, _(f'Error processing CSV file: {str(e)}'))
+    
+    return render(request, 'upload_bunkers_csv.html')

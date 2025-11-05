@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "My Diplomas" %} - BOTA Project{% endblock %}
+{% block title %}{% trans "My Awards" %} - BOTA Project{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <h1>{% trans "My Diplomas" %}</h1>
+        <h1>{% trans "My Awards" %}</h1>
         <p class="text-muted">{% trans "Track your achievements and progress" %}</p>
     </div>
 </div>
 
-<!-- Earned Diplomas -->
+<!-- Earned Awards -->
 {% if earned_diplomas %}
 <div class="row mb-4">
     <div class="col-12 mb-3">
-        <h3>{% trans "Earned Diplomas" %}</h3>
+        <h3>{% trans "Earned Awards" %}</h3>
     </div>
     
     {% for diploma in earned_diplomas %}
@@ -84,26 +84,47 @@
 </div>
 {% else %}
 <div class="alert alert-info">
-    <i class="bi bi-info-circle"></i> {% trans "You haven't earned any diplomas yet. Keep activating and hunting!" %}
+    <i class="bi bi-info-circle"></i> {% trans "You haven't earned any awards yet. Keep activating and hunting!" %}
 </div>
 {% endif %}
 
-<!-- Progress Toward Diplomas -->
+<!-- Progress Toward Awards -->
 <div class="row">
     <div class="col-12 mb-3">
-        <h3>{% trans "Diploma Progress" %}</h3>
+        <h3>{% trans "Award Progress" %}</h3>
+        <p class="text-muted">{% trans "Track your progress towards earning awards in each category" %}</p>
+    </div>
+</div>
+
+<!-- Activator Awards -->
+{% if activator_progress %}
+<div class="row">
+    <div class="col-12 mb-3">
+        <h4><i class="bi bi-broadcast-pin text-primary"></i> {% trans "Activator Awards" %}</h4>
     </div>
     
-    {% for progress in all_progress %}
+    {% for progress in activator_progress %}
     {% if not progress.is_eligible %}
     <div class="col-md-6 mb-3">
         <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="mb-0">{{ progress.diploma_type.name_en }}</h5>
+                    <h5 class="mb-0">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}
+                        {% endif %}
+                    </h5>
                     <span class="badge bg-secondary">{% trans "In Progress" %}</span>
                 </div>
-                <p class="text-muted small mb-2">{{ progress.diploma_type.description_en }}</p>
+                <p class="text-muted small mb-2">
+                    {% if LANGUAGE_CODE == 'pl' %}
+                        {{ progress.diploma_type.description_pl }}
+                    {% else %}
+                        {{ progress.diploma_type.description_en }}
+                    {% endif %}
+                </p>
                 
                 <!-- Requirements -->
                 <div class="mb-2">
@@ -133,10 +154,46 @@
                         </span>
                     </div>
                     {% endif %}
+                    
+                    {% if progress.diploma_type.min_unique_activations > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Unique Activations" %}</small>
+                        <span class="badge {% if progress.unique_activations >= progress.diploma_type.min_unique_activations %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.unique_activations }} / {{ progress.diploma_type.min_unique_activations }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_total_activations > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Total Activations" %}</small>
+                        <span class="badge {% if progress.total_activations >= progress.diploma_type.min_total_activations %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.total_activations }} / {{ progress.diploma_type.min_total_activations }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_unique_hunted > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Unique Hunted" %}</small>
+                        <span class="badge {% if progress.unique_hunted >= progress.diploma_type.min_unique_hunted %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.unique_hunted }} / {{ progress.diploma_type.min_unique_hunted }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_total_hunted > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Total Hunted" %}</small>
+                        <span class="badge {% if progress.total_hunted >= progress.diploma_type.min_total_hunted %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.total_hunted }} / {{ progress.diploma_type.min_total_hunted }}
+                        </span>
+                    </div>
+                    {% endif %}
                 </div>
                 
-                <div class="progress mb-2">
-                    <div class="progress-bar" 
+                <div class="progress mb-2" style="height: 25px;">
+                    <div class="progress-bar {% if progress.percentage_complete >= 75 %}bg-success{% elif progress.percentage_complete >= 50 %}bg-info{% elif progress.percentage_complete >= 25 %}bg-warning{% endif %}" 
                          role="progressbar" 
                          style="width: {{ progress.percentage_complete }}%"
                          aria-valuenow="{{ progress.percentage_complete }}" 
@@ -149,12 +206,356 @@
         </div>
     </div>
     {% endif %}
-    {% empty %}
-    <div class="col-12">
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i> {% trans "No diploma progress yet. Start activating or hunting to begin!" %}
-        </div>
-    </div>
     {% endfor %}
 </div>
+{% endif %}
+
+<!-- Hunter Awards -->
+{% if hunter_progress %}
+<div class="row mt-4">
+    <div class="col-12 mb-3">
+        <h4><i class="bi bi-crosshair text-success"></i> {% trans "Hunter Awards" %}</h4>
+    </div>
+    
+    {% for progress in hunter_progress %}
+    {% if not progress.is_eligible %}
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}
+                        {% endif %}
+                    </h5>
+                    <span class="badge bg-secondary">{% trans "In Progress" %}</span>
+                </div>
+                <p class="text-muted small mb-2">
+                    {% if LANGUAGE_CODE == 'pl' %}
+                        {{ progress.diploma_type.description_pl }}
+                    {% else %}
+                        {{ progress.diploma_type.description_en }}
+                    {% endif %}
+                </p>
+                
+                <!-- Requirements -->
+                <div class="mb-2">
+                    {% if progress.diploma_type.min_activator_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Activator Points" %}</small>
+                        <span class="badge {% if progress.activator_points >= progress.diploma_type.min_activator_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.activator_points }} / {{ progress.diploma_type.min_activator_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_hunter_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Hunter Points" %}</small>
+                        <span class="badge {% if progress.hunter_points >= progress.diploma_type.min_hunter_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.hunter_points }} / {{ progress.diploma_type.min_hunter_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_b2b_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "B2B Points" %}</small>
+                        <span class="badge {% if progress.b2b_points >= progress.diploma_type.min_b2b_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.b2b_points }} / {{ progress.diploma_type.min_b2b_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_unique_activations > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Unique Activations" %}</small>
+                        <span class="badge {% if progress.unique_activations >= progress.diploma_type.min_unique_activations %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.unique_activations }} / {{ progress.diploma_type.min_unique_activations }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_total_activations > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Total Activations" %}</small>
+                        <span class="badge {% if progress.total_activations >= progress.diploma_type.min_total_activations %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.total_activations }} / {{ progress.diploma_type.min_total_activations }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_unique_hunted > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Unique Hunted" %}</small>
+                        <span class="badge {% if progress.unique_hunted >= progress.diploma_type.min_unique_hunted %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.unique_hunted }} / {{ progress.diploma_type.min_unique_hunted }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_total_hunted > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Total Hunted" %}</small>
+                        <span class="badge {% if progress.total_hunted >= progress.diploma_type.min_total_hunted %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.total_hunted }} / {{ progress.diploma_type.min_total_hunted }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="progress mb-2" style="height: 25px;">
+                    <div class="progress-bar {% if progress.percentage_complete >= 75 %}bg-success{% elif progress.percentage_complete >= 50 %}bg-info{% elif progress.percentage_complete >= 25 %}bg-warning{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ progress.percentage_complete }}%"
+                         aria-valuenow="{{ progress.percentage_complete }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        {{ progress.percentage_complete|floatformat:0 }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- B2B Awards -->
+{% if b2b_progress %}
+<div class="row mt-4">
+    <div class="col-12 mb-3">
+        <h4><i class="bi bi-arrow-left-right text-warning"></i> {% trans "Bunker-to-Bunker Awards" %}</h4>
+    </div>
+    
+    {% for progress in b2b_progress %}
+    {% if not progress.is_eligible %}
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}
+                        {% endif %}
+                    </h5>
+                    <span class="badge bg-secondary">{% trans "In Progress" %}</span>
+                </div>
+                <p class="text-muted small mb-2">
+                    {% if LANGUAGE_CODE == 'pl' %}
+                        {{ progress.diploma_type.description_pl }}
+                    {% else %}
+                        {{ progress.diploma_type.description_en }}
+                    {% endif %}
+                </p>
+                
+                <!-- Requirements -->
+                <div class="mb-2">
+                    {% if progress.diploma_type.min_activator_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Activator Points" %}</small>
+                        <span class="badge {% if progress.activator_points >= progress.diploma_type.min_activator_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.activator_points }} / {{ progress.diploma_type.min_activator_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_hunter_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Hunter Points" %}</small>
+                        <span class="badge {% if progress.hunter_points >= progress.diploma_type.min_hunter_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.hunter_points }} / {{ progress.diploma_type.min_hunter_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_b2b_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "B2B Points" %}</small>
+                        <span class="badge {% if progress.b2b_points >= progress.diploma_type.min_b2b_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.b2b_points }} / {{ progress.diploma_type.min_b2b_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_unique_activations > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Unique Activations" %}</small>
+                        <span class="badge {% if progress.unique_activations >= progress.diploma_type.min_unique_activations %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.unique_activations }} / {{ progress.diploma_type.min_unique_activations }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_total_activations > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Total Activations" %}</small>
+                        <span class="badge {% if progress.total_activations >= progress.diploma_type.min_total_activations %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.total_activations }} / {{ progress.diploma_type.min_total_activations }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_unique_hunted > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Unique Hunted" %}</small>
+                        <span class="badge {% if progress.unique_hunted >= progress.diploma_type.min_unique_hunted %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.unique_hunted }} / {{ progress.diploma_type.min_unique_hunted }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_total_hunted > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Total Hunted" %}</small>
+                        <span class="badge {% if progress.total_hunted >= progress.diploma_type.min_total_hunted %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.total_hunted }} / {{ progress.diploma_type.min_total_hunted }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="progress mb-2" style="height: 25px;">
+                    <div class="progress-bar {% if progress.percentage_complete >= 75 %}bg-success{% elif progress.percentage_complete >= 50 %}bg-info{% elif progress.percentage_complete >= 25 %}bg-warning{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ progress.percentage_complete }}%"
+                         aria-valuenow="{{ progress.percentage_complete }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        {{ progress.percentage_complete|floatformat:0 }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Special Event Awards -->
+{% if special_progress %}
+<div class="row mt-4">
+    <div class="col-12 mb-3">
+        <h4><i class="bi bi-star text-info"></i> {% trans "Special Event & Other Awards" %}</h4>
+    </div>
+    
+    {% for progress in special_progress %}
+    {% if not progress.is_eligible %}
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}
+                        {% endif %}
+                    </h5>
+                    <span class="badge bg-secondary">{% trans "In Progress" %}</span>
+                </div>
+                <p class="text-muted small mb-2">
+                    {% if LANGUAGE_CODE == 'pl' %}
+                        {{ progress.diploma_type.description_pl }}
+                    {% else %}
+                        {{ progress.diploma_type.description_en }}
+                    {% endif %}
+                </p>
+                
+                <!-- Requirements -->
+                <div class="mb-2">
+                    {% if progress.diploma_type.min_activator_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Activator Points" %}</small>
+                        <span class="badge {% if progress.activator_points >= progress.diploma_type.min_activator_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.activator_points }} / {{ progress.diploma_type.min_activator_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_hunter_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Hunter Points" %}</small>
+                        <span class="badge {% if progress.hunter_points >= progress.diploma_type.min_hunter_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.hunter_points }} / {{ progress.diploma_type.min_hunter_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_b2b_points > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "B2B Points" %}</small>
+                        <span class="badge {% if progress.b2b_points >= progress.diploma_type.min_b2b_points %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.b2b_points }} / {{ progress.diploma_type.min_b2b_points }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_unique_activations > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Unique Activations" %}</small>
+                        <span class="badge {% if progress.unique_activations >= progress.diploma_type.min_unique_activations %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.unique_activations }} / {{ progress.diploma_type.min_unique_activations }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_total_activations > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Total Activations" %}</small>
+                        <span class="badge {% if progress.total_activations >= progress.diploma_type.min_total_activations %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.total_activations }} / {{ progress.diploma_type.min_total_activations }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_unique_hunted > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Unique Hunted" %}</small>
+                        <span class="badge {% if progress.unique_hunted >= progress.diploma_type.min_unique_hunted %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.unique_hunted }} / {{ progress.diploma_type.min_unique_hunted }}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if progress.diploma_type.min_total_hunted > 0 %}
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted">{% trans "Total Hunted" %}</small>
+                        <span class="badge {% if progress.total_hunted >= progress.diploma_type.min_total_hunted %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ progress.total_hunted }} / {{ progress.diploma_type.min_total_hunted }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="progress mb-2" style="height: 25px;">
+                    <div class="progress-bar {% if progress.percentage_complete >= 75 %}bg-success{% elif progress.percentage_complete >= 50 %}bg-info{% elif progress.percentage_complete >= 25 %}bg-warning{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ progress.percentage_complete }}%"
+                         aria-valuenow="{{ progress.percentage_complete }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        {{ progress.percentage_complete|floatformat:0 }}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if not activator_progress and not hunter_progress and not b2b_progress and not special_progress %}
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i> {% trans "No award progress yet. Start activating or hunting to begin!" %}
+</div>
+{% endif %}
+
 {% endblock %}

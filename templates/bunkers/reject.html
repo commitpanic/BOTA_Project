@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Reject Bunker Request" %} - BOTA{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-x-circle"></i> {% trans "Reject Bunker Request" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {% trans "You are about to reject this bunker request. Please provide a reason for rejection." %}
+                    </div>
+                    
+                    <h6>{% trans "Request Details" %}:</h6>
+                    <table class="table table-sm table-bordered mb-4">
+                        <tr>
+                            <th width="30%">{% trans "Reference" %}:</th>
+                            <td><strong>{{ bunker_request.reference_number }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "Name" %}:</th>
+                            <td>{{ bunker_request.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "Type" %}:</th>
+                            <td>{{ bunker_request.bunker_type|default:"-" }}</td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "Requested By" %}:</th>
+                            <td>{{ bunker_request.requested_by.callsign }}</td>
+                        </tr>
+                        <tr>
+                            <th>{% trans "Location" %}:</th>
+                            <td>
+                                {{ bunker_request.latitude|floatformat:6 }}, 
+                                {{ bunker_request.longitude|floatformat:6 }}
+                                {% if bunker_request.locator %}
+                                    <br><small class="text-muted">{{ bunker_request.locator }}</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if bunker_request.description %}
+                        <tr>
+                            <th>{% trans "Description" %}:</th>
+                            <td>{{ bunker_request.description }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">
+                                {% trans "Rejection Reason" %} <span class="text-danger">*</span>
+                            </label>
+                            <textarea 
+                                class="form-control" 
+                                id="reason" 
+                                name="reason" 
+                                rows="5" 
+                                required
+                                placeholder="{% trans 'Please explain why this request is being rejected (e.g., duplicate, incorrect coordinates, insufficient information, etc.)' %}"
+                            ></textarea>
+                            <small class="form-text text-muted">
+                                {% trans "This reason will be visible to the user who submitted the request." %}
+                            </small>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'manage_bunker_requests' %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-x-circle"></i> {% trans "Reject Request" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

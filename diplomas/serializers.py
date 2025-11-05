@@ -9,20 +9,38 @@ from .models import DiplomaType, Diploma, DiplomaProgress, DiplomaVerification
 class DiplomaTypeSerializer(serializers.ModelSerializer):
     """Serializer for DiplomaType model"""
     total_issued = serializers.SerializerMethodField()
+    is_time_limited = serializers.SerializerMethodField()
+    is_currently_valid = serializers.SerializerMethodField()
     
     class Meta:
         model = DiplomaType
         fields = [
             'id', 'name_pl', 'name_en', 'description_pl', 'description_en',
-            'category', 'requirements', 'points_awarded',
+            'category',
+            # Point requirements
+            'min_activator_points', 'min_hunter_points', 'min_b2b_points',
+            # Bunker count requirements
+            'min_unique_activations', 'min_total_activations',
+            'min_unique_hunted', 'min_total_hunted',
+            # Time limitation
+            'valid_from', 'valid_to', 'is_time_limited', 'is_currently_valid',
+            # Display
             'template_image', 'is_active', 'display_order',
             'total_issued', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'is_time_limited', 'is_currently_valid']
     
     def get_total_issued(self, obj):
         """Get total diplomas issued of this type"""
         return obj.get_total_issued()
+    
+    def get_is_time_limited(self, obj):
+        """Check if diploma is time-limited"""
+        return obj.is_time_limited()
+    
+    def get_is_currently_valid(self, obj):
+        """Check if time-limited diploma is currently valid"""
+        return obj.is_currently_valid()
 
 
 class DiplomaVerificationSerializer(serializers.ModelSerializer):
@@ -55,7 +73,10 @@ class DiplomaSerializer(serializers.ModelSerializer):
             'id', 'diploma_type', 'diploma_type_name_en', 'diploma_type_name_pl',
             'user', 'user_callsign',
             'issue_date', 'diploma_number', 'verification_code',
-            'pdf_file', 'requirements_met',
+            'pdf_file',
+            # Points at issuance
+            'activator_points_earned', 'hunter_points_earned', 'b2b_points_earned',
+            # Administration
             'issued_by', 'issued_by_callsign', 'notes',
             'verifications', 'verification_count'
         ]
@@ -86,20 +107,72 @@ class DiplomaProgressSerializer(serializers.ModelSerializer):
     diploma_type_name_pl = serializers.CharField(source='diploma_type.name_pl', read_only=True)
     user_callsign = serializers.CharField(source='user.callsign', read_only=True)
     requirements = serializers.SerializerMethodField()
+    current_progress = serializers.SerializerMethodField()
     
     class Meta:
         model = DiplomaProgress
         fields = [
             'id', 'user', 'user_callsign',
             'diploma_type', 'diploma_type_name_en', 'diploma_type_name_pl',
-            'current_progress', 'percentage_complete', 'is_eligible',
-            'requirements', 'last_updated'
+            # Point progress
+            'activator_points', 'hunter_points', 'b2b_points',
+            # Bunker count progress
+            'unique_activations', 'total_activations',
+            'unique_hunted', 'total_hunted',
+            # Completion status
+            'percentage_complete', 'is_eligible',
+            'current_progress', 'requirements', 'last_updated'
         ]
-        read_only_fields = ['id', 'last_updated']
+        read_only_fields = ['id', 'last_updated', 'current_progress', 'requirements']
     
     def get_requirements(self, obj):
         """Get requirements from diploma type"""
-        return obj.diploma_type.requirements
+        dt = obj.diploma_type
+        requirements = {}
+        
+        # Add point requirements
+        if dt.min_activator_points > 0:
+            requirements['min_activator_points'] = dt.min_activator_points
+        if dt.min_hunter_points > 0:
+            requirements['min_hunter_points'] = dt.min_hunter_points
+        if dt.min_b2b_points > 0:
+            requirements['min_b2b_points'] = dt.min_b2b_points
+        
+        # Add bunker count requirements
+        if dt.min_unique_activations > 0:
+            requirements['min_unique_activations'] = dt.min_unique_activations
+        if dt.min_total_activations > 0:
+            requirements['min_total_activations'] = dt.min_total_activations
+        if dt.min_unique_hunted > 0:
+            requirements['min_unique_hunted'] = dt.min_unique_hunted
+        if dt.min_total_hunted > 0:
+            requirements['min_total_hunted'] = dt.min_total_hunted
+        
+        return requirements
+    
+    def get_current_progress(self, obj):
+        """Get current progress values"""
+        progress = {}
+        
+        # Add point progress
+        if obj.diploma_type.min_activator_points > 0:
+            progress['activator_points'] = obj.activator_points
+        if obj.diploma_type.min_hunter_points > 0:
+            progress['hunter_points'] = obj.hunter_points
+        if obj.diploma_type.min_b2b_points > 0:
+            progress['b2b_points'] = obj.b2b_points
+        
+        # Add bunker count progress
+        if obj.diploma_type.min_unique_activations > 0:
+            progress['unique_activations'] = obj.unique_activations
+        if obj.diploma_type.min_total_activations > 0:
+            progress['total_activations'] = obj.total_activations
+        if obj.diploma_type.min_unique_hunted > 0:
+            progress['unique_hunted'] = obj.unique_hunted
+        if obj.diploma_type.min_total_hunted > 0:
+            progress['total_hunted'] = obj.total_hunted
+        
+        return progress
 
 
 class DiplomaVerifySerializer(serializers.Serializer):

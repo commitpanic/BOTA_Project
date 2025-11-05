@@ -509,6 +509,8 @@ locust -f locustfile.py
 
 **⚠️ CRITICAL FIX:** Point logic was completely reversed and has been corrected!
 
+**⭐ NOVEMBER 2025 UPDATE:** Extended with bunker count requirements!
+
 **New Point-Based System:**
 - Simple 1:1 point system (no complex JSON requirements)
 - Each QSO as activator = 1 activator point
@@ -595,6 +597,95 @@ python manage.py update_diploma_progress --user SP3FCK
 - Dashboard now shows correct labels and counts
 - Home page displays activations (not individual hunter entries)
 - Profile page shows accurate point breakdown
+
+#### 7.6 Extended Diploma Requirements System - Complete (November 2025)
+**Location:** `diplomas/models.py`, `diplomas/admin.py`, `activations/log_import_service.py`
+
+**Overview:**
+Extended diploma system to support bunker count requirements in addition to points, enabling more diverse diploma types (Explorer, Marathon Hunter, etc.)
+
+**New Requirement Fields (DiplomaType Model):**
+1. `min_unique_activations` - Minimum number of different bunkers to activate
+2. `min_total_activations` - Minimum total activation sessions (including repeats)
+3. `min_unique_hunted` - Minimum number of different bunkers to hunt
+4. `min_total_hunted` - Minimum total hunting QSOs (including repeats)
+
+**New Tracking Fields (DiplomaProgress Model):**
+1. `unique_activations` - Current count of unique bunkers activated
+2. `total_activations` - Current count of all activation sessions
+3. `unique_hunted` - Current count of unique bunkers hunted
+4. `total_hunted` - Current count of all hunting QSOs
+
+**Progress Calculation Enhancement:**
+- **Old Logic**: Only checked 3 point requirements (activator, hunter, B2B)
+- **New Logic**: Checks all 7 requirements (3 points + 4 counts)
+- **Percentage**: Average across ALL active requirements (any field > 0)
+- **Eligibility**: ALL requirements must reach 100% (not just average)
+- **Backward Compatible**: Existing point-only diplomas work unchanged
+
+**Example Diploma Types:**
+```python
+# Point-Based (Original)
+"Basic Activator" - min_activator_points=10, all else=0
+
+# Count-Based (New)
+"Explorer" - min_unique_activations=10, all else=0
+"Marathon Hunter" - min_unique_hunted=25, all else=0
+
+# Mixed Requirements (New)
+"Versatile Operator" - min_activator_points=50, min_hunter_points=50,
+                       min_unique_activations=10, min_unique_hunted=10
+```
+
+**Admin Interface Updates:**
+- New fieldset: "Bunker Count Requirements" (collapsed by default)
+- Enhanced requirements summary: Shows all 7 requirement types (ACT, HNT, B2B, UA, TA, UH, TH)
+- Progress display: Shows bunker counts with color coding
+- Detailed progress view: Lists all requirements with checkmarks when met
+
+**Automatic Updates:**
+After every ADIF upload, `LogImportService._update_diploma_progress()`:
+1. Updates activator points (as before)
+2. Updates hunter points (as before)
+3. Updates B2B points (as before)
+4. **NEW**: Updates unique_activations (from UserStatistics)
+5. **NEW**: Updates total_activations (from QSO count)
+6. **NEW**: Updates unique_hunted (from UserStatistics)
+7. **NEW**: Updates total_hunted (from QSO count)
+8. Recalculates percentage across all requirements
+9. Auto-awards diploma if ALL requirements met
+
+**Database Migrations:**
+- `diplomas/migrations/0003_add_bunker_count_requirements.py` - DiplomaType fields
+- `diplomas/migrations/0004_add_progress_bunker_counts.py` - DiplomaProgress fields
+
+**Data Source:**
+Bunker counts are sourced from `accounts.UserStatistics`:
+- `unique_activations` - Tracked by counting distinct bunkers in activation logs
+- `unique_bunkers_hunted` - Tracked by counting distinct bunkers hunted
+- Total counts come from QSO tallies (total_activator_qso, total_hunter_qso)
+
+**Documentation:**
+- Updated `DIPLOMA_SYSTEM.md` with bunker count requirements examples
+- Added section on count vs. point requirements
+- Added combined requirements examples
+
+**Testing Script:**
+- `update_diploma_progress.py` - Manual progress recalculation for testing
+- Now includes bunker count statistics display
+- Validates all 7 requirement types
+
+**Key Changes to Methods:**
+1. `DiplomaProgress.calculate_progress()` - Now loops through all 7 requirements
+2. `DiplomaProgress.update_points()` - Added 4 new optional parameters
+3. `LogImportService._update_diploma_progress()` - Passes bunker count statistics
+4. Admin display methods - Show all requirement types
+
+**Benefits:**
+- More diverse diploma types (exploration-focused, not just QSO volume)
+- Encourages visiting different bunkers, not just repeat activations
+- Flexible mixing of point and count requirements
+- Better progression system (bronze/silver/gold with increasing requirements)
 
 ---
 

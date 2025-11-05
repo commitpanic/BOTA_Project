@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}Dashboard - BOTA Project{% endblock %}
+{% block title %}{% trans "Dashboard" %} - BOTA Project{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <h1>Welcome back, {{ user.callsign }}!</h1>
-        <p class="text-muted">Track your progress and manage your activations</p>
+        <h1>{% trans "Welcome back" %}, {{ user.callsign }}!</h1>
+        <p class="text-muted">{% trans "Track your progress and manage your activations" %}</p>
     </div>
 </div>
 
@@ -15,9 +16,9 @@
     <div class="col-md-3 col-sm-6 mb-3">
         <div class="card">
             <div class="card-body text-center">
-                <h6 class="text-muted mb-2">Bunkers Activated</h6>
+                <h6 class="text-muted mb-2">{% trans "Bunkers Activated" %}</h6>
                 <h2 class="text-primary">{{ stats.unique_activations }}</h2>
-                <small class="text-muted">{{ stats.total_activator_qso }} QSOs</small>
+                <small class="text-muted">{{ stats.total_activator_qso }} {% trans "QSOs" %}</small>
             </div>
         </div>
     </div>
@@ -25,9 +26,9 @@
     <div class="col-md-3 col-sm-6 mb-3">
         <div class="card">
             <div class="card-body text-center">
-                <h6 class="text-muted mb-2">Bunkers Hunted</h6>
+                <h6 class="text-muted mb-2">{% trans "Bunkers Hunted" %}</h6>
                 <h2 class="text-success">{{ stats.unique_bunkers_hunted }}</h2>
-                <small class="text-muted">{{ stats.total_hunter_qso }} QSOs</small>
+                <small class="text-muted">{{ stats.total_hunter_qso }} {% trans "QSOs" %}</small>
             </div>
         </div>
     </div>
@@ -35,9 +36,9 @@
     <div class="col-md-3 col-sm-6 mb-3">
         <div class="card">
             <div class="card-body text-center">
-                <h6 class="text-muted mb-2">Activator Points</h6>
+                <h6 class="text-muted mb-2">{% trans "Activator Points" %}</h6>
                 <h2 class="text-info">{{ stats.total_activator_qso }}</h2>
-                <small class="text-muted">1 point per QSO</small>
+                <small class="text-muted">{% trans "1 point per QSO" %}</small>
             </div>
         </div>
     </div>
@@ -45,9 +46,9 @@
     <div class="col-md-3 col-sm-6 mb-3">
         <div class="card">
             <div class="card-body text-center">
-                <h6 class="text-muted mb-2">Hunter Points</h6>
+                <h6 class="text-muted mb-2">{% trans "Hunter Points" %}</h6>
                 <h2 class="text-warning">{{ stats.total_hunter_qso }}</h2>
-                <small class="text-muted">1 point per QSO</small>
+                <small class="text-muted">{% trans "1 point per QSO" %}</small>
             </div>
         </div>
     </div>
@@ -55,18 +56,63 @@
     <div class="col-md-3 col-sm-6 mb-3">
         <div class="card">
             <div class="card-body text-center">
-                <h6 class="text-muted mb-2">B2B Confirmed</h6>
+                <h6 class="text-muted mb-2">{% trans "B2B Confirmed" %}</h6>
                 <h2 class="text-danger">{{ stats.activator_b2b_qso }}</h2>
-                <small class="text-muted">Both logs uploaded</small>
+                <small class="text-muted">{% trans "Both logs uploaded" %}</small>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Admin Actions -->
+{% if user.is_staff %}
+<div class="row mb-4">
+    <div class="col-12 mb-3">
+        <h3><i class="bi bi-shield-check"></i> {% trans "Admin Actions" %}</h3>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <a href="{% url 'upload_bunkers_csv' %}" class="text-decoration-none">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center">
+                    <i class="bi bi-file-earmark-arrow-up display-4 text-success mb-3"></i>
+                    <h5>{% trans "Upload Bunkers CSV" %}</h5>
+                    <p class="text-muted">{% trans "Bulk import bunker data" %}</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <a href="/admin/" class="text-decoration-none">
+            <div class="card h-100 border-danger">
+                <div class="card-body text-center">
+                    <i class="bi bi-gear display-4 text-danger mb-3"></i>
+                    <h5>{% trans "Django Admin" %}</h5>
+                    <p class="text-muted">{% trans "Full admin panel access" %}</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <a href="{% url 'manage_bunker_requests' %}" class="text-decoration-none">
+            <div class="card h-100 border-warning">
+                <div class="card-body text-center">
+                    <i class="bi bi-inbox display-4 text-warning mb-3"></i>
+                    <h5>{% trans "Manage Requests" %}</h5>
+                    <p class="text-muted">{% trans "Review bunker requests" %}</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+{% endif %}
+
 <!-- Quick Actions -->
 <div class="row mb-4">
     <div class="col-12 mb-3">
-        <h3>Quick Actions</h3>
+        <h3>{% trans "Quick Actions" %}</h3>
     </div>
     
     <div class="col-md-4 mb-3">
@@ -74,8 +120,8 @@
             <div class="card h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-upload display-4 text-primary mb-3"></i>
-                    <h5>Upload ADIF Log</h5>
-                    <p class="text-muted">Upload your activation logs</p>
+                    <h5>{% trans "Upload ADIF Log" %}</h5>
+                    <p class="text-muted">{% trans "Upload your activation logs" %}</p>
                 </div>
             </div>
         </a>
@@ -86,8 +132,8 @@
             <div class="card h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-trophy display-4 text-warning mb-3"></i>
-                    <h5>View Diplomas</h5>
-                    <p class="text-muted">Check your achievements</p>
+                    <h5>{% trans "View Awards" %}</h5>
+                    <p class="text-muted">{% trans "Check your achievements" %}</p>
                 </div>
             </div>
         </a>
@@ -98,88 +144,301 @@
             <div class="card h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-person-circle display-4 text-success mb-3"></i>
-                    <h5>Edit Profile</h5>
-                    <p class="text-muted">Update your information</p>
+                    <h5>{% trans "Edit Profile" %}</h5>
+                    <p class="text-muted">{% trans "Update your information" %}</p>
                 </div>
             </div>
         </a>
     </div>
 </div>
 
-<!-- Diploma Progress -->
+<!-- Award Progress -->
 <div class="row mb-4">
-    <div class="col-12 mb-3">
-        <h3>Diploma Progress</h3>
+    <div class="col-12 mb-3 d-flex justify-content-between align-items-center">
+        <h3>{% trans "Award Progress" %}</h3>
+        <a href="{% url 'diplomas' %}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-trophy"></i> {% trans "View All Awards" %}
+        </a>
     </div>
-    
-    {% for progress in diploma_progress %}
-    {% if not progress.is_eligible %}
+</div>
+
+<!-- Activator Awards -->
+{% if activator_progress %}
+<div class="row mb-4">
+    <div class="col-12 mb-2">
+        <h5 class="text-primary">
+            <i class="bi bi-broadcast"></i> {% trans "Activator Awards" %}
+        </h5>
+    </div>
+    {% for progress in activator_progress %}
     <div class="col-md-6 mb-3">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="mb-0">{{ progress.diploma_type.name }}</h5>
-                    <span class="badge bg-secondary">In Progress</span>
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="mb-0">
+                        {% load i18n %}
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}
+                        {% endif %}
+                    </h6>
                 </div>
-                <p class="text-muted small mb-2">{{ progress.diploma_type.description }}</p>
+                <p class="text-muted small mb-3">
+                    {% if LANGUAGE_CODE == 'pl' %}
+                        {{ progress.diploma_type.description_pl }}
+                    {% else %}
+                        {{ progress.diploma_type.description_en }}
+                    {% endif %}
+                </p>
                 
-                <!-- Requirements -->
-                <div class="mb-2">
+                <!-- Requirements badges -->
+                <div class="mb-3">
                     {% if progress.diploma_type.min_activator_points > 0 %}
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <small class="text-muted">Activator Points</small>
-                        <span class="badge {% if progress.activator_points >= progress.diploma_type.min_activator_points %}bg-success{% else %}bg-secondary{% endif %}">
-                            {{ progress.activator_points }} / {{ progress.diploma_type.min_activator_points }}
-                        </span>
-                    </div>
+                    <span class="badge {% if progress.activator_points >= progress.diploma_type.min_activator_points %}bg-success{% else %}bg-secondary{% endif %} me-1 mb-1">
+                        <i class="bi bi-broadcast"></i> {{ progress.activator_points }} / {{ progress.diploma_type.min_activator_points }}
+                    </span>
                     {% endif %}
-                    
-                    {% if progress.diploma_type.min_hunter_points > 0 %}
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <small class="text-muted">Hunter Points</small>
-                        <span class="badge {% if progress.hunter_points >= progress.diploma_type.min_hunter_points %}bg-success{% else %}bg-secondary{% endif %}">
-                            {{ progress.hunter_points }} / {{ progress.diploma_type.min_hunter_points }}
-                        </span>
-                    </div>
+                    {% if progress.diploma_type.min_unique_activations > 0 %}
+                    <span class="badge {% if progress.unique_activations >= progress.diploma_type.min_unique_activations %}bg-success{% else %}bg-secondary{% endif %} me-1 mb-1">
+                        <i class="bi bi-pin-map"></i> {{ progress.unique_activations }} / {{ progress.diploma_type.min_unique_activations }}
+                    </span>
                     {% endif %}
-                    
-                    {% if progress.diploma_type.min_b2b_points > 0 %}
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <small class="text-muted">B2B Points</small>
-                        <span class="badge {% if progress.b2b_points >= progress.diploma_type.min_b2b_points %}bg-success{% else %}bg-secondary{% endif %}">
-                            {{ progress.b2b_points }} / {{ progress.diploma_type.min_b2b_points }}
-                        </span>
-                    </div>
+                    {% if progress.diploma_type.min_total_activations > 0 %}
+                    <span class="badge {% if progress.total_activations >= progress.diploma_type.min_total_activations %}bg-success{% else %}bg-secondary{% endif %} me-1 mb-1">
+                        <i class="bi bi-calendar-check"></i> {{ progress.total_activations }} / {{ progress.diploma_type.min_total_activations }}
+                    </span>
                     {% endif %}
                 </div>
                 
-                <div class="progress mb-2">
-                    <div class="progress-bar" role="progressbar" 
+                <!-- Progress bar -->
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar {% if progress.percentage_complete >= 75 %}bg-success{% elif progress.percentage_complete >= 50 %}bg-info{% elif progress.percentage_complete >= 25 %}bg-warning{% else %}bg-secondary{% endif %}" 
+                         role="progressbar" 
                          style="width: {{ progress.percentage_complete }}%"
                          aria-valuenow="{{ progress.percentage_complete }}" 
                          aria-valuemin="0" 
                          aria-valuemax="100">
-                        {{ progress.percentage_complete|floatformat:0 }}%
+                        <strong>{{ progress.percentage_complete|floatformat:0 }}%</strong>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    {% endif %}
-    {% empty %}
-    <div class="col-12">
-        <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i> No diploma progress yet. Start activating or hunting to begin earning diplomas!
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Hunter Awards -->
+{% if hunter_progress %}
+<div class="row mb-4">
+    <div class="col-12 mb-2">
+        <h5 class="text-success">
+            <i class="bi bi-crosshair"></i> {% trans "Hunter Awards" %}
+        </h5>
+    </div>
+    {% for progress in hunter_progress %}
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="mb-0">
+                        {% load i18n %}
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}
+                        {% endif %}
+                    </h6>
+                </div>
+                <p class="text-muted small mb-3">
+                    {% if LANGUAGE_CODE == 'pl' %}
+                        {{ progress.diploma_type.description_pl }}
+                    {% else %}
+                        {{ progress.diploma_type.description_en }}
+                    {% endif %}
+                </p>
+                
+                <!-- Requirements badges -->
+                <div class="mb-3">
+                    {% if progress.diploma_type.min_hunter_points > 0 %}
+                    <span class="badge {% if progress.hunter_points >= progress.diploma_type.min_hunter_points %}bg-success{% else %}bg-secondary{% endif %} me-1 mb-1">
+                        <i class="bi bi-crosshair"></i> {{ progress.hunter_points }} / {{ progress.diploma_type.min_hunter_points }}
+                    </span>
+                    {% endif %}
+                    {% if progress.diploma_type.min_unique_hunted > 0 %}
+                    <span class="badge {% if progress.unique_hunted >= progress.diploma_type.min_unique_hunted %}bg-success{% else %}bg-secondary{% endif %} me-1 mb-1">
+                        <i class="bi bi-geo-alt"></i> {{ progress.unique_hunted }} / {{ progress.diploma_type.min_unique_hunted }}
+                    </span>
+                    {% endif %}
+                    {% if progress.diploma_type.min_total_hunted > 0 %}
+                    <span class="badge {% if progress.total_hunted >= progress.diploma_type.min_total_hunted %}bg-success{% else %}bg-secondary{% endif %} me-1 mb-1">
+                        <i class="bi bi-bullseye"></i> {{ progress.total_hunted }} / {{ progress.diploma_type.min_total_hunted }}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <!-- Progress bar -->
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar {% if progress.percentage_complete >= 75 %}bg-success{% elif progress.percentage_complete >= 50 %}bg-info{% elif progress.percentage_complete >= 25 %}bg-warning{% else %}bg-secondary{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ progress.percentage_complete }}%"
+                         aria-valuenow="{{ progress.percentage_complete }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        <strong>{{ progress.percentage_complete|floatformat:0 }}%</strong>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     {% endfor %}
 </div>
+{% endif %}
+
+<!-- B2B Awards -->
+{% if b2b_progress %}
+<div class="row mb-4">
+    <div class="col-12 mb-2">
+        <h5 class="text-warning">
+            <i class="bi bi-arrow-left-right"></i> Bunker-to-Bunker Awards
+        </h5>
+    </div>
+    {% for progress in b2b_progress %}
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="mb-0">
+                        {% load i18n %}
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}
+                        {% endif %}
+                    </h6>
+                </div>
+                <p class="text-muted small mb-3">
+                    {% if LANGUAGE_CODE == 'pl' %}
+                        {{ progress.diploma_type.description_pl }}
+                    {% else %}
+                        {{ progress.diploma_type.description_en }}
+                    {% endif %}
+                </p>
+                
+                <!-- Requirements badges -->
+                <div class="mb-3">
+                    {% if progress.diploma_type.min_b2b_points > 0 %}
+                    <span class="badge {% if progress.b2b_points >= progress.diploma_type.min_b2b_points %}bg-success{% else %}bg-secondary{% endif %} me-1 mb-1">
+                        <i class="bi bi-arrow-left-right"></i> {{ progress.b2b_points }} / {{ progress.diploma_type.min_b2b_points }}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <!-- Progress bar -->
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar {% if progress.percentage_complete >= 75 %}bg-success{% elif progress.percentage_complete >= 50 %}bg-info{% elif progress.percentage_complete >= 25 %}bg-warning{% else %}bg-secondary{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ progress.percentage_complete }}%"
+                         aria-valuenow="{{ progress.percentage_complete }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        <strong>{{ progress.percentage_complete|floatformat:0 }}%</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Special Event & Other Awards -->
+{% if special_progress %}
+<div class="row mb-4">
+    <div class="col-12 mb-2">
+        <h5 class="text-info">
+            <i class="bi bi-star"></i> Special Event & Other Awards
+        </h5>
+    </div>
+    {% for progress in special_progress %}
+    <div class="col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="mb-0">
+                        {% load i18n %}
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% if LANGUAGE_CODE == 'pl' %}
+                            {{ progress.diploma_type.name_pl }}
+                        {% else %}
+                            {{ progress.diploma_type.name_en }}
+                        {% endif %}
+                    </h6>
+                </div>
+                <p class="text-muted small mb-3">
+                    {% if LANGUAGE_CODE == 'pl' %}
+                        {{ progress.diploma_type.description_pl }}
+                    {% else %}
+                        {{ progress.diploma_type.description_en }}
+                    {% endif %}
+                </p>
+                
+                <!-- Requirements badges -->
+                <div class="mb-3">
+                    {% if progress.diploma_type.min_activator_points > 0 %}
+                    <span class="badge {% if progress.activator_points >= progress.diploma_type.min_activator_points %}bg-success{% else %}bg-secondary{% endif %} me-1 mb-1">
+                        <i class="bi bi-broadcast"></i> {{ progress.activator_points }} / {{ progress.diploma_type.min_activator_points }}
+                    </span>
+                    {% endif %}
+                    {% if progress.diploma_type.min_hunter_points > 0 %}
+                    <span class="badge {% if progress.hunter_points >= progress.diploma_type.min_hunter_points %}bg-success{% else %}bg-secondary{% endif %} me-1 mb-1">
+                        <i class="bi bi-crosshair"></i> {{ progress.hunter_points }} / {{ progress.diploma_type.min_hunter_points }}
+                    </span>
+                    {% endif %}
+                    {% if progress.diploma_type.min_b2b_points > 0 %}
+                    <span class="badge {% if progress.b2b_points >= progress.diploma_type.min_b2b_points %}bg-success{% else %}bg-secondary{% endif %} me-1 mb-1">
+                        <i class="bi bi-arrow-left-right"></i> {{ progress.b2b_points }} / {{ progress.diploma_type.min_b2b_points }}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <!-- Progress bar -->
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar {% if progress.percentage_complete >= 75 %}bg-success{% elif progress.percentage_complete >= 50 %}bg-info{% elif progress.percentage_complete >= 25 %}bg-warning{% else %}bg-secondary{% endif %}" 
+                         role="progressbar" 
+                         style="width: {{ progress.percentage_complete }}%"
+                         aria-valuenow="{{ progress.percentage_complete }}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        <strong>{{ progress.percentage_complete|floatformat:0 }}%</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if not activator_progress and not hunter_progress and not b2b_progress and not special_progress %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No award progress yet. Start activating or hunting to begin earning awards!
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <!-- Recent Activity -->
 {% if recent_logs %}
 <div class="row">
     <div class="col-12 mb-3">
-        <h3>Recent Activity</h3>
+        <h3>{% trans "Recent Activity" %}</h3>
     </div>
     <div class="col-12">
         <div class="card">
@@ -188,11 +447,11 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Bunker</th>
-                                <th>Mode</th>
-                                <th>Band</th>
-                                <th>Type</th>
+                                <th>{% trans "Date" %}</th>
+                                <th>{% trans "Bunker" %}</th>
+                                <th>{% trans "Mode" %}</th>
+                                <th>{% trans "Band" %}</th>
+                                <th>{% trans "Type" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -204,9 +463,9 @@
                                 <td>{{ log.band|default:"N/A" }}</td>
                                 <td>
                                     {% if log.activator %}
-                                    <span class="badge bg-success">Activator</span>
+                                    <span class="badge bg-success">{% trans "Activator" %}</span>
                                     {% else %}
-                                    <span class="badge bg-info">Hunter</span>
+                                    <span class="badge bg-info">{% trans "Hunter" %}</span>
                                     {% endif %}
                                 </td>
                             </tr>

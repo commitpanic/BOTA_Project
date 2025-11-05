@@ -160,7 +160,7 @@
   - [ ] Bunker ratings and reviews
 
 - [ ] **Social Features**
-  - [ ] User profiles with avatar upload
+  - [ ] User profiles with avatar upload (tip: use Gravatar)
   - [ ] Activity feed (recent activations, diplomas earned)
   - [ ] Leaderboards (top activators, top hunters, B2B leaders)
   - [ ] User connections/friends system

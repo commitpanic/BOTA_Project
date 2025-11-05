@@ -1,0 +1,1250 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid \\"\\"
+msgstr \\"\\"
+\\"Project-Id-Version: PACKAGE VERSION\n\\"
+\\"Report-Msgid-Bugs-To: \n\\"
+\\"POT-Creation-Date: 2025-11-05 15:00+0000\n\\"
+\\"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n\\"
+\\"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n\\"
+\\"Language-Team: LANGUAGE <LL@li.org>\n\\"
+\\"Language: pl\n\\"
+\\"MIME-Version: 1.0\n\\"
+\\"Content-Type: text/plain; charset=UTF-8\n\\"
+\\"Content-Transfer-Encoding: 8bit\n\\"
+\\"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n\\"
+
+# Awards/Diplomas terminology
+msgid \\"My Awards\\"
+msgstr \\"Moje Dyplomy\\"
+
+msgid \\"Earned Awards\\"
+msgstr \\"Zdobyte Dyplomy\\"
+
+msgid \\"Award Progress\\"
+msgstr \\"Postęp Dyplomów\\"
+
+msgid \\"Activator Awards\\"
+msgstr \\"Dyplomy Aktywatora\\"
+
+msgid \\"Hunter Awards\\"
+msgstr \\"Dyplomy Łowcy\\"
+
+msgid \\"Bunker-to-Bunker Awards\\"
+msgstr \\"Dyplomy Bunker-to-Bunker\\"
+
+msgid \\"Special Event & Other Awards\\"
+msgstr \\"Dyplomy Specjalne i Inne\\"
+
+msgid \\"Awards\\"
+msgstr \\"Dyplomy\\"
+
+msgid \\"Award Verification\\"
+msgstr \\"Weryfikacja Dyplomu\\"
+
+msgid \\"Award Not Found\\"
+msgstr \\"Dyplom Nie Znaleziony\\"
+
+msgid \\"Award Verified\\"
+msgstr \\"Dyplom Zweryfikowany\\"
+
+msgid \\"This award is authentic and officially issued\\"
+msgstr \\"Ten dyplom jest autentyczny i oficjalnie wydany\\"
+
+msgid \\"Award Number\\"
+msgstr \\"Numer Dyplomu\\"
+
+msgid \\"Award Type\\"
+msgstr \\"Typ Dyplomu\\"
+
+msgid \\"Awarded To\\"
+msgstr \\"Przyznano dla\\"
+
+msgid \\"Issue Date\\"
+msgstr \\"Data Wydania\\"
+
+msgid \\"Download Certificate\\"
+msgstr \\"Pobierz Certyfikat\\"
+
+msgid \\"Track your achievements and progress\\"
+msgstr \\"Śledź swoje osiągnięcia i postępy\\"
+
+msgid \\"Track your progress towards earning awards in each category\\"
+msgstr \\"Śledź swoje postępy w zdobywaniu dyplomów w każdej kategorii\\"
+
+msgid \\"You haven't earned any awards yet. Keep activating and hunting!\\"
+msgstr \\"Nie zdobyłeś jeszcze żadnych dyplomów. Kontynuuj aktywacje i łowiectwo!\\"
+
+msgid \\"No award progress yet. Start activating or hunting to begin!\\"
+msgstr \\"Brak postępu w dyplomach. Zacznij aktywować lub polować!\\"
+
+msgid \\"Earned\\"
+msgstr \\"Zdobyty\\"
+
+msgid \\"Earned Date\\"
+msgstr \\"Data Zdobycia\\"
+
+msgid \\"Certificate #\\"
+msgstr \\"Certyfikat nr\\"
+
+msgid \\"Category\\"
+msgstr \\"Kategoria\\"
+
+msgid \\"Requirements Met\\"
+msgstr \\"Spełnione Wymagania\\"
+
+msgid \\"In Progress\\"
+msgstr \\"W Trakcie\\"
+
+# Points and requirements
+msgid \\"Activator Points\\"
+msgstr \\"Punkty Aktywatora\\"
+
+msgid \\"Hunter Points\\"
+msgstr \\"Punkty Łowcy\\"
+
+msgid \\"B2B Points\\"
+msgstr \\"Punkty B2B\\"
+
+msgid \\"Unique Activations\\"
+msgstr \\"Unikalne Aktywacje\\"
+
+msgid \\"Total Activations\\"
+msgstr \\"Wszystkie Aktywacje\\"
+
+msgid \\"Unique Hunted\\"
+msgstr \\"Unikalne Upolowane\\"
+
+msgid \\"Total Hunted\\"
+msgstr \\"Wszystkie Upolowane\\"
+
+# Verification page
+msgid \\"This diploma could not be verified\\"
+msgstr \\"Ten dyplom nie mógł zostać zweryfikowany\\"
+
+msgid \\"Diploma Number\\"
+msgstr \\"Numer Dyplomu\\"
+
+msgid \\"Warning\\"
+msgstr \\"Ostrzeżenie\\"
+
+msgid \\"This award number does not exist in our database.\\"
+msgstr \\"Ten numer dyplomu nie istnieje w naszej bazie danych.\\"
+
+msgid \\"Possible reasons\\"
+msgstr \\"Możliwe przyczyny\\"
+
+msgid \\"The award number was entered incorrectly\\"
+msgstr \\"Numer dyplomu został wprowadzony nieprawidłowo\\"
+
+msgid \\"The award has not been officially issued\\"
+msgstr \\"Dyplom nie został oficjalnie wydany\\"
+
+msgid \\"The award may be counterfeit\\"
+msgstr \\"Dyplom może być podrobiony\\"
+
+msgid \\"Return to Home\\"
+msgstr \\"Powrót do Strony Głównej\\"
+
+msgid \\"Report an Issue\\"
+msgstr \\"Zgłoś Problem\\"
+
+msgid \\"If you believe this award should be valid, please contact the BOTA Project administrators.\\"
+msgstr \\"Jeśli uważasz, że ten dyplom powinien być ważny, skontaktuj się z administratorami projektu BOTA.\\"
+
+msgid \\"Back to Home\\"
+msgstr \\"Powrót do Strony Głównej\\"
+
+msgid \\"Note: This diploma type is time-limited and may no longer be active.\\"
+msgstr \\"Uwaga: Ten typ dyplomu jest ograniczony czasowo i może już nie być aktywny.\\"
+
+msgid \\"Verified\\"
+msgstr \\"Zweryfikowano\\"
+
+msgid \\"time(s)\\"
+msgstr \\"raz(y)\\"
+
+msgid \\"Issued by BOTA Project\\"
+msgstr \\"Wydany przez Projekt BOTA\\"
+
+msgid \\"Approved by\\"
+msgstr \\"Zatwierdzony przez\\"
+
+msgid \\"This verification confirms the authenticity of this BOTA award certificate\\"
+msgstr \\"Ta weryfikacja potwierdza autentyczność tego certyfikatu dyplomu BOTA\\"
+
+msgid \\"Security Information\\"
+msgstr \\"Informacje Bezpieczeństwa\\"
+
+msgid \\"Each award has a unique number and verification code\\"
+msgstr \\"Każdy dyplom ma unikalny numer i kod weryfikacyjny\\"
+
+msgid \\"All verifications are logged with timestamp and IP address\\"
+msgstr \\"Wszystkie weryfikacje są rejestrowane z oznaczeniem czasu i adresem IP\\"
+
+msgid \\"Awards cannot be forged or duplicated\\"
+msgstr \\"Dyplomy nie mogą być podrobione ani zduplikowane\\"
+
+# Navigation and general
+msgid \\"BOTA Project - Bunkers on the Air\\"
+msgstr \\"Projekt BOTA - Bunkry w Eterze\\"
+
+msgid \\"Home\\"
+msgstr \\"Strona Główna\\"
+
+msgid \\"Dashboard\\"
+msgstr \\"Kokpit\\"
+
+msgid \\"Bunkers\\"
+msgstr \\"Bunkry\\"
+
+msgid \\"Browse Bunkers\\"
+msgstr \\"Przeglądaj Bunkry\\"
+
+msgid \\"Request New Bunker\\"
+msgstr \\"Zgłoś Nowy Bunker\\"
+
+msgid \\"My Requests\\"
+msgstr \\"Moje Zgłoszenia\\"
+
+msgid \\"Manage Requests\\"
+msgstr \\"Zarządzaj Zgłoszeniami\\"
+
+msgid \\"Upload Log\\"
+msgstr \\"Wgraj Log\\"
+
+msgid \\"Profile\\"
+msgstr \\"Profil\\"
+
+msgid \\"Logout\\"
+msgstr \\"Wyloguj\\"
+
+msgid \\"Login\\"
+msgstr \\"Zaloguj\\"
+
+msgid \\"Register\\"
+msgstr \\"Rejestracja\\"
+
+# Home page
+msgid \\"Connect amateur radio with military history. Activate bunkers, hunt contacts, earn awards!\\"
+msgstr \\"Połącz radioamatorstwo z historią wojskową. Aktywuj bunkry, poluj na łączności, zdobywaj dyplomy!\\"
+
+msgid \\"Get Started\\"
+msgstr \\"Rozpocznij\\"
+
+msgid \\"Go to Dashboard\\"
+msgstr \\"Przejdź do Kokpitu\\"
+
+msgid \\"How It Works\\"
+msgstr \\"Jak To Działa\\"
+
+msgid \\"Activate Bunkers\\"
+msgstr \\"Aktywuj Bunkry\\"
+
+msgid \\"Visit military fortifications and activate them on amateur radio bands. Upload your ADIF logs to record your activations.\\"
+msgstr \\"Odwiedź fortyfikacje wojskowe i aktywuj je na pasmach radioamatorskich. Wgraj swoje logi ADIF, aby zarejestrować swoje aktywacje.\\"
+
+msgid \\"Hunt Contacts\\"
+msgstr \\"Poluj na Łączności\\"
+
+msgid \\"Contact activators at bunker locations. Earn points for each QSO and build your collection of bunkers.\\"
+msgstr \\"Łącz się z aktywatorami w lokalizacjach bunkrów. Zdobywaj punkty za każde QSO i buduj swoją kolekcję bunkrów.\\"
+
+msgid \\"Earn Awards\\"
+msgstr \\"Zdobywaj Dyplomy\\"
+
+msgid \\"Track your progress and earn awards based on your activity. From Bronze to Diamond levels!\\"
+msgstr \\"Śledź swoje postępy i zdobywaj dyplomy na podstawie swojej aktywności. Od poziomu Brązowego do Diamentowego!\\"
+
+msgid \\"Program Statistics\\"
+msgstr \\"Statystyki Programu\\"
+
+msgid \\"Awards Issued\\"
+msgstr \\"Wydane Dyplomy\\"
+
+# Profile page
+msgid \\"My Profile\\"
+msgstr \\"Mój Profil\\"
+
+msgid \\"My Statistics\\"
+msgstr \\"Moje Statystyki\\"
+
+msgid \\"Total Points\\"
+msgstr \\"Łączne Punkty\\"
+
+msgid \\"Activator QSOs\\"
+msgstr \\"QSO Aktywatora\\"
+
+msgid \\"Hunter QSOs\\"
+msgstr \\"QSO Łowcy\\"
+
+msgid \\"B2B QSOs\\"
+msgstr \\"QSO B2B\\"
+
+msgid \\"Activator Statistics\\"
+msgstr \\"Statystyki Aktywatora\\"
+
+msgid \\"Total Activator QSOs\\"
+msgstr \\"Wszystkie QSO Aktywatora\\"
+
+msgid \\"Activator B2B QSOs\\"
+msgstr \\"QSO B2B Aktywatora\\"
+
+msgid \\"Hunter Statistics\\"
+msgstr \\"Statystyki Łowcy\\"
+
+msgid \\"Total Hunter QSOs\\"
+msgstr \\"Wszystkie QSO Łowcy\\"
+
+msgid \\"Unique Bunkers Hunted\\"
+msgstr \\"Unikalne Upolowane Bunkry\\"
+
+msgid \\"Total B2B QSOs\\"
+msgstr \\"Wszystkie QSO B2B\\"
+
+msgid \\"Account Actions\\"
+msgstr \\"Akcje Konta\\"
+
+# Register page
+msgid \\"Create Your Account\\"
+msgstr \\"Utwórz Swoje Konto\\"
+
+msgid \\"Email Address\\"
+msgstr \\"Adres Email\\"
+
+msgid \\"Used for login\\"
+msgstr \\"Używany do logowania\\"
+
+msgid \\"Callsign\\"
+msgstr \\"Znak Wywoławczy\\"
+
+msgid \\"Your amateur radio callsign\\"
+msgstr \\"Twój znak wywoławczy radioamatorski\\"
+
+msgid \\"Password\\"
+msgstr \\"Hasło\\"
+
+msgid \\"Minimum 8 characters\\"
+msgstr \\"Minimum 8 znaków\\"
+
+msgid \\"Confirm Password\\"
+msgstr \\"Potwierdź Hasło\\"
+
+msgid \\"Already have an account?\\"
+msgstr \\"Masz już konto?\\"
+
+msgid \\"Login here\\"
+msgstr \\"Zaloguj się tutaj\\"
+
+# Footer
+msgid \\"Bunkers on the Air - Connecting amateur radio enthusiasts with military history.\\"
+msgstr \\"Bunkry w Eterze - Łączymy entuzjastów radioamatorstwa z historią wojskową.\\"
+
+msgid \\"Quick Links\\"
+msgstr \\"Szybkie Linki\\"
+
+msgid \\"About\\"
+msgstr \\"O Nas\\"
+
+msgid \\"Rules\\"
+msgstr \\"Regulamin\\"
+
+msgid \\"Map\\"
+msgstr \\"Mapa\\"
+
+msgid \\"Admin\\"
+msgstr \\"Admin\\"
+
+msgid \\"Legal\\"
+msgstr \\"Informacje Prawne\\"
+
+msgid \\"Privacy Policy\\"
+msgstr \\"Polityka Prywatności\\"
+
+msgid \\"Cookie Policy\\"
+msgstr \\"Polityka Cookies\\"
+
+msgid \\"Terms of Service\\"
+msgstr \\"Warunki Użytkowania\\"
+
+msgid \\"All rights reserved.\\"
+msgstr \\"Wszelkie prawa zastrzeżone.\\"
+
+# Dashboard
+msgid \\"View All Awards\\"
+msgstr \\"Zobacz Wszystkie Dyplomy\\"
+
+# Upload CSV
+msgid \\"Upload Bunkers CSV\\"
+msgstr \\"Wgraj CSV Bunkrów\\"
+
+msgid \\"CSV File\\"
+msgstr \\"Plik CSV\\"
+
+msgid \\"CSV Format Requirements\\"
+msgstr \\"Wymagania Formatu CSV\\"
+
+msgid \\"Your CSV file must contain the following columns:\\"
+msgstr \\"Twój plik CSV musi zawierać następujące kolumny:\\"
+
+msgid \\"Unique bunker reference (e.g., B/SP-0039)\\"
+msgstr \\"Unikalny numer referencyjny bunkra (np. B/SP-0039)\\"
+
+msgid \\"Bunker name in Polish\\"
+msgstr \\"Nazwa bunkra po polsku\\"
+
+msgid \\"Bunker name in English\\"
+msgstr \\"Nazwa bunkra po angielsku\\"
+
+msgid \\"Category name (will be created if doesn't exist)\\"
+msgstr \\"Nazwa kategorii (zostanie utworzona jeśli nie istnieje)\\"
+
+msgid \\"GPS latitude in decimal degrees\\"
+msgstr \\"Szerokość GPS w stopniach dziesiętnych\\"
+
+msgid \\"GPS longitude in decimal degrees\\"
+msgstr \\"Długość GPS w stopniach dziesiętnych\\"
+
+msgid \\"Description in Polish (optional)\\"
+msgstr \\"Opis po polsku (opcjonalnie)\\"
+
+msgid \\"Description in English (optional)\\"
+msgstr \\"Opis po angielsku (opcjonalnie)\\"
+
+msgid \\"Example CSV Format:\\"
+msgstr \\"Przykładowy Format CSV:\\"
+
+msgid \\"Note:\\"
+msgstr \\"Uwaga:\\"
+
+msgid \\"Bunkers with duplicate reference numbers will be skipped.\\"
+msgstr \\"Bunkry z duplikującymi się numerami referencyjnymi zostaną pominięte.\\"
+
+msgid \\"As a staff member, imported bunkers will be automatically verified.\\"
+msgstr \\"Jako członek zespołu, importowane bunkry będą automatycznie zweryfikowane.\\"
+
+msgid \\"Upload CSV\\"
+msgstr \\"Wgraj CSV\\"
+
+msgid \\"Cancel\\"
+msgstr \\"Anuluj\\"
+
+msgid \\"Download Sample CSV\\"
+msgstr \\"Pobierz Przykładowy CSV\\"
+
+msgid \\"You can copy this sample data to create your CSV file:\\"
+msgstr \\"Możesz skopiować te przykładowe dane, aby utworzyć swój plik CSV:\\"
+
+# Dashboard page
+msgid \\"Welcome back\\"
+msgstr \\"Witaj ponownie\\"
+
+msgid \\"Track your progress and manage your activations\\"
+msgstr \\"Śledź swoje postępy i zarządzaj swoimi aktywacjami\\"
+
+msgid \\"Bunkers Activated\\"
+msgstr \\"Aktywowane Bunkry\\"
+
+msgid \\"Bunkers Hunted\\"
+msgstr \\"Upolowane Bunkry\\"
+
+msgid \\"QSOs\\"
+msgstr \\"QSO\\"
+
+msgid \\"1 point per QSO\\"
+msgstr \\"1 punkt za QSO\\"
+
+msgid \\"B2B Confirmed\\"
+msgstr \\"Potwierdzone B2B\\"
+
+msgid \\"Both logs uploaded\\"
+msgstr \\"Oba logi wgrane\\"
+
+msgid \\"Admin Actions\\"
+msgstr \\"Akcje Administratora\\"
+
+msgid \\"Bulk import bunker data\\"
+msgstr \\"Masowy import danych bunkrów\\"
+
+msgid \\"Django Admin\\"
+msgstr \\"Panel Administracyjny Django\\"
+
+msgid \\"Full admin panel access\\"
+msgstr \\"Pełny dostęp do panelu administracyjnego\\"
+
+msgid \\"Review bunker requests\\"
+msgstr \\"Przejrzyj zgłoszenia bunkrów\\"
+
+msgid \\"Quick Actions\\"
+msgstr \\"Szybkie Akcje\\"
+
+msgid \\"Upload ADIF Log\\"
+msgstr \\"Wgraj Log ADIF\\"
+
+msgid \\"Upload your activation logs\\"
+msgstr \\"Wgraj swoje logi aktywacji\\"
+
+msgid \\"Check your achievements\\"
+msgstr \\"Sprawdź swoje osiągnięcia\\"
+
+msgid \\"Edit Profile\\"
+msgstr \\"Edytuj Profil\\"
+
+msgid \\"Update your information\\"
+msgstr \\"Zaktualizuj swoje informacje\\"
+
+msgid \\"Recent Activity\\"
+msgstr \\"Ostatnia Aktywność\\"
+
+msgid \\"Date\\"
+msgstr \\"Data\\"
+
+msgid \\"Bunker\\"
+msgstr \\"Bunker\\"
+
+msgid \\"Mode\\"
+msgstr \\"Rodzaj\\"
+
+msgid \\"Band\\"
+msgstr \\"Pasmo\\"
+
+msgid \\"Type\\"
+msgstr \\"Typ\\"
+
+msgid \\"Hunter\\"
+msgstr \\"Łowca\\"
+
+# Home page additional
+msgid \\"Active Bunkers\\"
+msgstr \\"Aktywne Bunkry\\"
+
+msgid \\"Registered Users\\"
+msgstr \\"Zarejestrowani Użytkownicy\\"
+
+msgid \\"Total QSOs\\"
+msgstr \\"Wszystkie QSO\\"
+
+msgid \\"Recent Activations\\"
+msgstr \\"Ostatnie Aktywacje\\"
+
+msgid \\"Last QSO\\"
+msgstr \\"Ostatnie QSO\\"
+
+# Dashboard Award Progress section
+msgid \\"Award Progress\\"
+msgstr \\"Postęp Nagród\\"
+
+msgid \\"View All Awards\\"
+msgstr \\"Zobacz Wszystkie Nagrody\\"
+
+msgid \\"Activator Awards\\"
+msgstr \\"Nagrody Aktywatora\\"
+
+msgid \\"Hunter Awards\\"
+msgstr \\"Nagrody Łowcy\\"
+
+# Upload Log page
+msgid \\"Upload ADIF Log\\"
+msgstr \\"Prześlij Log ADIF\\"
+
+msgid \\"Upload ADIF Log File\\"
+msgstr \\"Prześlij Plik Logów ADIF\\"
+
+msgid \\"Instructions:\\"
+msgstr \\"Instrukcje:\\"
+
+msgid \\"Only activators can upload logs\\"
+msgstr \\"Tylko aktywatorzy mogą przesyłać logi\\"
+
+msgid \\"File must be in ADIF format (.adi extension)\\"
+msgstr \\"Plik musi być w formacie ADIF (rozszerzenie .adi)\\"
+
+msgid \\"Your callsign must match the OPERATOR or STATION_CALLSIGN field\\"
+msgstr \\"Twój znak wywoławczy musi odpowiadać polu OPERATOR lub STATION_CALLSIGN\\"
+
+msgid \\"Bunker references must be in format: B/SP-xxxx\\"
+msgstr \\"Referencje bunkrów muszą być w formacie: B/SP-xxxx\\"
+
+msgid \\"Hunter points will be automatically awarded\\"
+msgstr \\"Punkty łowcy zostaną automatycznie przyznane\\"
+
+msgid \\"Select ADIF File (.adi)\\"
+msgstr \\"Wybierz Plik ADIF (.adi)\\"
+
+msgid \\"Maximum file size: 10 MB\\"
+msgstr \\"Maksymalny rozmiar pliku: 10 MB\\"
+
+msgid \\"Upload Log\\"
+msgstr \\"Prześlij Log\\"
+
+msgid \\"Back to Dashboard\\"
+msgstr \\"Powrót do Panelu\\"
+
+msgid \\"Processing...\\"
+msgstr \\"Przetwarzanie...\\"
+
+msgid \\"ADIF Format Requirements\\"
+msgstr \\"Wymagania Formatu ADIF\\"
+
+msgid \\"Required ADIF Fields:\\"
+msgstr \\"Wymagane Pola ADIF:\\"
+
+msgid \\"Must be \\\"WWBOTA\\\"\\"
+msgstr \\"Musi być \\\"WWBOTA\\\"\\"
+
+msgid \\"Bunker reference (e.g., B/SP-0039)\\"
+msgstr \\"Referencja bunkra (np. B/SP-0039)\\"
+
+msgid \\"Your callsign\\"
+msgstr \\"Twój znak wywoławczy\\"
+
+msgid \\"Hunter's callsign\\"
+msgstr \\"Znak wywoławczy łowcy\\"
+
+msgid \\"Date of contact\\"
+msgstr \\"Data kontaktu\\"
+
+msgid \\"Time of contact (UTC)\\"
+msgstr \\"Czas kontaktu (UTC)\\"
+
+msgid \\"Optional Fields:\\"
+msgstr \\"Pola Opcjonalne:\\"
+
+msgid \\"Radio mode (SSB, CW, FM, etc.)\\"
+msgstr \\"Rodzaj emisji (SSB, CW, FM, itp.)\\"
+
+msgid \\"Radio band (40m, 20m, etc.)\\"
+msgstr \\"Pasmo radiowe (40m, 20m, itp.)\\"
+
+msgid \\"Example ADIF Record:\\"
+msgstr \\"Przykładowy Rekord ADIF:\\"
+
+# Spots/Cluster page
+msgid \\"Spots\\"
+msgstr \\"Klaster\\"
+
+msgid \\"Klaster\\"
+msgstr \\"Klaster\\"
+
+msgid \\"Real-time spotting system for BOTA activations\\"
+msgstr \\"System zgłoszeń aktywacji BOTA w czasie rzeczywistym\\"
+
+msgid \\"Auto-refresh\\"
+msgstr \\"Auto-odświeżanie\\"
+
+msgid \\"Pause/Resume\\"
+msgstr \\"Pauza/Wznów\\"
+
+msgid \\"Next refresh in:\\"
+msgstr \\"Kolejne odświeżenie za:\\"
+
+msgid \\"Post Spot\\"
+msgstr \\"Dodaj Spot\\"
+
+msgid \\"Filter\\"
+msgstr \\"Filtruj\\"
+
+msgid \\"Post a Spot\\"
+msgstr \\"Dodaj Spot\\"
+
+msgid \\"Activator Callsign\\"
+msgstr \\"Znak Aktywatora\\"
+
+msgid \\"Frequency (MHz)\\"
+msgstr \\"Częstotliwość (MHz)\\"
+
+msgid \\"Bunker Reference\\"
+msgstr \\"Referencja Bunkra\\"
+
+msgid \\"optional\\"
+msgstr \\"opcjonalnie\\"
+
+msgid \\"Comment\\"
+msgstr \\"Komentarz\\"
+
+msgid \\"Cancel\\"
+msgstr \\"Anuluj\\"
+
+msgid \\"Filter by Activator\\"
+msgstr \\"Filtruj po Aktywatorze\\"
+
+msgid \\"Enter callsign\\"
+msgstr \\"Wpisz znak wywoławczy\\"
+
+msgid \\"Filter by Spotter\\"
+msgstr \\"Filtruj po Spotterze\\"
+
+msgid \\"Filter by Band\\"
+msgstr \\"Filtruj po Paśmie\\"
+
+msgid \\"All Bands\\"
+msgstr \\"Wszystkie Pasma\\"
+
+msgid \\"Apply Filters\\"
+msgstr \\"Zastosuj Filtry\\"
+
+msgid \\"Clear Filters\\"
+msgstr \\"Wyczyść Filtry\\"
+
+msgid \\"Active Spots\\"
+msgstr \\"Aktywne Spoty\\"
+
+msgid \\"spot(s)\\"
+msgstr \\"spot(y)\\"
+
+msgid \\"Activator\\"
+msgstr \\"Aktywator\\"
+
+msgid \\"Frequency\\"
+msgstr \\"Częstotliwość\\"
+
+msgid \\"Band\\"
+msgstr \\"Pasmo\\"
+
+msgid \\"Bunker\\"
+msgstr \\"Bunkier\\"
+
+msgid \\"Spotter\\"
+msgstr \\"Spotter\\"
+
+msgid \\"Last Heard\\"
+msgstr \\"Ostatnio Słyszany\\"
+
+msgid \\"No Active Spots\\"
+msgstr \\"Brak Aktywnych Spotów\\"
+
+msgid \\"No spots are currently active. Be the first to post one!\\"
+msgstr \\"Obecnie brak aktywnych spotów. Bądź pierwszy i dodaj spot!\\"
+
+msgid \\"Spot posted successfully\\"
+msgstr \\"Spot został dodany pomyślnie\\"
+
+msgid \\"Activator callsign and frequency are required\\"
+msgstr \\"Znak aktywatora i częstotliwość są wymagane\\"
+
+msgid \\"Invalid frequency value\\"
+msgstr \\"Nieprawidłowa wartość częstotliwości\\"
+
+msgid \\"Error processing spot: \\"
+msgstr \\"Błąd przetwarzania spotu: \\"
+
+msgid \\"Error submitting spot. Please try again.\\"
+msgstr \\"Błąd podczas dodawania spotu. Spróbuj ponownie.\\"
+
+# Cookie & Terms Consent Banner
+msgid \\"Cookies & Terms of Service\\"
+msgstr \\"Cookies i Regulamin\\"
+
+msgid \\"Accept\\"
+msgstr \\"Akceptuję\\"
+
+# Privacy Policy
+msgid \\"Last updated: November 5, 2025\\"
+msgstr \\"Ostatnia aktualizacja: 5 listopada 2025\\"
+
+msgid \\"1. Introduction\\"
+msgstr \\"1. Wstęp\\"
+
+msgid \\"Welcome to BOTA App, the official application for the \\\"Bunkers On The Air\\\" (SPBOTA) program. This privacy policy explains how we collect, use, and protect your personal information when you use our service.\\"
+msgstr \\"Witamy w BOTA App, oficjalnej aplikacji programu \\\"Bunkers On The Air\\\" (SPBOTA). Ta polityka prywatności wyjaśnia, jak zbieramy, wykorzystujemy i chronimy Twoje dane osobowe podczas korzystania z naszej usługi.\\"
+
+msgid \\"BOTA App is a supplementary tool for the main SPBOTA program. For complete information about the program, please visit <a href=\\\"https://www.spbota.pl\\\" target=\\\"_blank\\\">www.spbota.pl</a>.\\"
+msgstr \\"BOTA App jest narzędziem uzupełniającym dla głównego programu SPBOTA. Pełne informacje o programie znajdziesz na <a href=\\\"https://www.spbota.pl\\\" target=\\\"_blank\\\">www.spbota.pl</a>.\\"
+
+msgid \\"2. Data Controller\\"
+msgstr \\"2. Administrator Danych\\"
+
+msgid \\"The data controller for this application is the SPBOTA Coordinator. For any inquiries regarding the SPBOTA program, please refer to the contact information at <a href=\\\"https://www.spbota.pl\\\" target=\\\"_blank\\\">www.spbota.pl</a>.\\"
+msgstr \\"Administratorem danych dla tej aplikacji jest Koordynator SPBOTA. W sprawach dotyczących programu SPBOTA prosimy o kontakt zgodnie z informacjami na <a href=\\\"https://www.spbota.pl\\\" target=\\\"_blank\\\">www.spbota.pl</a>.\\"
+
+msgid \\"For technical issues related to BOTA App, please contact: <a href=\\\"mailto:sp3fck@gmail.com\\\">sp3fck@gmail.com</a>\\"
+msgstr \\"W sprawach technicznych dotyczących BOTA App prosimy o kontakt: <a href=\\\"mailto:sp3fck@gmail.com\\\">sp3fck@gmail.com</a>\\"
+
+msgid \\"3. Data We Collect\\"
+msgstr \\"3. Zbierane Dane\\"
+
+msgid \\"We collect only the following personal information:\\"
+msgstr \\"Zbieramy wyłącznie następujące dane osobowe:\\"
+
+msgid \\"Email address\\"
+msgstr \\"Adres email\\"
+
+msgid \\"Used for account creation and communication\\"
+msgstr \\"Używany do tworzenia konta i komunikacji\\"
+
+msgid \\"Amateur radio callsign\\"
+msgstr \\"Znak wywoławczy krótkofalowca\\"
+
+msgid \\"Your unique radio amateur identifier\\"
+msgstr \\"Twój unikalny identyfikator radioamatora\\"
+
+msgid \\"Activity data\\"
+msgstr \\"Dane aktywności\\"
+
+msgid \\"Bunker activations, QSO logs, and earned awards\\"
+msgstr \\"Aktywacje bunkrów, logi QSO i zdobyte dyplomy\\"
+
+msgid \\"<strong>Important:</strong> We do NOT collect sensitive personal data such as: financial information, health data, political opinions, or any other sensitive categories defined by GDPR.\\"
+msgstr \\"<strong>Ważne:</strong> NIE zbieramy wrażliwych danych osobowych takich jak: informacje finansowe, dane zdrowotne, opinie polityczne ani żadne inne wrażliwe kategorie zdefiniowane przez RODO.\\"
+
+msgid \\"4. How We Use Your Data\\"
+msgstr \\"4. Jak Wykorzystujemy Twoje Dane\\"
+
+msgid \\"Your data is used for:\\"
+msgstr \\"Twoje dane są wykorzystywane do:\\"
+
+msgid \\"Managing your BOTA App account\\"
+msgstr \\"Zarządzania Twoim kontem BOTA App\\"
+
+msgid \\"Tracking your bunker activations and contacts\\"
+msgstr \\"Śledzenia Twoich aktywacji bunkrów i łączności\\"
+
+msgid \\"Calculating progress toward awards/diplomas\\"
+msgstr \\"Obliczania postępów w zdobywaniu dyplomów\\"
+
+msgid \\"Displaying public leaderboards and statistics\\"
+msgstr \\"Wyświetlania publicznych rankingów i statystyk\\"
+
+msgid \\"Communicating important updates about the service\\"
+msgstr \\"Komunikowania ważnych aktualizacji dotyczących usługi\\"
+
+msgid \\"5. Data Sharing\\"
+msgstr \\"5. Udostępnianie Danych\\"
+
+msgid \\"Your callsign and activity statistics are publicly visible to all users as part of the normal operation of the amateur radio program. Your email address is NEVER shared with third parties or made public.\\"
+msgstr \\"Twój znak wywoławczy i statystyki aktywności są publicznie widoczne dla wszystkich użytkowników jako część normalnego działania programu krótkofalarskiego. Twój adres email NIE jest NIGDY udostępniany osobom trzecim ani upubliczniany.\\"
+
+msgid \\"6. Data Retention\\"
+msgstr \\"6. Przechowywanie Danych\\"
+
+msgid \\"We retain your account data as long as your account is active. You may request account deletion at any time by contacting <a href=\\\"mailto:sp3fck@gmail.com\\\">sp3fck@gmail.com</a>.\\"
+msgstr \\"Przechowujemy dane Twojego konta tak długo, jak Twoje konto jest aktywne. Możesz w każdej chwili poprosić o usunięcie konta kontaktując się z <a href=\\\"mailto:sp3fck@gmail.com\\\">sp3fck@gmail.com</a>.\\"
+
+msgid \\"7. Your Rights (GDPR)\\"
+msgstr \\"7. Twoje Prawa (RODO)\\"
+
+msgid \\"Under GDPR, you have the right to:\\"
+msgstr \\"Zgodnie z RODO masz prawo do:\\"
+
+msgid \\"Access your personal data\\"
+msgstr \\"Dostępu do swoich danych osobowych\\"
+
+msgid \\"Rectify incorrect data\\"
+msgstr \\"Poprawiania nieprawidłowych danych\\"
+
+msgid \\"Request data deletion\\"
+msgstr \\"Żądania usunięcia danych\\"
+
+msgid \\"Export your data (data portability)\\"
+msgstr \\"Eksportu swoich danych (przenośność danych)\\"
+
+msgid \\"Withdraw consent at any time\\"
+msgstr \\"Wycofania zgody w dowolnym momencie\\"
+
+msgid \\"To exercise these rights, contact:\\"
+msgstr \\"Aby skorzystać z tych praw, skontaktuj się:\\"
+
+msgid \\"8. Cookies\\"
+msgstr \\"8. Cookies\\"
+
+msgid \\"We use essential cookies for website functionality (login sessions, language preferences). For detailed information, see our <a href=\\\"{% url 'cookie_policy' %}\\\">Cookie Policy</a>.\\"
+msgstr \\"Używamy niezbędnych plików cookie do funkcjonowania strony (sesje logowania, preferencje językowe). Szczegółowe informacje znajdziesz w naszej <a href=\\\"{% url 'cookie_policy' %}\\\">Polityce Cookies</a>.\\"
+
+msgid \\"9. Security\\"
+msgstr \\"9. Bezpieczeństwo\\"
+
+msgid \\"We implement appropriate technical and organizational measures to protect your data against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the Internet is 100% secure.\\"
+msgstr \\"Wdrażamy odpowiednie środki techniczne i organizacyjne w celu ochrony Twoich danych przed nieautoryzowanym dostępem, zmianą, ujawnieniem lub zniszczeniem. Jednak żadna metoda transmisji przez Internet nie jest w 100% bezpieczna.\\"
+
+msgid \\"10. Changes to This Policy\\"
+msgstr \\"10. Zmiany w Polityce\\"
+
+msgid \\"We may update this privacy policy from time to time. Significant changes will be announced on the website and via email.\\"
+msgstr \\"Możemy od czasu do czasu aktualizować tę politykę prywatności. Istotne zmiany będą ogłaszane na stronie internetowej i za pośrednictwem poczty elektronicznej.\\"
+
+msgid \\"11. Contact\\"
+msgstr \\"11. Kontakt\\"
+
+msgid \\"For questions about this privacy policy:\\"
+msgstr \\"W sprawach dotyczących tej polityki prywatności:\\"
+
+msgid \\"Technical issues\\"
+msgstr \\"Sprawy techniczne\\"
+
+msgid \\"Program inquiries\\"
+msgstr \\"Sprawy programu\\"
+
+msgid \\"Back to Home\\"
+msgstr \\"Powrót do Strony Głównej\\"
+
+
+
+# Cookie Policy
+msgid "What Are Cookies?"
+msgstr "Czym Są Cookies?"
+
+msgid "Cookies are small text files stored on your device when you visit our website. They help us provide you with a better experience by remembering your preferences and keeping you logged in."
+msgstr "Cookies to małe pliki tekstowe przechowywane na Twoim urządzeniu podczas odwiedzania naszej strony. Pomagają nam zapewnić lepsze doświadczenie, zapamiętując Twoje preferencje i utrzymując Cię zalogowanym."
+
+msgid "2. Types of Cookies We Use"
+msgstr "2. Rodzaje Używanych Cookies"
+
+msgid "Essential Cookies (Strictly Necessary)"
+msgstr "Niezbędne Cookies (Ściśle Konieczne)"
+
+msgid "These cookies are required for the website to function properly:"
+msgstr "Te pliki cookie są wymagane do prawidłowego funkcjonowania strony:"
+
+msgid "Cookie Name"
+msgstr "Nazwa Cookie"
+
+msgid "Purpose"
+msgstr "Cel"
+
+msgid "Duration"
+msgstr "Czas Trwania"
+
+msgid "Maintains your login session"
+msgstr "Utrzymuje sesję logowania"
+
+msgid "2 weeks"
+msgstr "2 tygodnie"
+
+msgid "Security protection against CSRF attacks"
+msgstr "Ochrona bezpieczeństwa przed atakami CSRF"
+
+msgid "1 year"
+msgstr "1 rok"
+
+msgid "Remembers your language preference (PL/EN)"
+msgstr "Zapamiętuje preferencję językową (PL/EN)"
+
+msgid "Preference Cookies (Functional)"
+msgstr "Cookies Preferencji (Funkcjonalne)"
+
+msgid "These cookies remember your choices and preferences:"
+msgstr "Te pliki cookie zapamiętują Twoje wybory i preferencje:"
+
+msgid "Storage Name"
+msgstr "Nazwa Przechowywania"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "Remembers that you accepted cookies/terms"
+msgstr "Zapamiętuje, że zaakceptowałeś cookies/regulamin"
+
+msgid "Local Storage"
+msgstr "Magazyn Lokalny"
+
+msgid "Remembers scroll position on Spots page"
+msgstr "Zapamiętuje pozycję przewijania na stronie Spotów"
+
+msgid "Session Storage"
+msgstr "Magazyn Sesji"
+
+msgid "3. Cookies We Do NOT Use"
+msgstr "3. Cookies Których NIE Używamy"
+
+msgid "We do not use:"
+msgstr "Nie używamy:"
+
+msgid "Analytics cookies (Google Analytics, etc.)"
+msgstr "Cookies analitycznych (Google Analytics, itp.)"
+
+msgid "Advertising/marketing cookies"
+msgstr "Cookies reklamowych/marketingowych"
+
+msgid "Social media tracking cookies"
+msgstr "Cookies śledzących mediów społecznościowych"
+
+msgid "Third-party tracking cookies"
+msgstr "Cookies śledzących osób trzecich"
+
+msgid "4. Managing Cookies"
+msgstr "4. Zarządzanie Cookies"
+
+msgid "You can control cookies through your browser settings. However, disabling essential cookies may affect website functionality (e.g., you won\'t be able to log in)."
+msgstr "Możesz kontrolować cookies poprzez ustawienia swojej przeglądarki. Jednak wyłączenie niezbędnych cookies może wpłynąć na funkcjonalność strony (np. nie będziesz mógł się zalogować)."
+
+msgid "How to Delete Cookies:"
+msgstr "Jak Usunąć Cookies:"
+
+msgid "Settings → Privacy and Security → Clear browsing data"
+msgstr "Ustawienia → Prywatność i Bezpieczeństwo → Wyczyść dane przeglądania"
+
+msgid "Options → Privacy & Security → Cookies and Site Data"
+msgstr "Opcje → Prywatność i Bezpieczeństwo → Cookies i Dane Strony"
+
+msgid "Preferences → Privacy → Manage Website Data"
+msgstr "Preferencje → Prywatność → Zarządzaj Danymi Stron"
+
+msgid "5. Local Storage & Session Storage"
+msgstr "5. Magazyn Lokalny i Magazyn Sesji"
+
+msgid "We use browser Local Storage and Session Storage for:"
+msgstr "Używamy Magazynu Lokalnego i Sesyjnego przeglądarki do:"
+
+msgid "Remembering your consent (cookies/terms acceptance)"
+msgstr "Zapamiętywania Twojej zgody (akceptacja cookies/regulaminu)"
+
+msgid "Preserving scroll position during auto-refresh"
+msgstr "Zachowania pozycji przewijania podczas auto-odświeżania"
+
+msgid "This data stays on your device and is never transmitted to our servers."
+msgstr "Te dane pozostają na Twoim urządzeniu i nigdy nie są przesyłane na nasze serwery."
+
+msgid "6. Your Consent"
+msgstr "6. Twoja Zgoda"
+
+msgid "By clicking \"Accept\" on the consent banner, you agree to our use of essential and functional cookies. You can withdraw consent at any time by clearing your browser cookies and local storage."
+msgstr "Klikając \"Akceptuję\" na banerze zgody, wyrażasz zgodę na używanie przez nas niezbędnych i funkcjonalnych plików cookie. Możesz wycofać zgodę w dowolnym momencie, czyszcząc pliki cookie i magazyn lokalny przeglądarki."
+
+msgid "7. Updates to This Policy"
+msgstr "7. Aktualizacje Polityki"
+
+msgid "We may update this cookie policy. Check this page periodically for changes."
+msgstr "Możemy aktualizować tę politykę cookies. Sprawdzaj tę stronę okresowo, aby być na bieżąco ze zmianami."
+
+msgid "Questions about cookies?"
+msgstr "Pytania dotyczące cookies?"
+
+msgid "Email"
+msgstr "Email"
+
+# Terms of Service
+msgid "1. Acceptance of Terms"
+msgstr "1. Akceptacja Warunków"
+
+msgid "By accessing and using BOTA App, you accept and agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use this application."
+msgstr "Uzyskując dostęp i korzystając z BOTA App, akceptujesz i zgadzasz się być związany tymi Warunkami Użytkowania. Jeśli nie zgadzasz się z tymi warunkami, prosimy nie korzystać z tej aplikacji."
+
+msgid "2. About BOTA App"
+msgstr "2. O BOTA App"
+
+msgid "BOTA App is a supplementary tool for the \"Bunkers On The Air\" (SPBOTA) amateur radio program. The main program is managed and coordinated through <a href=\"https://www.spbota.pl\" target=\"_blank\">www.spbota.pl</a>, which is the authoritative source for all program rules and regulations."
+msgstr "BOTA App jest narzędziem uzupełniającym dla programu krótkofalarskiego \"Bunkers On The Air\" (SPBOTA). Główny program jest zarządzany i koordynowany przez <a href=\"https://www.spbota.pl\" target=\"_blank\">www.spbota.pl</a>, który jest autorytatywnym źródłem wszystkich zasad i regulacji programu."
+
+msgid "This application provides:"
+msgstr "Ta aplikacja zapewnia:"
+
+msgid "Online log submission (ADIF format)"
+msgstr "Przesyłanie logów online (format ADIF)"
+
+msgid "Activity tracking and statistics"
+msgstr "Śledzenie aktywności i statystyki"
+
+msgid "Award/diploma progress tracking"
+msgstr "Śledzenie postępów w zdobywaniu dyplomów"
+
+msgid "Real-time spotting system"
+msgstr "System zgłoszeń w czasie rzeczywistym"
+
+msgid "Bunker database and management"
+msgstr "Baza danych i zarządzanie bunkrami"
+
+msgid "3. User Accounts"
+msgstr "3. Konta Użytkowników"
+
+msgid "Registration"
+msgstr "Rejestracja"
+
+msgid "To use BOTA App, you must:"
+msgstr "Aby korzystać z BOTA App, musisz:"
+
+msgid "Be a licensed amateur radio operator"
+msgstr "Być licencjonowanym radioamatorem"
+
+msgid "Provide a valid email address and callsign"
+msgstr "Podać ważny adres email i znak wywoławczy"
+
+msgid "Create a secure password"
+msgstr "Utworzyć bezpieczne hasło"
+
+msgid "Accept these Terms of Service"
+msgstr "Zaakceptować te Warunki Użytkowania"
+
+msgid "Account Security"
+msgstr "Bezpieczeństwo Konta"
+
+msgid "You are responsible for:"
+msgstr "Jesteś odpowiedzialny za:"
+
+msgid "Maintaining the confidentiality of your password"
+msgstr "Zachowanie poufności swojego hasła"
+
+msgid "All activities that occur under your account"
+msgstr "Wszystkie działania wykonywane na Twoim koncie"
+
+msgid "Notifying us immediately of any unauthorized access"
+msgstr "Natychmiastowe powiadomienie nas o nieautoryzowanym dostępie"
+
+msgid "Account Termination"
+msgstr "Zakończenie Konta"
+
+msgid "We reserve the right to suspend or terminate accounts that:"
+msgstr "Zastrzegamy sobie prawo do zawieszenia lub zakończenia kont, które:"
+
+msgid "Violate these Terms of Service"
+msgstr "Naruszają te Warunki Użytkowania"
+
+msgid "Engage in fraudulent activity or data manipulation"
+msgstr "Angażują się w oszukańczą działalność lub manipulację danymi"
+
+msgid "Upload false or misleading information"
+msgstr "Przesyłają fałszywe lub wprowadzające w błąd informacje"
+
+msgid "Harass or abuse other users"
+msgstr "Nękają lub nadużywają innych użytkowników"
+
+msgid "4. User Conduct"
+msgstr "4. Zasady Postępowania Użytkowników"
+
+msgid "You agree NOT to:"
+msgstr "Zgadzasz się NIE:"
+
+msgid "Upload false QSO logs or manipulate data"
+msgstr "Przesyłać fałszywych logów QSO ani manipulować danymi"
+
+msgid "Use another person\'s callsign without authorization"
+msgstr "Używać znaku wywoławczego innej osoby bez autoryzacji"
+
+msgid "Attempt to gain unauthorized access to the system"
+msgstr "Próbować uzyskać nieautoryzowany dostęp do systemu"
+
+msgid "Distribute malware or harmful code"
+msgstr "Rozpowszechniać złośliwe oprogramowanie lub szkodliwy kod"
+
+msgid "Scrape or harvest data without permission"
+msgstr "Zbierać lub wydobywać danych bez pozwolenia"
+
+msgid "Use the service for commercial purposes without authorization"
+msgstr "Używać usługi w celach komercyjnych bez autoryzacji"
+
+msgid "5. ADIF Log Uploads"
+msgstr "5. Przesyłanie Logów ADIF"
+
+msgid "When uploading ADIF logs:"
+msgstr "Podczas przesyłania logów ADIF:"
+
+msgid "You certify that all contacts are genuine and accurate"
+msgstr "Poświadczasz, że wszystkie łączności są autentyczne i dokładne"
+
+msgid "Logs must be in standard ADIF format with required fields"
+msgstr "Logi muszą być w standardowym formacie ADIF z wymaganymi polami"
+
+msgid "You are responsible for the accuracy of submitted data"
+msgstr "Jesteś odpowiedzialny za dokładność przesyłanych danych"
+
+msgid "Duplicate QSOs will be automatically filtered"
+msgstr "Duplikaty QSO będą automatycznie filtrowane"
+
+msgid "6. Spotting System"
+msgstr "6. System Zgłoszeń"
+
+msgid "The real-time spotting system is for legitimate activity reports only:"
+msgstr "System zgłoszeń w czasie rzeczywistym służy wyłącznie do raportowania legalnej aktywności:"
+
+msgid "Spots must represent actual on-air activations"
+msgstr "Spoty muszą reprezentować rzeczywiste aktywacje w eterze"
+
+msgid "False or spam spots may result in account suspension"
+msgstr "Fałszywe lub spamowe spoty mogą skutkować zawieszeniem konta"
+
+msgid "Spots expire automatically after 30 minutes"
+msgstr "Spoty wygasają automatycznie po 30 minutach"
+
+msgid "7. Intellectual Property"
+msgstr "7. Własność Intelektualna"
+
+msgid "The SPBOTA program name, logo, and concept are property of the SPBOTA organization. BOTA App source code and design are protected by copyright. You may not:"
+msgstr "Nazwa programu SPBOTA, logo i koncepcja są własnością organizacji SPBOTA. Kod źródłowy i projekt BOTA App są chronione prawem autorskim. Nie możesz:"
+
+msgid "Copy, modify, or redistribute the application code"
+msgstr "Kopiować, modyfikować ani redystrybuować kodu aplikacji"
+
+msgid "Use SPBOTA branding for unauthorized purposes"
+msgstr "Używać brandingu SPBOTA do nieautoryzowanych celów"
+
+msgid "Reverse engineer the application"
+msgstr "Dokonywać inżynierii wstecznej aplikacji"
+
+msgid "8. Disclaimer of Warranties"
+msgstr "8. Wyłączenie Gwarancji"
+
+msgid "BOTA App is provided \"AS IS\" without warranties of any kind. We do not guarantee:"
+msgstr "BOTA App jest dostarczana \"TAK JAK JEST\" bez gwarancji jakiegokolwiek rodzaju. Nie gwarantujemy:"
+
+msgid "Uninterrupted or error-free service"
+msgstr "Nieprzerwanej lub bezbłędnej usługi"
+
+msgid "Accuracy or completeness of data"
+msgstr "Dokładności lub kompletności danych"
+
+msgid "That the service will meet your requirements"
+msgstr "Że usługa spełni Twoje wymagania"
+
+msgid "9. Limitation of Liability"
+msgstr "9. Ograniczenie Odpowiedzialności"
+
+msgid "We are not liable for:"
+msgstr "Nie ponosimy odpowiedzialności za:"
+
+msgid "Data loss or corruption"
+msgstr "Utratę lub uszkodzenie danych"
+
+msgid "Service interruptions or downtime"
+msgstr "Przerwy w działaniu usługi lub przestoje"
+
+msgid "Incorrect award calculations or statistics"
+msgstr "Nieprawidłowe obliczenia dyplomów lub statystyki"
+
+msgid "Third-party actions or content"
+msgstr "Działania osób trzecich lub treści"
+
+msgid "10. Program Rules"
+msgstr "10. Zasady Programu"
+
+msgid "All SPBOTA program rules and regulations are defined on <a href=\"https://www.spbota.pl\" target=\"_blank\">www.spbota.pl</a>. This application is a tool to support those rules, not to replace them. In case of any conflict, the official SPBOTA rules prevail."
+msgstr "Wszystkie zasady i regulacje programu SPBOTA są zdefiniowane na <a href=\"https://www.spbota.pl\" target=\"_blank\">www.spbota.pl</a>. Ta aplikacja jest narzędziem wspierającym te zasady, a nie ich zastępującym. W przypadku jakiegokolwiek konfliktu, oficjalne zasady SPBOTA mają pierwszeństwo."
+
+msgid "11. Contact & Support"
+msgstr "11. Kontakt i Wsparcie"
+
+msgid "Program Questions & Coordination"
+msgstr "Pytania o Program i Koordynacja"
+
+msgid "Please refer to contact information at"
+msgstr "Prosimy o kontakt zgodnie z informacjami na"
+
+msgid "Technical Issues with BOTA App"
+msgstr "Problemy Techniczne z BOTA App"
+
+msgid "12. Governing Law"
+msgstr "12. Prawo Właściwe"
+
+msgid "These Terms are governed by the laws of Poland. Any disputes shall be resolved in Polish courts."
+msgstr "Te Warunki podlegają prawu polskiemu. Wszelkie spory będą rozstrzygane przed sądami polskimi."
+
+msgid "13. Changes to Terms"
+msgstr "13. Zmiany w Warunkach"
+
+msgid "We reserve the right to modify these Terms at any time. Continued use of the service after changes constitutes acceptance of the new terms. Significant changes will be announced via email and on the website."
+msgstr "Zastrzegamy sobie prawo do modyfikacji tych Warunków w dowolnym czasie. Kontynuowanie korzystania z usługi po zmianach stanowi akceptację nowych warunków. Istotne zmiany będą ogłaszane za pośrednictwem poczty elektronicznej i na stronie internetowej."
+
+msgid "14. Severability"
+msgstr "14. Rozdzielność"
+
+msgid "If any provision of these Terms is found to be unenforceable, the remaining provisions will remain in full effect."
+msgstr "Jeśli jakiekolwiek postanowienie tych Warunków zostanie uznane za niewykonalne, pozostałe postanowienia pozostaną w pełni obowiązujące."
+
+msgid "Summary"
+msgstr "Podsumowanie"
+
+msgid "By using BOTA App, you agree to use it honestly for legitimate amateur radio activity, follow SPBOTA program rules, and respect other users. We provide this tool as-is to support the ham radio community."
+msgstr "Korzystając z BOTA App, zgadzasz się używać jej uczciwie do legalnej działalności krótkofalarskiej, przestrzegać zasad programu SPBOTA i szanować innych użytkowników. Dostarczamy to narzędzie takie jakie jest, aby wspierać społeczność krótkofalowców."
+

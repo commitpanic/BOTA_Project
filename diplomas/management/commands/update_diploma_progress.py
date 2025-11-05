@@ -40,11 +40,27 @@ class Command(BaseCommand):
         progress_updated = 0
         
         for user in users:
+            from activations.models import ActivationLog
+            from django.db.models.functions import TruncDate
+            
             # Get user statistics
             stats, _ = UserStatistics.objects.get_or_create(user=user)
             
+            # Calculate total activations = distinct (bunker, date) combinations
+            total_activations = ActivationLog.objects.filter(
+                activator=user
+            ).annotate(
+                activation_day=TruncDate('activation_date')
+            ).values('bunker', 'activation_day').distinct().count()
+            
+            # Calculate unique hunted bunkers
+            unique_hunted = ActivationLog.objects.filter(
+                user=user
+            ).exclude(activator=user).values('bunker').distinct().count()
+            
             self.stdout.write(f'\nUser: {user.callsign}')
             self.stdout.write(f'  Activator QSOs: {stats.total_activator_qso}')
+            self.stdout.write(f'  Activation Sessions: {total_activations}')
             self.stdout.write(f'  Hunter QSOs: {stats.total_hunter_qso}')
             self.stdout.write(f'  B2B QSOs: {stats.activator_b2b_qso}')
             
@@ -62,11 +78,15 @@ class Command(BaseCommand):
                 if created:
                     self.stdout.write(f'  Created progress for: {diploma_type.name_en}')
                 
-                # Update points
+                # Update points and bunker counts
                 progress.update_points(
-                    activator=stats.total_activator_qso,
+                    activator=total_activations,
                     hunter=stats.total_hunter_qso,
-                    b2b=stats.activator_b2b_qso
+                    b2b=stats.activator_b2b_qso,
+                    unique_activations=stats.unique_activations,
+                    total_activations=total_activations,
+                    unique_hunted=unique_hunted,
+                    total_hunted=unique_hunted
                 )
                 progress_updated += 1
                 

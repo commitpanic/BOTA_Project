@@ -162,8 +162,7 @@ class LogImportService:
                 }
             )
             
-            if created:
-                self.warnings.append(f"Created placeholder account for hunter {hunter_callsign}")
+            # Note: Placeholder accounts are created silently - no need to inform user
             
             # Check for duplicate log entry
             existing = ActivationLog.objects.filter(
@@ -225,6 +224,7 @@ class LogImportService:
         stats, _ = UserStatistics.objects.get_or_create(user=hunter_user)
         
         # Hunter gets 1 point per QSO with a bunker
+        stats.hunter_points += 1
         stats.total_hunter_qso += 1
         
         # Update unique bunkers hunted count
@@ -245,6 +245,7 @@ class LogImportService:
         stats, _ = UserStatistics.objects.get_or_create(user=activator_user)
         
         # Activator gets 1 point per QSO made from bunker
+        stats.activator_points += 1
         stats.total_activator_qso += 1
         
         stats.save()
@@ -332,9 +333,23 @@ class LogImportService:
             user: User to update diploma progress for
         """
         from diplomas.models import DiplomaType, DiplomaProgress, Diploma
+        from django.db.models.functions import TruncDate
         
         # Get user's current statistics
         stats, _ = UserStatistics.objects.get_or_create(user=user)
+        
+        # Calculate total activations = distinct (bunker, date) combinations
+        # Each activation session counts as one, regardless of QSO count
+        total_activations = ActivationLog.objects.filter(
+            activator=user
+        ).annotate(
+            activation_day=TruncDate('activation_date')
+        ).values('bunker', 'activation_day').distinct().count()
+        
+        # Calculate unique hunted bunkers
+        unique_hunted = ActivationLog.objects.filter(
+            user=user
+        ).exclude(activator=user).values('bunker').distinct().count()
         
         # Get or create progress records for all active diplomas
         active_diplomas = DiplomaType.objects.filter(is_active=True)
@@ -349,14 +364,19 @@ class LogImportService:
                 diploma_type=diploma_type
             )
             
-            # Update points based on user statistics
-            # Each QSO as activator = 1 activator point
-            # Each QSO hunting bunkers = 1 hunter point
-            # Each B2B QSO = 1 B2B point
+            # Update points and bunker counts based on user statistics
+            # Points: Each activation session = 1 activator point (distinct bunker+date)
+            #         Each QSO hunting bunkers = 1 hunter point
+            #         Each B2B QSO = 1 B2B point
+            # Counts: Unique bunkers and distinct (bunker, date) activation sessions
             progress.update_points(
-                activator=stats.total_activator_qso,    # Total QSOs as activator
-                hunter=stats.total_hunter_qso,          # Total QSOs hunting bunkers
-                b2b=stats.activator_b2b_qso             # Total B2B QSOs
+                activator=total_activations,                     # Total activation sessions (bunker+date)
+                hunter=stats.total_hunter_qso,                  # Total QSOs hunting bunkers
+                b2b=stats.activator_b2b_qso,                    # Total B2B QSOs
+                unique_activations=stats.unique_activations,     # Unique bunkers activated
+                total_activations=total_activations,             # Total activation sessions (bunker+date)
+                unique_hunted=unique_hunted,                     # Unique bunkers hunted
+                total_hunted=unique_hunted                       # Total hunted (same as unique for hunters)
             )
             
             # Check if eligible and not already awarded

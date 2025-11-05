@@ -450,3 +450,233 @@ class DiplomaAwardingTest(TestCase):
         self.assertEqual(user_diplomas.count(), 2)
         self.assertIn('ACT-', diploma1.diploma_number)
         self.assertIn('HNT-', diploma2.diploma_number)
+
+
+class BunkerCountRequirementsTest(TestCase):
+    """Test diploma system with bunker count requirements"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.user = User.objects.create_user(
+            email='test@example.com',
+            callsign='TEST1',
+            password='testpass123'
+        )
+        # Create user statistics
+        self.stats = UserStatistics.objects.create(
+            user=self.user,
+            total_activator_qso=15,
+            unique_activations=5,
+            total_hunter_qso=20,
+            unique_bunkers_hunted=8
+        )
+    
+    def test_unique_activations_requirement(self):
+        """Test diploma requiring unique activations only"""
+        diploma_type = DiplomaType.objects.create(
+            name_en='Explorer',
+            name_pl='Odkrywca',
+            description_en='Activate 10 different bunkers',
+            description_pl='Aktywuj 10 różnych bunkrów',
+            category='activator',
+            min_activator_points=0,
+            min_hunter_points=0,
+            min_b2b_points=0,
+            min_unique_activations=10,
+            min_total_activations=0,
+            min_unique_hunted=0,
+            min_total_hunted=0,
+            is_active=True
+        )
+        
+        progress = DiplomaProgress.objects.create(
+            user=self.user,
+            diploma_type=diploma_type
+        )
+        
+        # Update with current stats (5 unique activations - not enough)
+        progress.update_points(unique_activations=5)
+        self.assertEqual(progress.unique_activations, 5)
+        self.assertFalse(progress.is_eligible)
+        self.assertEqual(progress.percentage_complete, 50)  # 5/10 = 50%
+        
+        # Update to meet requirement
+        progress.update_points(unique_activations=10)
+        self.assertEqual(progress.unique_activations, 10)
+        self.assertTrue(progress.is_eligible)
+        self.assertEqual(progress.percentage_complete, 100)
+    
+    def test_total_activations_requirement(self):
+        """Test diploma requiring total activations"""
+        diploma_type = DiplomaType.objects.create(
+            name_en='Dedicated',
+            name_pl='Oddany',
+            description_en='Complete 50 activations',
+            description_pl='Wykonaj 50 aktywacji',
+            category='activator',
+            min_activator_points=0,
+            min_hunter_points=0,
+            min_b2b_points=0,
+            min_unique_activations=0,
+            min_total_activations=50,
+            min_unique_hunted=0,
+            min_total_hunted=0,
+            is_active=True
+        )
+        
+        progress = DiplomaProgress.objects.create(
+            user=self.user,
+            diploma_type=diploma_type
+        )
+        
+        # Update with 30 total activations
+        progress.update_points(total_activations=30)
+        self.assertEqual(progress.total_activations, 30)
+        self.assertFalse(progress.is_eligible)
+        self.assertEqual(progress.percentage_complete, 60)  # 30/50 = 60%
+    
+    def test_unique_hunted_requirement(self):
+        """Test diploma requiring unique bunkers hunted"""
+        diploma_type = DiplomaType.objects.create(
+            name_en='Marathon Hunter',
+            name_pl='Maratoński Łowca',
+            description_en='Hunt 25 different bunkers',
+            description_pl='Upoluj 25 różnych bunkrów',
+            category='hunter',
+            min_activator_points=0,
+            min_hunter_points=0,
+            min_b2b_points=0,
+            min_unique_activations=0,
+            min_total_activations=0,
+            min_unique_hunted=25,
+            min_total_hunted=0,
+            is_active=True
+        )
+        
+        progress = DiplomaProgress.objects.create(
+            user=self.user,
+            diploma_type=diploma_type
+        )
+        
+        # Update with 8 unique hunted (from stats)
+        progress.update_points(unique_hunted=8)
+        self.assertEqual(progress.unique_hunted, 8)
+        self.assertFalse(progress.is_eligible)
+        self.assertAlmostEqual(float(progress.percentage_complete), 32.0, places=1)  # 8/25 = 32%
+    
+    def test_combined_points_and_counts(self):
+        """Test diploma with both point and count requirements"""
+        diploma_type = DiplomaType.objects.create(
+            name_en='Versatile Operator',
+            name_pl='Wszechstronny Operator',
+            description_en='Balanced achievement',
+            description_pl='Zrównoważone osiągnięcie',
+            category='other',
+            min_activator_points=50,
+            min_hunter_points=50,
+            min_b2b_points=0,
+            min_unique_activations=10,
+            min_total_activations=0,
+            min_unique_hunted=10,
+            min_total_hunted=0,
+            is_active=True
+        )
+        
+        progress = DiplomaProgress.objects.create(
+            user=self.user,
+            diploma_type=diploma_type
+        )
+        
+        # Update with partial progress on all requirements
+        progress.update_points(
+            activator=30,           # 60% of 50
+            hunter=40,              # 80% of 50
+            unique_activations=5,   # 50% of 10
+            unique_hunted=8         # 80% of 10
+        )
+        
+        self.assertFalse(progress.is_eligible)  # Not all requirements met
+        # Average: (60 + 80 + 50 + 80) / 4 = 67.5%
+        self.assertAlmostEqual(float(progress.percentage_complete), 67.5, places=1)
+        
+        # Now meet all requirements
+        progress.update_points(
+            activator=50,
+            hunter=50,
+            unique_activations=10,
+            unique_hunted=10
+        )
+        
+        self.assertTrue(progress.is_eligible)
+        self.assertEqual(progress.percentage_complete, 100)
+    
+    def test_mixed_requirements_partial_completion(self):
+        """Test that partial completion of mixed requirements doesn't award diploma"""
+        diploma_type = DiplomaType.objects.create(
+            name_en='Expert',
+            name_pl='Ekspert',
+            description_en='Expert diploma',
+            description_pl='Dyplom eksperta',
+            category='other',
+            min_activator_points=100,
+            min_hunter_points=100,
+            min_b2b_points=50,
+            min_unique_activations=15,
+            min_total_activations=0,
+            min_unique_hunted=20,
+            min_total_hunted=0,
+            is_active=True
+        )
+        
+        progress = DiplomaProgress.objects.create(
+            user=self.user,
+            diploma_type=diploma_type
+        )
+        
+        # Meet 4 out of 5 requirements (all except hunter_points)
+        progress.update_points(
+            activator=100,          # MET
+            hunter=50,              # NOT MET (need 100)
+            b2b=50,                 # MET
+            unique_activations=15,  # MET
+            unique_hunted=20        # MET
+        )
+        
+        # Should not be eligible despite 4/5 requirements met
+        self.assertFalse(progress.is_eligible)
+        # (100 + 50 + 100 + 100 + 100) / 5 = 90%
+        self.assertAlmostEqual(float(progress.percentage_complete), 90.0, places=1)
+    
+    def test_progress_calculation_only_active_requirements(self):
+        """Test that percentage is calculated only from active requirements"""
+        # Diploma with only 2 requirements (others are 0)
+        diploma_type = DiplomaType.objects.create(
+            name_en='Simple',
+            name_pl='Prosty',
+            description_en='Two requirements',
+            description_pl='Dwa wymagania',
+            category='other',
+            min_activator_points=20,
+            min_hunter_points=0,    # Not required
+            min_b2b_points=0,       # Not required
+            min_unique_activations=5,
+            min_total_activations=0, # Not required
+            min_unique_hunted=0,    # Not required
+            min_total_hunted=0,     # Not required
+            is_active=True
+        )
+        
+        progress = DiplomaProgress.objects.create(
+            user=self.user,
+            diploma_type=diploma_type
+        )
+        
+        # 50% of activator, 100% of unique activations
+        progress.update_points(
+            activator=10,           # 50% of 20
+            unique_activations=5    # 100% of 5
+        )
+        
+        # Should average only the 2 active requirements: (50 + 100) / 2 = 75%
+        self.assertAlmostEqual(float(progress.percentage_complete), 75.0, places=1)
+        self.assertFalse(progress.is_eligible)  # Not all requirements met

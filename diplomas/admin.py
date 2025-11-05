@@ -41,6 +41,14 @@ class DiplomaTypeAdmin(admin.ModelAdmin):
             'fields': ('min_activator_points', 'min_hunter_points', 'min_b2b_points'),
             'description': _('Each QSO as activator = 1 activator point, each hunted QSO = 1 hunter point, each B2B QSO = 1 B2B point')
         }),
+        (_('Bunker Count Requirements'), {
+            'fields': (
+                ('min_unique_activations', 'min_total_activations'),
+                ('min_unique_hunted', 'min_total_hunted')
+            ),
+            'description': _('Set minimum bunker counts: unique = different bunkers, total = all activations/hunts (including repeats). Set to 0 for no requirement.'),
+            'classes': ('collapse',)
+        }),
         (_('Time Limitation (for Special Diplomas)'), {
             'fields': ('valid_from', 'valid_to'),
             'description': _('Leave empty for permanent diplomas. Set dates for time-limited/special event diplomas.'),
@@ -65,12 +73,22 @@ class DiplomaTypeAdmin(admin.ModelAdmin):
     def requirements_summary(self, obj):
         """Display requirements summary"""
         parts = []
+        # Points
         if obj.min_activator_points > 0:
             parts.append(f"ACT:{obj.min_activator_points}")
         if obj.min_hunter_points > 0:
             parts.append(f"HNT:{obj.min_hunter_points}")
         if obj.min_b2b_points > 0:
             parts.append(f"B2B:{obj.min_b2b_points}")
+        # Bunker counts
+        if obj.min_unique_activations > 0:
+            parts.append(f"UA:{obj.min_unique_activations}")
+        if obj.min_total_activations > 0:
+            parts.append(f"TA:{obj.min_total_activations}")
+        if obj.min_unique_hunted > 0:
+            parts.append(f"UH:{obj.min_unique_hunted}")
+        if obj.min_total_hunted > 0:
+            parts.append(f"TH:{obj.min_total_hunted}")
         return " | ".join(parts) if parts else "-"
     requirements_summary.short_description = _("Requirements")
     
@@ -193,6 +211,12 @@ class DiplomaProgressAdmin(admin.ModelAdmin):
         (_('Current Points'), {
             'fields': ('activator_points', 'hunter_points', 'b2b_points')
         }),
+        (_('Current Bunker Counts'), {
+            'fields': (
+                ('unique_activations', 'total_activations'),
+                ('unique_hunted', 'total_hunted')
+            )
+        }),
         (_('Progress Status'), {
             'fields': ('percentage_complete', 'is_eligible', 'last_updated')
         }),
@@ -213,10 +237,11 @@ class DiplomaProgressAdmin(admin.ModelAdmin):
     diploma_type_name.admin_order_field = 'diploma_type__name_en'
     
     def points_display(self, obj):
-        """Display current points vs required"""
+        """Display current progress vs required"""
         dt = obj.diploma_type
         parts = []
         
+        # Points
         if dt.min_activator_points > 0:
             color = '#28a745' if obj.activator_points >= dt.min_activator_points else '#dc3545'
             parts.append(f'<span style="color: {color};">ACT: {obj.activator_points}/{dt.min_activator_points}</span>')
@@ -229,8 +254,17 @@ class DiplomaProgressAdmin(admin.ModelAdmin):
             color = '#28a745' if obj.b2b_points >= dt.min_b2b_points else '#dc3545'
             parts.append(f'<span style="color: {color};">B2B: {obj.b2b_points}/{dt.min_b2b_points}</span>')
         
+        # Bunker counts
+        if dt.min_unique_activations > 0:
+            color = '#28a745' if obj.unique_activations >= dt.min_unique_activations else '#dc3545'
+            parts.append(f'<span style="color: {color};">UA: {obj.unique_activations}/{dt.min_unique_activations}</span>')
+        
+        if dt.min_unique_hunted > 0:
+            color = '#28a745' if obj.unique_hunted >= dt.min_unique_hunted else '#dc3545'
+            parts.append(f'<span style="color: {color};">UH: {obj.unique_hunted}/{dt.min_unique_hunted}</span>')
+        
         return format_html(' | '.join(parts)) if parts else '-'
-    points_display.short_description = _("Points")
+    points_display.short_description = _("Progress")
     
     def progress_bar(self, obj):
         """Display progress bar"""
@@ -252,6 +286,8 @@ class DiplomaProgressAdmin(admin.ModelAdmin):
         
         dt = obj.diploma_type
         requirements_html = '<ul>'
+        
+        # Points requirements
         if dt.min_activator_points > 0:
             met = '✓' if obj.activator_points >= dt.min_activator_points else '✗'
             requirements_html += f'<li>{met} Activator Points: {obj.activator_points} / {dt.min_activator_points}</li>'
@@ -261,6 +297,21 @@ class DiplomaProgressAdmin(admin.ModelAdmin):
         if dt.min_b2b_points > 0:
             met = '✓' if obj.b2b_points >= dt.min_b2b_points else '✗'
             requirements_html += f'<li>{met} B2B Points: {obj.b2b_points} / {dt.min_b2b_points}</li>'
+        
+        # Bunker count requirements
+        if dt.min_unique_activations > 0:
+            met = '✓' if obj.unique_activations >= dt.min_unique_activations else '✗'
+            requirements_html += f'<li>{met} Unique Activations: {obj.unique_activations} / {dt.min_unique_activations}</li>'
+        if dt.min_total_activations > 0:
+            met = '✓' if obj.total_activations >= dt.min_total_activations else '✗'
+            requirements_html += f'<li>{met} Total Activations: {obj.total_activations} / {dt.min_total_activations}</li>'
+        if dt.min_unique_hunted > 0:
+            met = '✓' if obj.unique_hunted >= dt.min_unique_hunted else '✗'
+            requirements_html += f'<li>{met} Unique Hunted: {obj.unique_hunted} / {dt.min_unique_hunted}</li>'
+        if dt.min_total_hunted > 0:
+            met = '✓' if obj.total_hunted >= dt.min_total_hunted else '✗'
+            requirements_html += f'<li>{met} Total Hunted: {obj.total_hunted} / {dt.min_total_hunted}</li>'
+        
         requirements_html += '</ul>'
         
         return format_html(

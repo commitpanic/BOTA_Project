@@ -11,7 +11,7 @@
                     <i class="bi bi-broadcast-pin"></i> Bunkers on the Air
                 </h1>
                 <p class="lead mb-4">
-                    {% trans "Connect amateur radio with military history. Activate bunkers, hunt contacts, earn diplomas!" %}
+                    {% trans "Connect amateur radio with military history. Activate bunkers, hunt contacts, earn awards!" %}
                 </p>
                 {% if not user.is_authenticated %}
                 <div class="mt-4">
@@ -70,8 +70,8 @@
                 <div class="display-4 text-primary mb-3">
                     <i class="bi bi-trophy"></i>
                 </div>
-                <h4>{% trans "Earn Diplomas" %}</h4>
-                <p>{% trans "Track your progress and earn diplomas based on your activity. From Bronze to Diamond levels!" %}</p>
+                <h4>{% trans "Earn Awards" %}</h4>
+                <p>{% trans "Track your progress and earn awards based on your activity. From Bronze to Diamond levels!" %}</p>
             </div>
         </div>
     </div>
@@ -80,34 +80,34 @@
 <!-- Statistics -->
 <div class="row mb-5">
     <div class="col-12 mb-3">
-        <h2 class="text-center">Program Statistics</h2>
+        <h2 class="text-center">{% trans "Program Statistics" %}</h2>
     </div>
     
     <div class="col-md-3 col-sm-6 mb-3">
         <div class="stat-card text-center">
             <div class="stat-value">{{ total_bunkers }}</div>
-            <div class="stat-label">Active Bunkers</div>
+            <div class="stat-label">{% trans "Active Bunkers" %}</div>
         </div>
     </div>
     
     <div class="col-md-3 col-sm-6 mb-3">
         <div class="stat-card text-center">
             <div class="stat-value">{{ total_users }}</div>
-            <div class="stat-label">Registered Users</div>
+            <div class="stat-label">{% trans "Registered Users" %}</div>
         </div>
     </div>
     
     <div class="col-md-3 col-sm-6 mb-3">
         <div class="stat-card text-center">
             <div class="stat-value">{{ total_qsos }}</div>
-            <div class="stat-label">Total QSOs</div>
+            <div class="stat-label">{% trans "Total QSOs" %}</div>
         </div>
     </div>
     
     <div class="col-md-3 col-sm-6 mb-3">
         <div class="stat-card text-center">
             <div class="stat-value">{{ total_diplomas }}</div>
-            <div class="stat-label">Diplomas Issued</div>
+            <div class="stat-label">{% trans "Awards Issued" %}</div>
         </div>
     </div>
 </div>
@@ -116,7 +116,7 @@
 {% if recent_activations %}
 <div class="row">
     <div class="col-12 mb-3">
-        <h2 class="text-center">Recent Activations</h2>
+        <h2 class="text-center">{% trans "Recent Activations" %}</h2>
     </div>
     <div class="col-12">
         <div class="card">
@@ -125,9 +125,9 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Activator</th>
-                                <th>Bunker</th>
-                                <th>Last QSO</th>
+                                <th>{% trans "Activator" %}</th>
+                                <th>{% trans "Bunker" %}</th>
+                                <th>{% trans "Last QSO" %}</th>
                                 <th>QSOs</th>
                             </tr>
                         </thead>

@@ -31,7 +31,13 @@ class DiplomaTypeAPITest(TestCase):
             description_pl='Opis',
             description_en='Description',
             category='hunter',
-            points_awarded=100
+            min_activator_points=0,
+            min_hunter_points=100,
+            min_b2b_points=0,
+            min_unique_activations=0,
+            min_total_activations=0,
+            min_unique_hunted=50,
+            min_total_hunted=0
         )
     
     def test_list_diploma_types(self):
@@ -63,13 +69,22 @@ class DiplomaAPITest(TestCase):
             description_pl='Opis',
             description_en='Description',
             category='hunter',
-            points_awarded=100
+            min_activator_points=0,
+            min_hunter_points=100,
+            min_b2b_points=0,
+            min_unique_activations=0,
+            min_total_activations=0,
+            min_unique_hunted=50,
+            min_total_hunted=0
         )
         self.diploma = Diploma.objects.create(
             diploma_type=self.diploma_type,
             user=self.user,
             issue_date=timezone.now(),
-            diploma_number='D-001'
+            diploma_number='D-001',
+            activator_points_earned=0,
+            hunter_points_earned=120,
+            b2b_points_earned=0
         )
     
     def test_list_diplomas(self):
@@ -112,12 +127,24 @@ class DiplomaProgressAPITest(TestCase):
             description_pl='Opis',
             description_en='Description',
             category='hunter',
-            points_awarded=100
+            min_activator_points=0,
+            min_hunter_points=100,
+            min_b2b_points=0,
+            min_unique_activations=0,
+            min_total_activations=0,
+            min_unique_hunted=50,
+            min_total_hunted=0
         )
         self.progress = DiplomaProgress.objects.create(
             user=self.user,
             diploma_type=self.diploma_type,
-            current_progress={'bunkers_activated': 5},
+            activator_points=0,
+            hunter_points=60,
+            b2b_points=0,
+            unique_activations=0,
+            total_activations=0,
+            unique_hunted=25,
+            total_hunted=100,
             percentage_complete=50
         )
     
@@ -137,7 +164,7 @@ class DiplomaProgressAPITest(TestCase):
     def test_update_progress(self):
         """Test updating diploma progress"""
         self.client.force_authenticate(user=self.user)
-        data = {'progress_updates': {'bunkers_activated': 10}}
+        data = {'progress_updates': {'hunter_points': 80, 'unique_hunted': 30}}
         response = self.client.post(f'/api/diploma-progress/{self.progress.id}/update_progress/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -165,13 +192,22 @@ class DiplomaVerificationAPITest(TestCase):
             description_pl='Opis',
             description_en='Description',
             category='hunter',
-            points_awarded=100
+            min_activator_points=0,
+            min_hunter_points=100,
+            min_b2b_points=0,
+            min_unique_activations=0,
+            min_total_activations=0,
+            min_unique_hunted=50,
+            min_total_hunted=0
         )
         self.diploma = Diploma.objects.create(
             diploma_type=self.diploma_type,
             user=self.user,
             issue_date=timezone.now(),
-            diploma_number='D-001'
+            diploma_number='D-001',
+            activator_points_earned=0,
+            hunter_points_earned=120,
+            b2b_points_earned=0
         )
         self.verification = DiplomaVerification.objects.create(
             diploma=self.diploma,

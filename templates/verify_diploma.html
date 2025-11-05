@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% if verified %}
+        {% trans "Award Verification" %} - {{ diploma.diploma_number }}
+    {% else %}
+        {% trans "Award Not Found" %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {% if verified %}
+                <!-- Verified Award -->
+                <div class="card border-success shadow-lg">
+                    <div class="card-header bg-success text-white text-center py-4">
+                        <i class="bi bi-patch-check-fill" style="font-size: 3rem;"></i>
+                        <h2 class="mb-0 mt-2">{% trans "Award Verified" %}</h2>
+                        <p class="mb-0">{% trans "This award is authentic and officially issued" %}</p>
+                    </div>
+                    
+                    <div class="card-body p-4">
+                        <!-- Award Number -->
+                        <div class="text-center mb-4 p-3 bg-light rounded">
+                            <h3 class="text-primary mb-1">{{ diploma.diploma_number }}</h3>
+                            <small class="text-muted">{% trans "Award Number" %}</small>
+                        </div>
+                        
+                        <!-- Award Details -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-muted">
+                                        <i class="bi bi-person-badge"></i> {% trans "Awarded To" %}
+                                    </label>
+                                    <div class="fs-4 text-primary">{{ diploma.user.callsign }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-muted">
+                                        <i class="bi bi-calendar-check"></i> {% trans "Issue Date" %}
+                                    </label>
+                                    <div class="fs-5">{{ diploma.issue_date|date:"Y-m-d" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Award Type -->
+                        <div class="mb-4 p-3 bg-light rounded">
+                            <label class="form-label fw-bold text-muted">
+                                <i class="bi bi-award"></i> {% trans "Award Type" %}
+                            </label>
+                            <h4 class="text-dark mb-2">
+                                {% if LANGUAGE_CODE == 'pl' %}
+                                    {{ diploma.diploma_type.name_pl }}
+                                {% else %}
+                                    {{ diploma.diploma_type.name_en }}
+                                {% endif %}
+                            </h4>
+                            <p class="text-muted mb-0">
+                                {% if LANGUAGE_CODE == 'pl' %}
+                                    {{ diploma.diploma_type.description_pl }}
+                                {% else %}
+                                    {{ diploma.diploma_type.description_en }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        
+                        <!-- Achievement Details -->
+                        <div class="row mb-4">
+                            {% if diploma.activator_points_earned > 0 %}
+                            <div class="col-md-4">
+                                <div class="card bg-primary text-white mb-3">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-broadcast-pin"></i>
+                                        </h5>
+                                        <h3 class="mb-0">{{ diploma.activator_points_earned }}</h3>
+                                        <small>{% trans "Activator Points" %}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if diploma.hunter_points_earned > 0 %}
+                            <div class="col-md-4">
+                                <div class="card bg-success text-white mb-3">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-crosshair"></i>
+                                        </h5>
+                                        <h3 class="mb-0">{{ diploma.hunter_points_earned }}</h3>
+                                        <small>{% trans "Hunter Points" %}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if diploma.b2b_points_earned > 0 %}
+                            <div class="col-md-4">
+                                <div class="card bg-warning text-white mb-3">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-arrow-left-right"></i>
+                                        </h5>
+                                        <h3 class="mb-0">{{ diploma.b2b_points_earned }}</h3>
+                                        <small>{% trans "B2B Points" %}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Verification Status -->
+                        {% if not is_valid %}
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            {% trans "Note: This diploma type is time-limited and may no longer be active." %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Additional Info -->
+                        <div class="row text-center border-top pt-4">
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <i class="bi bi-shield-check text-success" style="font-size: 2rem;"></i>
+                                </div>
+                                <p class="text-muted mb-0">
+                                    <small>{% trans "Verified" %} {{ verification_count }} {% trans "time(s)" %}</small>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-2">
+                                    <i class="bi bi-building text-primary" style="font-size: 2rem;"></i>
+                                </div>
+                                <p class="text-muted mb-0">
+                                    <small>{% trans "Issued by BOTA Project" %}</small>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {% if diploma.issued_by %}
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                {% trans "Approved by" %}: {{ diploma.issued_by.callsign }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-footer text-center bg-light">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle"></i>
+                            {% trans "This verification confirms the authenticity of this BOTA award certificate" %}
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- Security Info -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-lock"></i> {% trans "Security Information" %}
+                        </h5>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i>
+                                {% trans "Each award has a unique number and verification code" %}
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i>
+                                {% trans "All verifications are logged with timestamp and IP address" %}
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle text-success"></i>
+                                {% trans "Awards cannot be forged or duplicated" %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+            {% else %}
+                <!-- Award Not Found -->
+                <div class="card border-danger shadow-lg">
+                    <div class="card-header bg-danger text-white text-center py-4">
+                        <i class="bi bi-x-circle-fill" style="font-size: 3rem;"></i>
+                        <h2 class="mb-0 mt-2">{% trans "Award Not Found" %}</h2>
+                        <p class="mb-0">{% trans "This diploma could not be verified" %}</p>
+                    </div>
+                    
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-4">
+                            <h5 class="text-muted">{% trans "Diploma Number" %}: <code>{{ diploma_number }}</code></h5>
+                        </div>
+                        
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>{% trans "Warning" %}:</strong>
+                            {% trans "This award number does not exist in our database." %}
+                        </div>
+                        
+                        <p class="text-muted">{% trans "Possible reasons" %}:</p>
+                        <ul class="text-start">
+                            <li>{% trans "The award number was entered incorrectly" %}</li>
+                            <li>{% trans "The award has not been officially issued" %}</li>
+                            <li>{% trans "The award may be counterfeit" %}</li>
+                        </ul>
+                        
+                        <div class="mt-4">
+                            <a href="{% url 'home' %}" class="btn btn-primary">
+                                <i class="bi bi-house"></i> {% trans "Return to Home" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Report Issue -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="bi bi-flag"></i> {% trans "Report an Issue" %}
+                        </h5>
+                        <p class="card-text">
+                            {% trans "If you believe this award should be valid, please contact the BOTA Project administrators." %}
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Back to Home -->
+            <div class="text-center mt-4">
+                <a href="{% url 'home' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> {% trans "Back to Home" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .bi-patch-check-fill,
+    .bi-x-circle-fill {
+        animation: scaleIn 0.5s ease-out;
+    }
+    
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+        }
+        to {
+            transform: scale(1);
+        }
+    }
+</style>
+{% endblock %}

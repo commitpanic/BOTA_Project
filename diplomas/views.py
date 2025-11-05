@@ -146,8 +146,12 @@ class DiplomaProgressViewSet(viewsets.ModelViewSet):
         serializer = DiplomaProgressUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        # Update progress
-        progress.update_progress(**serializer.validated_data['progress_updates'])
+        # Update progress fields directly
+        updates = serializer.validated_data['progress_updates']
+        for field, value in updates.items():
+            if hasattr(progress, field):
+                setattr(progress, field, value)
+        
         progress.calculate_progress()
         progress.save()
         
