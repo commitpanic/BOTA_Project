@@ -59,10 +59,12 @@ class Command(BaseCommand):
             ).exclude(activator=user).values('bunker').distinct().count()
             
             self.stdout.write(f'\nUser: {user.callsign}')
-            self.stdout.write(f'  Activator QSOs: {stats.total_activator_qso}')
-            self.stdout.write(f'  Activation Sessions: {total_activations}')
-            self.stdout.write(f'  Hunter QSOs: {stats.total_hunter_qso}')
-            self.stdout.write(f'  B2B QSOs: {stats.activator_b2b_qso}')
+            self.stdout.write(f'  Activator Points: {stats.activator_points}')
+            self.stdout.write(f'  Hunter Points: {stats.hunter_points}')
+            self.stdout.write(f'  B2B Points: {stats.b2b_points}')
+            self.stdout.write(f'  Unique Activations: {stats.unique_activations}')
+            self.stdout.write(f'  Total Activation Sessions: {total_activations}')
+            self.stdout.write(f'  Unique Hunted: {unique_hunted}')
             
             for diploma_type in active_diplomas:
                 # Skip time-limited diplomas that are not currently valid
@@ -80,9 +82,9 @@ class Command(BaseCommand):
                 
                 # Update points and bunker counts
                 progress.update_points(
-                    activator=total_activations,
-                    hunter=stats.total_hunter_qso,
-                    b2b=stats.activator_b2b_qso,
+                    activator=stats.activator_points,  # Use points, not session count
+                    hunter=stats.hunter_points,
+                    b2b=stats.b2b_points,
                     unique_activations=stats.unique_activations,
                     total_activations=total_activations,
                     unique_hunted=unique_hunted,

@@ -337,11 +337,15 @@ class LogImportService:
             
             # Mark both logs as B2B confirmed
             if not hasattr(current_log, 'b2b_confirmed') or not current_log.b2b_confirmed:
-                # Award B2B points
+                # Award B2B points - each confirmed B2B gives 1 point
                 activator_stats.activator_b2b_qso += 1
+                activator_stats.b2b_points += 1
+                activator_stats.total_b2b_qso += 1
                 activator_stats.save()
                 
                 hunter_stats.activator_b2b_qso += 1
+                hunter_stats.b2b_points += 1
+                hunter_stats.total_b2b_qso += 1
                 hunter_stats.save()
                 
                 self.warnings.append(

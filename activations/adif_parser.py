@@ -182,8 +182,8 @@ class ADIFParser:
         Returns:
             True if B2B QSO, False otherwise
         """
-        # Check if other station has SIG=WWBOTA and SIG_INFO with bunker reference
-        if 'SIG' in qso and qso['SIG'].upper() == 'WWBOTA':
+        # Check if other station has SIG=BOTA and SIG_INFO with bunker reference
+        if 'SIG' in qso and qso['SIG'].upper() == 'BOTA':
             if 'SIG_INFO' in qso:
                 sig_info = qso['SIG_INFO'].strip()
                 # Check for bunker reference format
