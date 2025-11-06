@@ -105,7 +105,7 @@ class ActivationKeyViewSet(viewsets.ModelViewSet):
 )
 class ActivationLogViewSet(viewsets.ModelViewSet):
     """ViewSet for ActivationLog model"""
-    queryset = ActivationLog.objects.select_related('user', 'bunker', 'activation_key')
+    queryset = ActivationLog.objects.select_related('user', 'activator', 'bunker', 'activation_key')
     serializer_class = ActivationLogSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend]

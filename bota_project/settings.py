@@ -255,3 +255,21 @@ SERVER_EMAIL = DEFAULT_FROM_EMAIL
 # Password Reset Configuration
 # Token validity: 5 minutes (300 seconds)
 PASSWORD_RESET_TIMEOUT = 300  # 5 minutes in seconds
+
+# Cache Configuration
+# Using LocMemCache for development (in-memory caching)
+# For production, consider Redis: pip install django-redis
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'bota-cache',
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,  # Maximum number of cached items
+        },
+        'TIMEOUT': 300,  # Default timeout: 5 minutes
+    }
+}
+
+# Cache key prefix to avoid conflicts
+CACHE_MIDDLEWARE_KEY_PREFIX = 'bota'
+CACHE_MIDDLEWARE_SECONDS = 600  # 10 minutes for full page caching (if needed)

@@ -143,6 +143,7 @@ class Bunker(models.Model):
         indexes = [
             models.Index(fields=['reference_number']),
             models.Index(fields=['is_verified']),
+            models.Index(fields=['category', 'is_verified']),
             models.Index(fields=['latitude', 'longitude']),
         ]
 

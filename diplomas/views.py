@@ -33,8 +33,9 @@ class DiplomaTypeViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         """Filter to show only active types for non-staff users"""
+        is_staff = self.request.user.is_staff if self.request.user.is_authenticated else False
         queryset = super().get_queryset()
-        if not self.request.user.is_staff:
+        if not is_staff:
             queryset = queryset.filter(is_active=True)
         return queryset
 

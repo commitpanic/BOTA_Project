@@ -7,8 +7,9 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Max
 from django.utils.translation import gettext as _
+from django.core.cache import cache
 from accounts.models import User, UserStatistics
 from bunkers.models import Bunker
 from activations.models import ActivationLog
@@ -18,26 +19,35 @@ from diplomas.models import Diploma, DiplomaProgress
 def home(request):
     """Home page with program statistics"""
     
-    # Get recent activations grouped by activator, bunker, and date
-    # Show activators with their QSO count for each activation
-    from django.db.models import Count, Max
+    # Try to get cached statistics
+    cache_key = 'home_statistics'
+    context = cache.get(cache_key)
     
-    recent_activations = ActivationLog.objects.values(
-        'activator__callsign',
-        'bunker__reference_number',
-        'bunker__name_en'
-    ).annotate(
-        qso_count=Count('id'),
-        latest_qso=Max('activation_date')
-    ).order_by('-latest_qso')[:10]
+    if context is None:
+        # Cache miss - calculate statistics
+        # Get recent activations grouped by activator, bunker, and date
+        # Show activators with their QSO count for each activation
+        
+        recent_activations = ActivationLog.objects.values(
+            'activator__callsign',
+            'bunker__reference_number',
+            'bunker__name_en'
+        ).annotate(
+            qso_count=Count('id'),
+            latest_qso=Max('activation_date')
+        ).order_by('-latest_qso')[:10]
+        
+        context = {
+            'total_bunkers': Bunker.objects.filter(is_verified=True).count(),
+            'total_users': User.objects.filter(is_active=True).count(),
+            'total_qsos': ActivationLog.objects.count(),
+            'total_diplomas': Diploma.objects.count(),
+            'recent_activations': list(recent_activations),  # Convert to list for caching
+        }
+        
+        # Cache for 15 minutes (900 seconds)
+        cache.set(cache_key, context, 900)
     
-    context = {
-        'total_bunkers': Bunker.objects.filter(is_verified=True).count(),
-        'total_users': User.objects.filter(is_active=True).count(),
-        'total_qsos': ActivationLog.objects.count(),
-        'total_diplomas': Diploma.objects.count(),
-        'recent_activations': recent_activations,
-    }
     return render(request, 'home.html', context)
 
 

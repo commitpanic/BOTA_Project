@@ -272,6 +272,10 @@ class SpotHistory(models.Model):
         verbose_name = _("Spot History")
         verbose_name_plural = _("Spot History")
         ordering = ['-respotted_at']
+        indexes = [
+            models.Index(fields=['spot', '-respotted_at']),
+            models.Index(fields=['respotter', '-respotted_at']),
+        ]
 
     def __str__(self):
         return f"{self.respotter.callsign} respotted {self.spot.activator_callsign} at {self.respotted_at}"

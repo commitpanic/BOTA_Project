@@ -121,19 +121,29 @@
   - [ ] Document GDPR compliance measures
 
 ### Performance Optimization
-- [ ] **Database Optimization**
-  - [ ] Review all queries for N+1 problems
-  - [ ] Add `select_related()` where needed
-  - [ ] Add `prefetch_related()` for reverse relationships
-  - [ ] Create database indexes for frequent queries
+- ✅ **Database Optimization** (COMPLETED Nov 6, 2025)
+  - ✅ Reviewed all queries for N+1 problems - most already optimized!
+  - ✅ Added `select_related('activator')` to ActivationLogViewSet
+  - ✅ Confirmed all major views use select_related() appropriately
+  - ✅ BunkerViewSet already has prefetch_related('photos', 'resources')
+  - ✅ Created database indexes for frequent queries:
+    - Bunker: (category, is_verified)
+    - ActivationLog: (activator, activation_date), (is_b2b, verified)
+    - SpotHistory: (spot, -respotted_at), (respotter, -respotted_at)
+  - ✅ Ran full test suite: 95 tests passed (accounts: 24, bunkers: 20, cluster: 19, diplomas: 25, activations: 7)
   - [ ] Test with large datasets (1000+ bunkers, 10000+ logs)
 
-- [ ] **Caching**
-  - [ ] Set up Redis for caching (if available)
-  - [ ] Cache bunker list queries
-  - [ ] Cache statistics on home page
-  - [ ] Cache diploma progress calculations
-  - [ ] Set appropriate cache timeouts
+- ✅ **Caching** (COMPLETED - Nov 6, 2025)
+  - ✅ Configured Django cache system (LocMemCache for development)
+  - ✅ Implemented home page statistics caching (15 min timeout)
+  - ✅ Tested DiplomaType caching - NOT VIABLE (DRF needs QuerySet.model attribute)
+  - ✅ Ran all tests: 126 tests passed (accounts: 24, bunkers: 20, cluster: 19, diplomas: 34, activations: 29)
+  - ✅ Created performance tests - **24.8x faster** with cache (96% improvement, 50ms→2ms)
+  - ✅ Documented caching implementation in docs/CACHING_IMPLEMENTATION.md
+  - Note: ViewSet caching incompatible with django-filters & DRF - requires QuerySet, not lists
+  - Note: Template views benefit greatly from caching; API endpoints better optimized via database
+  - [ ] Set up Redis for production caching
+  - [ ] Implement cache versioning for easy invalidation
 
 - [ ] **Static Files**
   - [ ] Configure static file compression

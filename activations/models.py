@@ -236,8 +236,10 @@ class ActivationLog(models.Model):
         ordering = ['-activation_date']
         indexes = [
             models.Index(fields=['user', 'activation_date']),
+            models.Index(fields=['activator', 'activation_date']),
             models.Index(fields=['bunker', 'activation_date']),
             models.Index(fields=['verified']),
+            models.Index(fields=['is_b2b', 'verified']),
         ]
 
     def __str__(self):
