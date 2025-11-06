@@ -1,8 +1,16 @@
 # BOTA PROJECT - TO-DO LIST
 
-**Last Updated:** November 5, 2025  
-**Current Phase:** Phase 8 - Testing & Quality Assurance  
-**Overall Progress:** 75% Complete
+**Last Updated:** November 6, 2025  
+**Current Phase:** Phase 9 - GDPR Compliance & Quality Assurance  
+**Overall Progress:** 88% Complete
+
+**Recent Updates (Nov 6, 2025):**
+- ✅ Completed Phase 8 (Spotting System) with advanced features
+- ✅ Added table/card view toggle with mobile responsiveness
+- ✅ Implemented detailed respot history tracking with SpotHistory model
+- ✅ Created spot history modal with timeline visualization
+- ✅ Enhanced UI with card styling improvements
+- ✅ Updated Polish translations (550+ strings total)
 
 ---
 
@@ -312,14 +320,14 @@
 ## 🐛 KNOWN ISSUES
 
 ### Current Bugs
-- None reported (system is new)
+- None reported at this time
 
 ### Technical Debt
 - [ ] Certificate download returns placeholder text (PDF generation not implemented)
 - [ ] Email notifications are placeholder (SMTP not configured)
-- [ ] Some inline CSS in templates (should move to separate CSS file)
 - [ ] No caching implemented (may affect performance at scale)
 - [ ] No rate limiting on API endpoints
+- [x] ~~Some inline CSS in templates~~ (Moved to extra_css blocks - Nov 6, 2025)
 
 ---
 
@@ -391,11 +399,49 @@
 - ✅ Implemented pause/resume button for updates
 - ✅ Added scroll position preservation (sessionStorage)
 - ✅ Added BOTA logo to navigation
-- ✅ Complete Polish translations (~400+ strings)
+- ✅ Complete Polish translations (~550+ strings)
 - ✅ GDPR compliance - legal pages (Privacy, Cookie, Terms)
 - ✅ Consent banner with localStorage tracking
 - ✅ All legal pages bilingual with full translations
-- [ ] Testing of spotting system (USER TESTING IN PROGRESS)
+- ✅ Testing of spotting system (COMPLETED Nov 6, 2025)
+- ✅ Table/Card view toggle with localStorage persistence (Nov 6, 2025)
+- ✅ Mobile-responsive card view auto-switching (<768px)
+- ✅ Added last_respot_time field to Spot model
+- ✅ Sticky footer implementation with flexbox
+- ✅ Respot history tracking system with SpotHistory model
+- ✅ Spot history modal with timeline visualization
+- ✅ API endpoint for detailed respot history (/api/spots/{id}/history/)
+- ✅ Card header styling (black bg with white text)
+- ✅ Button styling improvements (rounded corners, bold text)
+- ✅ Complete respot tracking (who, when, comment per respot)
+
+### Phase 8 (Spotting System & Translations) - COMPLETED Nov 6, 2025
+- ✅ Created Spot model with expiration system
+- ✅ Implemented real-time spotting with 30-second auto-refresh
+- ✅ Post spot and filter modals
+- ✅ Pause/resume functionality
+- ✅ Scroll position preservation
+- ✅ Complete Polish translations (~550+ strings)
+- ✅ GDPR compliance - legal pages (Privacy, Cookie, Terms)
+- ✅ Consent banner with localStorage tracking
+- ✅ **Table/Card view toggle switch** (Nov 6, 2025)
+  - Toggle between table and card views
+  - View preference saved in localStorage
+  - Auto card view on mobile (<768px)
+  - Smooth transitions between views
+- ✅ **Spot History Tracking System** (Nov 6, 2025)
+  - Created SpotHistory model for detailed respot tracking
+  - Each respot records: respotter, timestamp, comment
+  - API endpoint: `/api/spots/{id}/history/`
+  - Timeline visualization in modal
+  - Shows who respotted and when
+- ✅ **UI/UX Enhancements** (Nov 6, 2025)
+  - Added last_respot_time field to Spot model
+  - Sticky footer with flexbox layout
+  - Card header styling (black bg with white text)
+  - Button improvements (rounded corners, bold text)
+  - Mobile-responsive design
+  - Timeline CSS with markers and content boxes
 
 ### Documentation
 - ✅ IMPLEMENTATION_GUIDE.md (v2.1, 700+ lines)
@@ -410,7 +456,7 @@
 
 ## 📊 PROGRESS METRICS
 
-**Overall Project Status:** 85% Complete
+**Overall Project Status:** 88% Complete
 
 **Completion by Phase:**
 - Phase 1 (Core Setup): 100% ✅
@@ -420,7 +466,7 @@
 - Phase 5 (Diplomas): 100% ✅
 - Phase 6 (REST API): 100% ✅
 - Phase 7 (Frontend): 100% ✅
-- Phase 8 (Spotting & i18n): 95% ✅ (testing in progress)
+- Phase 8 (Spotting & i18n): 100% ✅ (completed Nov 6, 2025)
 - Phase 9 (GDPR): 90% ✅ (legal pages complete, data rights pending)
 - Phase 10 (Deployment): 0% ⏳
 
@@ -430,15 +476,15 @@
 - Backend: 100%
 - API: 100%
 - Frontend: 100%
-- Spotting System: 95% (awaiting user testing)
+- Spotting System: 100% ✅ (completed Nov 6, 2025)
 - Translations: 100% (Polish + English complete)
 - GDPR: 90% (legal pages complete, data export/deletion pending)
-- Production Ready: 75%
+- Production Ready: 80%
 
 ---
 
 **Priority Focus This Week:**
-1. User testing of spotting system ⏳ (IN PROGRESS)
+1. ✅ User testing of spotting system (COMPLETED Nov 6, 2025)
 2. Complete integration testing
 3. Implement PDF generation for diplomas
 4. Run full test suite verification
