@@ -17,6 +17,16 @@ class ColorPickerWidget(forms.TextInput):
 class DiplomaLayoutElementForm(forms.ModelForm):
     """Form for DiplomaLayoutElement with color picker"""
     
+    # Override qr_size to not be required
+    qr_size = forms.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        required=False,
+        label=_("QR Code Size (cm)"),
+        help_text=_("Only for QR code element"),
+        initial=3.0
+    )
+    
     class Meta:
         model = DiplomaLayoutElement
         fields = '__all__'
@@ -26,31 +36,14 @@ class DiplomaLayoutElementForm(forms.ModelForm):
             'bold': forms.CheckboxInput(attrs={'class': 'vCheckboxInput'}),
             'italic': forms.CheckboxInput(attrs={'class': 'vCheckboxInput'}),
         }
-        help_texts = {
-            'color': _('Click to choose a color'),
-            'qr_size': _('Only for QR code element'),
-        }
-    
-    def clean_qr_size(self):
-        """Clear qr_size for non-QR elements"""
-        element_type = self.cleaned_data.get('element_type')
-        qr_size = self.cleaned_data.get('qr_size')
-        
-        if element_type != 'qr_code':
-            return None
-        
-        return qr_size
     
     def clean(self):
         """Ensure boolean fields are properly handled"""
         cleaned_data = super().clean()
         
-        # Explicitly set boolean fields to False if not provided
-        if 'enabled' not in cleaned_data or cleaned_data['enabled'] is None:
-            cleaned_data['enabled'] = False
-        if 'bold' not in cleaned_data or cleaned_data['bold'] is None:
-            cleaned_data['bold'] = False
-        if 'italic' not in cleaned_data or cleaned_data['italic'] is None:
-            cleaned_data['italic'] = False
+        # Explicitly handle boolean fields
+        for field in ['enabled', 'bold', 'italic']:
+            if field not in cleaned_data or cleaned_data[field] is None:
+                cleaned_data[field] = False
         
         return cleaned_data

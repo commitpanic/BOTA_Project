@@ -46,14 +46,9 @@ class DiplomaLayoutElementInline(admin.TabularInline):
     model = DiplomaLayoutElement
     form = DiplomaLayoutElementForm
     extra = 0
+    can_delete = False  # Disable delete checkbox - elements are fixed per diploma type
     fields = ('element_type', 'enabled', 'x_position', 'y_position', 'font_family', 'font_size', 'bold', 'italic', 'color', 'qr_size')
-    readonly_fields = []
-    
-    def get_readonly_fields(self, request, obj=None):
-        """Make element_type readonly for existing objects"""
-        if obj:
-            return ['element_type']
-        return []
+    readonly_fields = ['element_type']  # Make element_type always readonly
     
     class Media:
         css = {
@@ -85,11 +80,11 @@ class DiplomaLayoutElementInline(admin.TabularInline):
     def _get_default_for_element(self, element_type):
         """Get default values for each element type"""
         defaults = {
-            'callsign': {'x_position': 14.5, 'y_position': 10, 'font_size': 24, 'bold': True},
-            'diploma_name': {'x_position': 14.5, 'y_position': 12, 'font_size': 16, 'bold': False},
-            'date': {'x_position': 14.5, 'y_position': 4, 'font_size': 10, 'bold': False},
-            'points': {'x_position': 14.5, 'y_position': 8, 'font_size': 12, 'bold': False},
-            'diploma_number': {'x_position': 14.5, 'y_position': 2, 'font_size': 10, 'bold': False},
+            'callsign': {'x_position': 14.5, 'y_position': 10, 'font_size': 24, 'bold': True, 'qr_size': 0.0},
+            'diploma_name': {'x_position': 14.5, 'y_position': 12, 'font_size': 16, 'bold': False, 'qr_size': 0.0},
+            'date': {'x_position': 14.5, 'y_position': 4, 'font_size': 10, 'bold': False, 'qr_size': 0.0},
+            'points': {'x_position': 14.5, 'y_position': 8, 'font_size': 12, 'bold': False, 'qr_size': 0.0},
+            'diploma_number': {'x_position': 14.5, 'y_position': 2, 'font_size': 10, 'bold': False, 'qr_size': 0.0},
             'qr_code': {'x_position': 26, 'y_position': 2, 'font_size': 10, 'bold': False, 'qr_size': 3.0},
         }
         return defaults.get(element_type, {'x_position': 14.5, 'y_position': 10, 'font_size': 12, 'bold': False})

@@ -1,22 +1,24 @@
 /* Diploma Layout Element Inline Styling */
 
-.diplomas-diplomalayoutelement-content-type-diploma_type input[readonly] {
+/* Hide delete checkbox column entirely */
+.diplomas-diplomalayoutelement-content-type-diploma_type .delete {
+    display: none !important;
+}
+
+/* Style readonly fields */
+.diplomas-diplomalayoutelement-content-type-diploma_type input[readonly],
+.diplomas-diplomalayoutelement-content-type-diploma_type .readonly {
     background-color: #f5f5f5;
     cursor: not-allowed;
 }
 
-.diplomas-diplomalayoutelement-content-type-diploma_type td.field-qr_size input[placeholder="N/A"] {
-    color: #999;
-    text-align: center;
-}
-
-.diplomas-diplomalayoutelement-content-type-diploma_type td.field-qr_size input[placeholder="N/A"]::placeholder {
-    color: #999;
-    font-style: italic;
-}
-
 /* Highlight QR code row */
-.diplomas-diplomalayoutelement-content-type-diploma_type tr:has(select[value="qr_code"]),
 .diplomas-diplomalayoutelement-content-type-diploma_type tr:has(input[value="qr_code"]) {
     background-color: #fffbf0;
+}
+
+/* Make element_type field stand out */
+.diplomas-diplomalayoutelement-content-type-diploma_type .field-element_type {
+    font-weight: bold;
+    background-color: #f9f9f9;
 }
