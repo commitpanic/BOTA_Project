@@ -199,6 +199,9 @@ msgstr "Strona Główna"
 msgid "Dashboard"
 msgstr "Kokpit"
 
+msgid "View Awards"
+msgstr "Zobacz Dyplomy"
+
 msgid "Bunkers"
 msgstr "Bunkry"
 
@@ -491,11 +494,11 @@ msgstr "Wgraj swoje logi aktywacji"
 msgid "Check your achievements"
 msgstr "Sprawdź swoje osiągnięcia"
 
-msgid "Edit Profile"
-msgstr "Edytuj Profil"
+msgid "Statistics"
+msgstr "Statystyki"
 
-msgid "Update your information"
-msgstr "Zaktualizuj swoje informacje"
+msgid "Check your profile"
+msgstr "Sprawdź swój profil"
 
 msgid "Recent Activity"
 msgstr "Ostatnia Aktywność"
@@ -1792,3 +1795,59 @@ msgstr "Twoje hasło zostało pomyślnie zmienione!"
 msgid "You must change your password before continuing."
 msgstr "Musisz zmienić hasło zanim będziesz mógł kontynuować."
 
+# Cluster view mode
+msgid "Table View"
+msgstr "Widok Tabeli"
+
+msgid "Table"
+msgstr "Tabela"
+
+msgid "Card View"
+msgstr "Widok Kart"
+
+msgid "Cards"
+msgstr "Karty"
+
+msgid "Last respot"
+msgstr "Ostatni respot"
+
+msgid "Switch view"
+msgstr "Przełącz widok"
+
+msgid "at"
+msgstr "o"
+
+# Time since update strings
+msgid "Just now"
+msgstr "Przed chwilą"
+
+msgid "1 min ago"
+msgstr "1 min temu"
+
+#, python-format
+msgid "%(minutes)d min ago"
+msgstr "%(minutes)d min temu"
+
+msgid "Spot History"
+msgstr "Historia Spota"
+
+msgid "Loading..."
+msgstr "Ładowanie..."
+
+msgid "Close"
+msgstr "Zamknij"
+
+msgid "Total respots"
+msgstr "Łącznie respotów"
+
+msgid "Initial Spot"
+msgstr "Początkowy Spot"
+
+msgid "Last Respot"
+msgstr "Ostatni Respot"
+
+msgid "No respots yet"
+msgstr "Brak respotów"
+
+msgid "Error loading spot history"
+msgstr "Błąd ładowania historii spota"

@@ -1,31 +1,49 @@
 #!/usr/bin/env python
 """
-Compile .po file to .mo file without requiring gettext tools
+Compile .po files to .mo files without requiring gettext tools
 """
 import os
 from django.core.management import execute_from_command_line
 
-# Try to compile using Django's built-in method
+# Translation files to compile
+translation_files = [
+    ('locale/pl/LC_MESSAGES/django.po', 'locale/pl/LC_MESSAGES/django.mo'),
+    ('planned_activations/locale/pl/LC_MESSAGES/django.po', 'planned_activations/locale/pl/LC_MESSAGES/django.mo')
+]
+
+# Try to compile using polib
 try:
     import polib
     
-    po_file = 'locale/pl/LC_MESSAGES/django.po'
-    mo_file = 'locale/pl/LC_MESSAGES/django.mo'
+    success_count = 0
+    for po_file, mo_file in translation_files:
+        if os.path.exists(po_file):
+            print(f"Compiling {po_file}...")
+            po = polib.pofile(po_file)
+            po.save_as_mofile(mo_file)
+            print(f"Successfully compiled to {mo_file}")
+            success_count += 1
+        else:
+            print(f"Warning: {po_file} not found, skipping...")
     
-    print(f"Compiling {po_file}...")
-    po = polib.pofile(po_file)
-    po.save_as_mofile(mo_file)
-    print(f"Successfully compiled to {mo_file}")
+    print(f"\n✓ {success_count} translation file(s) compiled successfully!")
+    print("Please restart your Django development server for changes to take effect.")
     
 except ImportError:
     print("polib not installed. Installing...")
     os.system('D:/BOTA/.venv/Scripts/pip.exe install polib')
     
     import polib
-    po_file = 'locale/pl/LC_MESSAGES/django.po'
-    mo_file = 'locale/pl/LC_MESSAGES/django.mo'
+    success_count = 0
+    for po_file, mo_file in translation_files:
+        if os.path.exists(po_file):
+            print(f"Compiling {po_file}...")
+            po = polib.pofile(po_file)
+            po.save_as_mofile(mo_file)
+            print(f"Successfully compiled to {mo_file}")
+            success_count += 1
+        else:
+            print(f"Warning: {po_file} not found, skipping...")
     
-    print(f"Compiling {po_file}...")
-    po = polib.pofile(po_file)
-    po.save_as_mofile(mo_file)
-    print(f"Successfully compiled to {mo_file}")
+    print(f"\n✓ {success_count} translation file(s) compiled successfully!")
+    print("Please restart your Django development server for changes to take effect.")

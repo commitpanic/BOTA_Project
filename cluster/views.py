@@ -120,8 +120,8 @@ class SpotViewSet(viewsets.ModelViewSet):
         return queryset
     
     def perform_create(self, serializer):
-        """Set spotter to current user"""
-        serializer.save(spotter=self.request.user)
+        """Set spotter to current user and initialize last_respot_time"""
+        serializer.save(spotter=self.request.user, last_respot_time=timezone.now())
     
     def perform_destroy(self, instance):
         """Only allow users to delete their own spots"""
@@ -142,17 +142,28 @@ class SpotViewSet(viewsets.ModelViewSet):
         """
         Re-spot an existing spot with optional new spotter callsign and comment.
         This updates the spot, resets the expiration time, and increments respot_count.
+        Also creates a SpotHistory record to track who respotted and when.
         """
+        from .models import SpotHistory
+        
         original_spot = self.get_object()
         
         # Get new spotter callsign and comment from request
         new_spotter_callsign = request.data.get('spotter_callsign', request.user.callsign)
         new_comment = request.data.get('comment', original_spot.comment or '')
         
+        # Create history record for this respot
+        SpotHistory.objects.create(
+            spot=original_spot,
+            respotter=request.user,
+            comment=new_comment
+        )
+        
         # Update the spot
         original_spot.spotter = request.user
         original_spot.comment = new_comment
         original_spot.respot_count += 1
+        original_spot.last_respot_time = timezone.now()  # Track respot time
         original_spot.refresh_expiration()  # Extends by 30 minutes
         original_spot.save()  # Save changes to database
         
@@ -161,6 +172,33 @@ class SpotViewSet(viewsets.ModelViewSet):
             'message': 'Spot re-posted successfully',
             'respot_count': original_spot.respot_count,
             'spot': serializer.data
+        })
+    
+    @action(detail=True, methods=['get'])
+    def history(self, request, pk=None):
+        """
+        Get respot history for a specific spot.
+        Returns list of respots with respotter callsign and timestamp.
+        """
+        from .models import SpotHistory
+        
+        spot = self.get_object()
+        history = SpotHistory.objects.filter(spot=spot).select_related('respotter').order_by('-respotted_at')
+        
+        history_data = [
+            {
+                'respotter': h.respotter.callsign,
+                'respotted_at': h.respotted_at,
+                'comment': h.comment or ''
+            }
+            for h in history
+        ]
+        
+        return Response({
+            'spot_id': spot.id,
+            'activator': spot.activator_callsign,
+            'total_respots': spot.respot_count,
+            'history': history_data
         })
     
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAdminUser])

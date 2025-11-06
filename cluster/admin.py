@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
-from .models import Cluster, ClusterMember, ClusterAlert, Spot
+from .models import Cluster, ClusterMember, ClusterAlert, Spot, SpotHistory
 
 
 class ClusterMemberInline(admin.TabularInline):
@@ -247,6 +247,15 @@ class ClusterAlertAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
+class SpotHistoryInline(admin.TabularInline):
+    """Inline for viewing spot history"""
+    model = SpotHistory
+    extra = 0
+    fields = ['respotter', 'respotted_at', 'comment']
+    readonly_fields = ['respotter', 'respotted_at']
+    can_delete = False
+
+
 @admin.register(Spot)
 class SpotAdmin(admin.ModelAdmin):
     """Admin configuration for Spot (Spotting System)"""
@@ -268,6 +277,7 @@ class SpotAdmin(admin.ModelAdmin):
     ]
     ordering = ['-updated_at']
     autocomplete_fields = ['bunker', 'spotter']
+    inlines = [SpotHistoryInline]
     
     fieldsets = (
         ('Spot Information', {
@@ -352,3 +362,22 @@ class SpotAdmin(admin.ModelAdmin):
         count = expired_spots.update(is_active=False)
         self.message_user(request, f'{count} expired spot(s) marked as inactive.')
     cleanup_expired.short_description = 'Cleanup expired spots'
+
+
+@admin.register(SpotHistory)
+class SpotHistoryAdmin(admin.ModelAdmin):
+    """Admin configuration for SpotHistory"""
+    list_display = [
+        'spot',
+        'respotter',
+        'respotted_at',
+        'comment'
+    ]
+    list_filter = ['respotted_at', 'respotter']
+    search_fields = [
+        'spot__activator_callsign',
+        'respotter__callsign',
+        'comment'
+    ]
+    ordering = ['-respotted_at']
+    readonly_fields = ['respotted_at']

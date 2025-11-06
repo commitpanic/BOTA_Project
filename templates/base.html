@@ -29,9 +29,20 @@
             --light-bg: #f8f9fa;
         }
         
+        html {
+            height: 100%;
+        }
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light-bg);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        main {
+            flex: 1 0 auto;
         }
         
         .navbar {
@@ -177,6 +188,7 @@
             color: white;
             padding: 2rem 0;
             margin-top: 4rem;
+            flex-shrink: 0;
         }
         
         /* Mobile responsive */
@@ -284,7 +296,7 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'planned_activation_list' %}">
-                            <i class="bi bi-calendar-event"></i> {% trans "Planned Activations" %}
+                            <i class="bi bi-calendar-event"></i> {% trans "Activations" %}
                         </a>
                     </li>
                     {% endif %}
@@ -371,7 +383,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer mt-auto">
+    <footer class="footer">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-3">

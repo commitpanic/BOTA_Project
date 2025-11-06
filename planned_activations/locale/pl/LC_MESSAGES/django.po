@@ -64,8 +64,8 @@ msgstr "Zaktualizowano"
 msgid "Planned Activation"
 msgstr "Planowana aktywacja"
 
-msgid "Planned Activations"
-msgstr "Planowane aktywacje"
+msgid "Activations"
+msgstr "Aktywacje"
 
 msgid "Other"
 msgstr "Inne"

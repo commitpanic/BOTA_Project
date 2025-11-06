@@ -922,7 +922,8 @@ def cluster_view(request):
                     spotter=request.user,
                     frequency=float(frequency),
                     bunker_reference=bunker_reference if bunker_reference else None,
-                    comment=comment if comment else ''
+                    comment=comment if comment else '',
+                    last_respot_time=timezone.now()  # Set initial spot time
                 )
                 
                 return JsonResponse({

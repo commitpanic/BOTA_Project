@@ -238,6 +238,45 @@ def detect_band_from_frequency(frequency):
     return None
 
 
+class SpotHistory(models.Model):
+    """
+    History of respots for a spot.
+    Records who respotted and when.
+    """
+    spot = models.ForeignKey(
+        'Spot',
+        on_delete=models.CASCADE,
+        related_name='respot_history',
+        verbose_name=_("Spot")
+    )
+    respotter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='respots',
+        verbose_name=_("Respotter"),
+        help_text=_("User who made this respot")
+    )
+    respotted_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Respotted At")
+    )
+    comment = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        verbose_name=_("Comment"),
+        help_text=_("Optional comment for this respot")
+    )
+
+    class Meta:
+        verbose_name = _("Spot History")
+        verbose_name_plural = _("Spot History")
+        ordering = ['-respotted_at']
+
+    def __str__(self):
+        return f"{self.respotter.callsign} respotted {self.spot.activator_callsign} at {self.respotted_at}"
+
+
 class Spot(models.Model):
     """
     Real-time spotting system for active bunker activations.
@@ -314,6 +353,12 @@ class Spot(models.Model):
         default=0,
         verbose_name=_("Respot Count"),
         help_text=_("Number of times this spot has been re-spotted")
+    )
+    last_respot_time = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Last Respot Time"),
+        help_text=_("Time of the most recent respot")
     )
 
     class Meta:

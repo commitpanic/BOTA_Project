@@ -6,14 +6,14 @@
 {% block extra_css %}
 <style>
     .spot-card {
-        border-left: 4px solid var(--primary-color);
         margin-bottom: 0.5rem;
         transition: all 0.2s;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08) !important;
     }
     
     .spot-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+        transform: translateY(-2px);
     }
     
     .band-badge {
@@ -30,6 +30,56 @@
     
     .pause-btn:hover {
         transform: scale(1.1);
+    }
+    
+    /* View toggle switch */
+    .view-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .view-toggle input[type="checkbox"] {
+        position: relative;
+        width: 48px;
+        height: 24px;
+        appearance: none;
+        background: #f5f5f5;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        outline: none;
+        border: 2px solid #e0e0e0;
+    }
+    
+    .view-toggle input[type="checkbox"]:checked {
+        background: #f5f5f5;
+        border-color: #e0e0e0;
+    }
+    
+    .view-toggle input[type="checkbox"]::before {
+        content: '';
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        top: 1px;
+        left: 1px;
+        background: #999;
+        transition: all 0.3s;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .view-toggle input[type="checkbox"]:checked::before {
+        left: 25px;
+        background: #999;
+    }
+    
+    .view-toggle-label {
+        font-size: 0.9rem;
+        color: white;
+        font-weight: 500;
+        user-select: none;
     }
     
     .band-160m { background-color: #8b4513; color: white; }
@@ -79,6 +129,43 @@
         font-size: 4rem;
         margin-bottom: 1rem;
     }
+    
+    /* Timeline styles for history modal */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -26px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px #dee2e6;
+    }
+    
+    .timeline-content {
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
 </style>
 {% endblock %}
 
@@ -92,7 +179,7 @@
 
 <!-- Auto-refresh countdown and action buttons -->
 <div class="row mb-3">
-    <div class="col-md-8">
+    <div class="col-lg-8 mb-2 mb-lg-0">
         <div class="alert alert-info d-flex justify-content-between align-items-center mb-0">
             <span>
                 <i class="bi bi-arrow-clockwise" id="refreshIcon"></i> 
@@ -106,15 +193,15 @@
             </span>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-lg-4">
         <div class="d-flex gap-2 h-100">
             {% if user.is_authenticated %}
             <button type="button" class="btn btn-primary flex-fill" data-bs-toggle="modal" data-bs-target="#spotModal">
-                <i class="bi bi-plus-circle"></i> {% trans "Post Spot" %}
+                <i class="bi bi-plus-circle"></i> <span class="d-none d-sm-inline">{% trans "Post Spot" %}</span>
             </button>
             {% endif %}
             <button type="button" class="btn btn-secondary flex-fill" data-bs-toggle="modal" data-bs-target="#filterModal">
-                <i class="bi bi-funnel"></i> {% trans "Filter" %}
+                <i class="bi bi-funnel"></i> <span class="d-none d-sm-inline">{% trans "Filter" %}</span>
                 {% if activator_filter or spotter_filter or band_filter %}
                 <span class="badge bg-warning text-dark">!</span>
                 {% endif %}
@@ -254,6 +341,34 @@
 </div>
 {% endif %}
 
+<!-- Modal: Spot History -->
+<div class="modal fade" id="spotHistoryModal" tabindex="-1" aria-labelledby="spotHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="spotHistoryModalLabel">
+                    <i class="bi bi-clock-history"></i> {% trans "Spot History" %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="spotHistoryContent">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">{% trans "Loading..." %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> {% trans "Close" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal: Filters -->
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -309,11 +424,25 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <span><i class="bi bi-broadcast"></i> {% trans "Active Spots" %}</span>
-                <span class="badge bg-success">{{ spots.count }} {% trans "spot(s)" %}</span>
+                <div class="d-flex align-items-center gap-3">
+                    <!-- View Toggle Switch -->
+                    <div class="view-toggle d-none d-md-flex">
+                        <span class="view-toggle-label">
+                            <i class="bi bi-table"></i> {% trans "Table" %}
+                        </span>
+                        <input type="checkbox" id="viewToggle" title="{% trans 'Switch view' %}">
+                        <span class="view-toggle-label">
+                            <i class="bi bi-grid-3x3-gap"></i> {% trans "Cards" %}
+                        </span>
+                    </div>
+                    <span class="badge bg-primary">{{ spots.count }} {% trans "spot(s)" %}</span>
+                </div>
             </div>
             <div class="card-body" id="spotsContainer">
                 {% if spots %}
-                <div class="table-responsive">
+                
+                <!-- TABLE VIEW -->
+                <div class="table-responsive" id="tableView">
                     <table class="table table-hover">
                         <thead>
                             <tr>
@@ -356,7 +485,87 @@
                                 <td><span class="spot-time">{{ spot.time_since_update }}</span></td>
                                 {% if user.is_authenticated %}
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary respot-btn" 
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-outline-primary respot-btn" 
+                                                data-spot-id="{{ spot.id }}"
+                                                data-activator="{{ spot.activator_callsign }}"
+                                                data-frequency="{{ spot.frequency }}"
+                                                data-bunker-ref="{{ spot.bunker_reference|default:'' }}"
+                                                data-comment="{{ spot.comment|default:'' }}"
+                                                title="{% trans 'Respot this activation' %}">
+                                            <i class="bi bi-arrow-repeat"></i> {% trans "Respot" %}
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary history-btn" 
+                                                data-spot-id="{{ spot.id }}"
+                                                title="{% trans 'Spot History' %}">
+                                            <i class="bi bi-clock-history"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- CARD VIEW -->
+                <div class="row" id="cardView" style="display: none;">
+                    {% for spot in spots %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100 spot-card">
+                            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                                <strong class="text-white">{{ spot.activator_callsign }}</strong>
+                                <span class="band-badge band-{{ spot.band|lower }}">{{ spot.band }}</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <i class="bi bi-broadcast-pin"></i> 
+                                    <strong>{% trans "Frequency" %}:</strong> 
+                                    <span class="spot-frequency">{{ spot.frequency }} MHz</span>
+                                </div>
+                                
+                                {% if spot.bunker %}
+                                <div class="mb-2">
+                                    <i class="bi bi-geo-alt text-primary"></i> 
+                                    <strong>{{ spot.bunker_reference }}</strong><br>
+                                    <small class="text-muted">{{ spot.bunker.name_en }}</small>
+                                </div>
+                                {% elif spot.bunker_reference %}
+                                <div class="mb-2">
+                                    <i class="bi bi-geo-alt text-primary"></i> 
+                                    <strong>{{ spot.bunker_reference }}</strong>
+                                </div>
+                                {% endif %}
+                                
+                                {% if spot.comment %}
+                                <div class="mb-2">
+                                    <i class="bi bi-chat-left-text"></i> 
+                                    <small>{{ spot.comment }}</small>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="mb-2">
+                                    <i class="bi bi-person-badge"></i> 
+                                    <strong>{% trans "Spotter" %}:</strong> {{ spot.spotter.callsign }}
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <i class="bi bi-clock-history"></i> 
+                                    <strong>{% trans "Last Heard" %}:</strong><br>
+                                    <small class="text-muted">
+                                        {{ spot.time_since_update }}
+                                        {% if spot.last_respot_time %}
+                                        <br>{% trans "at" %} {{ spot.last_respot_time|date:"H:i" }} UTC
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="card-footer p-0">
+                                <div class="d-flex">
+                                    {% if user.is_authenticated %}
+                                    <button class="btn btn-sm btn-outline-primary respot-btn flex-grow-1 border-end-0 fw-bold" 
+                                            style="flex-basis: 75%; border-radius: 0 0 0 12px;"
                                             data-spot-id="{{ spot.id }}"
                                             data-activator="{{ spot.activator_callsign }}"
                                             data-frequency="{{ spot.frequency }}"
@@ -365,13 +574,20 @@
                                             title="{% trans 'Respot this activation' %}">
                                         <i class="bi bi-arrow-repeat"></i> {% trans "Respot" %}
                                     </button>
-                                </td>
-                                {% endif %}
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-outline-secondary history-btn fw-bold {% if not user.is_authenticated %}w-100{% endif %}" 
+                                            {% if user.is_authenticated %}style="flex-basis: 25%; border-radius: 0 0 12px 0;"{% else %}style="border-radius: 0 0 12px 12px;"{% endif %}
+                                            data-spot-id="{{ spot.id }}"
+                                            title="{% trans 'Spot History' %}">
+                                        <i class="bi bi-clock-history"></i> <span class="badge bg-secondary">{{ spot.respot_count }}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
+                
                 {% else %}
                 <div class="empty-state">
                     <i class="bi bi-broadcast-pin text-muted"></i>
@@ -391,6 +607,53 @@
     let countdown = 30;
     let countdownInterval;
     let isPaused = false;
+    
+    // View mode management
+    function initializeViewMode() {
+        const savedView = localStorage.getItem('clusterViewMode');
+        const isMobile = window.innerWidth < 768; // Bootstrap md breakpoint
+        const toggle = document.getElementById('viewToggle');
+        
+        // On mobile, default to cards view, otherwise use saved preference or table
+        const defaultView = isMobile ? 'cards' : 'table';
+        const viewMode = savedView || defaultView;
+        
+        if (viewMode === 'cards') {
+            if (toggle) toggle.checked = true;
+            showCardView();
+        } else {
+            if (toggle) toggle.checked = false;
+            showTableView();
+        }
+    }
+    
+    function showTableView() {
+        const tableView = document.getElementById('tableView');
+        const cardView = document.getElementById('cardView');
+        if (tableView) tableView.style.display = 'block';
+        if (cardView) cardView.style.display = 'none';
+        localStorage.setItem('clusterViewMode', 'table');
+    }
+    
+    function showCardView() {
+        const tableView = document.getElementById('tableView');
+        const cardView = document.getElementById('cardView');
+        if (tableView) tableView.style.display = 'none';
+        if (cardView) cardView.style.display = 'flex';
+        localStorage.setItem('clusterViewMode', 'cards');
+    }
+    
+    // View toggle event listener
+    const viewToggle = document.getElementById('viewToggle');
+    if (viewToggle) {
+        viewToggle.addEventListener('change', function() {
+            if (this.checked) {
+                showCardView();
+            } else {
+                showTableView();
+            }
+        });
+    }
     
     function startCountdown() {
         countdown = 30;
@@ -619,6 +882,103 @@
     });
     {% endif %}
     
+    // Spot history button handler
+    document.querySelectorAll('.history-btn').forEach(button => {
+        button.addEventListener('click', async function() {
+            const spotId = this.dataset.spotId;
+            const modal = new bootstrap.Modal(document.getElementById('spotHistoryModal'));
+            const contentDiv = document.getElementById('spotHistoryContent');
+            
+            // Show loading spinner
+            contentDiv.innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">{% trans "Loading..." %}</span>
+                    </div>
+                </div>
+            `;
+            
+            // Open modal
+            modal.show();
+            
+            // Fetch spot history from the new history endpoint
+            try {
+                const historyResponse = await fetch(`/api/spots/${spotId}/history/`);
+                const historyData = await historyResponse.json();
+                
+                if (historyResponse.ok) {
+                    // Build history HTML
+                    let historyHtml = `
+                        <div class="mb-3">
+                            <h6 class="text-primary">
+                                <i class="bi bi-broadcast-pin"></i> 
+                                ${historyData.activator}
+                            </h6>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong><i class="bi bi-arrow-repeat"></i> {% trans "Total respots" %}:</strong> ${historyData.total_respots}
+                        </div>
+                    `;
+                    
+                    // Add timeline
+                    if (historyData.history && historyData.history.length > 0) {
+                        historyHtml += '<div class="timeline">';
+                        
+                        // Display each respot in chronological order (newest first)
+                        historyData.history.forEach((respot, index) => {
+                            const respotDate = new Date(respot.respotted_at);
+                            const formattedDate = respotDate.toLocaleString('pl-PL', {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            
+                            historyHtml += `
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-primary"></div>
+                                    <div class="timeline-content">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <strong>{% trans "Respot" %} #${historyData.history.length - index}</strong>
+                                            <small class="text-muted">${formattedDate}</small>
+                                        </div>
+                                        <div class="text-muted small mb-1">
+                                            <i class="bi bi-person"></i> ${respot.respotter}
+                                        </div>
+                                        ${respot.comment ? `<div class="small text-secondary"><i class="bi bi-chat-left-text"></i> ${respot.comment}</div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        historyHtml += '</div>';
+                    } else {
+                        historyHtml += `
+                            <div class="alert alert-secondary">
+                                <i class="bi bi-info-circle"></i> {% trans "No respots yet" %}
+                            </div>
+                        `;
+                    }
+                    
+                    contentDiv.innerHTML = historyHtml;
+                } else {
+                    contentDiv.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle"></i> {% trans "Error loading spot history" %}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                contentDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i> {% trans "Error loading spot history" %}
+                    </div>
+                `;
+            }
+        });
+    });
+    
     // Save scroll position before applying filters
     document.getElementById('filterForm').addEventListener('submit', function() {
         saveScrollPosition();
@@ -631,13 +991,11 @@
     
     // Start countdown on page load
     document.addEventListener('DOMContentLoaded', function() {
+        initializeViewMode();
         startCountdown();
         
         // Restore scroll position after page loads
         restoreScrollPosition();
-        
-        // Clear saved scroll position after restoration (optional)
-        // sessionStorage.removeItem('clusterScrollPos');
     });
 </script>
 {% endblock %}
