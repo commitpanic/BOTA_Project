@@ -9,6 +9,9 @@
 - ✅ Database optimization with strategic indexes (5 new indexes)
 - ✅ Caching implementation - 24.8x faster home page (96% improvement)
 - ✅ PDF generation for diploma certificates with QR codes
+- ✅ Advanced PDF customization system with user-friendly forms
+- ✅ DiplomaLayoutElement model with color picker and inline editing
+- ✅ FontFile model for custom font uploads (TTF/OTF)
 - ✅ All 133 tests passing (126 app tests + 7 PDF tests)
 - ✅ Added table/card view toggle with mobile responsiveness
 - ✅ Implemented detailed respot history tracking with SpotHistory model
@@ -72,6 +75,30 @@
   - ✅ PDF size: ~62KB per certificate
   - ✅ Endpoint: `/diplomas/{id}/download/` (login required)
   - ✅ Security: users can only download their own diplomas
+  - ✅ **Background Image Support** (COMPLETED Nov 6, 2025)
+    - Upload custom background templates per diploma type
+    - Automatic scaling to A4 landscape
+    - Transparent PNG support
+  - ✅ **Configurable Layouts** (COMPLETED Nov 6, 2025)
+    - DiplomaLayoutElement model with inline forms
+    - Simple checkbox for enable/disable per element
+    - Form fields for position, font, size, styling
+    - No JSON editing required - user-friendly admin interface
+    - Automatic migration from old JSON format
+  - ✅ **Font Management** (COMPLETED Nov 6, 2025)
+    - FontFile model for uploading custom TTF/OTF fonts
+    - Admin interface for font management
+    - Font selection in layout element forms
+  - ✅ **Admin Preview** (COMPLETED Nov 6, 2025)
+    - Preview button in Django admin
+    - Sample PDF with watermark
+    - Test layouts before issuing diplomas
+  - ✅ **User-Friendly Configuration** (COMPLETED Nov 6, 2025)
+    - Replaced complex JSON editing with simple forms
+    - Inline formsets for each text element
+    - Checkboxes, number inputs, color pickers
+    - Automatic creation of default layout elements
+  - ✅ Documentation: docs/DIPLOMA_PDF_CUSTOMIZATION.md (needs update)
 
 ### Missing Templates
 - [ ] **Create Staff Bunker Management Templates**
@@ -340,11 +367,12 @@
 - None reported at this time
 
 ### Technical Debt
-- [ ] Certificate download returns placeholder text (PDF generation not implemented)
+- [x] ~~Certificate download returns placeholder text~~ (PDF generation implemented - Nov 6, 2025)
 - [ ] Email notifications are placeholder (SMTP not configured)
-- [ ] No caching implemented (may affect performance at scale)
+- [x] ~~No caching implemented~~ (Caching implemented - Nov 6, 2025)
 - [ ] No rate limiting on API endpoints
 - [x] ~~Some inline CSS in templates~~ (Moved to extra_css blocks - Nov 6, 2025)
+- [x] ~~Complex JSON editing for diploma layouts~~ (Replaced with form-based UI - Nov 6, 2025)
 
 ---
 

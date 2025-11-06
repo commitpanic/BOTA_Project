@@ -1,0 +1,22 @@
+/* Diploma Layout Element Inline Styling */
+
+.diplomas-diplomalayoutelement-content-type-diploma_type input[readonly] {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.diplomas-diplomalayoutelement-content-type-diploma_type td.field-qr_size input[placeholder="N/A"] {
+    color: #999;
+    text-align: center;
+}
+
+.diplomas-diplomalayoutelement-content-type-diploma_type td.field-qr_size input[placeholder="N/A"]::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* Highlight QR code row */
+.diplomas-diplomalayoutelement-content-type-diploma_type tr:has(select[value="qr_code"]),
+.diplomas-diplomalayoutelement-content-type-diploma_type tr:has(input[value="qr_code"]) {
+    background-color: #fffbf0;
+}

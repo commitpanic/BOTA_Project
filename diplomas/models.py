@@ -1,10 +1,177 @@
 from django.db import models
 from django.conf import settings
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, FileExtensionValidator
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from decimal import Decimal
 import uuid
+import os
+import copy
+
+
+class FontFile(models.Model):
+    """
+    Uploaded font files for diploma customization.
+    Supports TTF and OTF formats.
+    """
+    FONT_TYPES = [
+        ('regular', _('Regular')),
+        ('bold', _('Bold')),
+        ('italic', _('Italic')),
+        ('bold_italic', _('Bold Italic')),
+    ]
+    
+    name = models.CharField(
+        max_length=100,
+        verbose_name=_("Font Name"),
+        help_text=_("Display name for this font (e.g., 'Arial', 'Times New Roman')")
+    )
+    font_file = models.FileField(
+        upload_to='diploma_fonts/',
+        validators=[FileExtensionValidator(allowed_extensions=['ttf', 'otf'])],
+        verbose_name=_("Font File"),
+        help_text=_("Upload TTF or OTF font file")
+    )
+    font_type = models.CharField(
+        max_length=20,
+        choices=FONT_TYPES,
+        default='regular',
+        verbose_name=_("Font Type"),
+        help_text=_("Specify if this is regular, bold, italic, or bold-italic variant")
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name=_("Active"),
+        help_text=_("Only active fonts appear in diploma configuration")
+    )
+    uploaded_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Uploaded At")
+    )
+    
+    class Meta:
+        verbose_name = _("Font File")
+        verbose_name_plural = _("Font Files")
+        ordering = ['name', 'font_type']
+        unique_together = [['name', 'font_type']]
+    
+    def __str__(self):
+        return f"{self.name} ({self.get_font_type_display()})"
+    
+    def get_font_family_name(self):
+        """Return font family name for reportlab registration"""
+        if self.font_type == 'regular':
+            return self.name
+        elif self.font_type == 'bold':
+            return f"{self.name}-Bold"
+        elif self.font_type == 'italic':
+            return f"{self.name}-Italic"
+        elif self.font_type == 'bold_italic':
+            return f"{self.name}-BoldItalic"
+        return self.name
+
+
+class DiplomaLayoutElement(models.Model):
+    """
+    Individual text element configuration for diploma layout.
+    Each diploma type has multiple elements (callsign, name, date, etc.)
+    """
+    ELEMENT_TYPES = [
+        ('callsign', _('Callsign')),
+        ('diploma_name', _('Diploma Name')),
+        ('date', _('Issue Date')),
+        ('points', _('Points Information')),
+        ('diploma_number', _('Diploma Number')),
+        ('qr_code', _('QR Code')),
+    ]
+    
+    diploma_type = models.ForeignKey(
+        'DiplomaType',
+        on_delete=models.CASCADE,
+        related_name='layout_elements',
+        verbose_name=_("Diploma Type")
+    )
+    element_type = models.CharField(
+        max_length=20,
+        choices=ELEMENT_TYPES,
+        verbose_name=_("Element Type")
+    )
+    enabled = models.BooleanField(
+        default=True,
+        verbose_name=_("Enabled"),
+        help_text=_("Show this element on the diploma")
+    )
+    x_position = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=14.5,
+        verbose_name=_("X Position (cm)"),
+        help_text=_("Horizontal position from left edge (center alignment)")
+    )
+    y_position = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=10.0,
+        verbose_name=_("Y Position (cm)"),
+        help_text=_("Vertical position from bottom edge")
+    )
+    font_family = models.CharField(
+        max_length=100,
+        default='Lato',
+        verbose_name=_("Font Family"),
+        help_text=_("Font name (e.g., Lato, Arial, Times)")
+    )
+    font_size = models.IntegerField(
+        default=24,
+        validators=[MinValueValidator(6)],
+        verbose_name=_("Font Size"),
+        help_text=_("Font size in points (minimum 6)")
+    )
+    bold = models.BooleanField(
+        default=False,
+        verbose_name=_("Bold")
+    )
+    italic = models.BooleanField(
+        default=False,
+        verbose_name=_("Italic")
+    )
+    color = models.CharField(
+        max_length=7,
+        default='#333333',
+        verbose_name=_("Color"),
+        help_text=_("Text color in hex format (e.g., #333333)")
+    )
+    
+    # For QR code only
+    qr_size = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=3.0,
+        null=True,
+        blank=True,
+        verbose_name=_("QR Code Size (cm)"),
+        help_text=_("Only for QR code element")
+    )
+    
+    class Meta:
+        verbose_name = _("Layout Element")
+        verbose_name_plural = _("Layout Elements")
+        ordering = ['element_type']
+        unique_together = [['diploma_type', 'element_type']]
+    
+    def __str__(self):
+        return f"{self.diploma_type.name_en} - {self.get_element_type_display()}"
+    
+    def save(self, *args, **kwargs):
+        """Override save to clear qr_size for non-QR elements"""
+        # Only QR code should have qr_size value
+        if self.element_type != 'qr_code':
+            self.qr_size = None
+        elif self.element_type == 'qr_code' and not self.qr_size:
+            # Set default QR size if not provided
+            self.qr_size = 3.0
+        
+        super().save(*args, **kwargs)
 
 
 class DiplomaType(models.Model):
@@ -107,6 +274,19 @@ class DiplomaType(models.Model):
         verbose_name=_("Template Image"),
         help_text=_("Background template for PDF generation")
     )
+    
+    # PDF Layout Configuration - Enhanced with full text styling
+    layout_config = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name=_("Layout Configuration"),
+        help_text=_(
+            "Advanced PDF layout configuration. Structure: "
+            "{'callsign': {'enabled': true, 'x': 14.5, 'y': 10, 'font': 'Lato', 'size': 24, 'bold': true, 'italic': false, 'color': '#000000'}, ...} "
+            "Available elements: callsign, diploma_name, date, points, diploma_number, qr_code"
+        )
+    )
+    
     is_active = models.BooleanField(
         default=True,
         verbose_name=_("Active"),
@@ -149,6 +329,323 @@ class DiplomaType(models.Model):
             return False
         
         return True
+    
+    def get_default_layout_config(self):
+        """Return default layout configuration with all styling options"""
+        return {
+            'callsign': {
+                'enabled': True,
+                'x': 14.5,
+                'y': 10,
+                'font': 'Lato',
+                'size': 24,
+                'bold': True,
+                'italic': False,
+                'color': '#333333'
+            },
+            'diploma_name': {
+                'enabled': True,
+                'x': 14.5,
+                'y': 12,
+                'font': 'Lato',
+                'size': 16,
+                'bold': False,
+                'italic': False,
+                'color': '#333333'
+            },
+            'date': {
+                'enabled': True,
+                'x': 14.5,
+                'y': 14,
+                'font': 'Lato',
+                'size': 12,
+                'bold': False,
+                'italic': False,
+                'color': '#666666'
+            },
+            'points': {
+                'enabled': True,
+                'x': 14.5,
+                'y': 16,
+                'font': 'Lato',
+                'size': 12,
+                'bold': False,
+                'italic': False,
+                'color': '#666666'
+            },
+            'diploma_number': {
+                'enabled': True,
+                'x': 14.5,
+                'y': 10.5,
+                'font': 'Lato',
+                'size': 10,
+                'bold': False,
+                'italic': False,
+                'color': '#999999'
+            },
+            'qr_code': {
+                'enabled': True,
+                'x': 2,
+                'y': 2,
+                'size': 3  # QR code size in cm
+            }
+        }
+    
+    def migrate_old_layout_config(self):
+        """Migrate old flat layout_config format to new nested format"""
+        if not self.layout_config:
+            return
+        
+        # Check if already in new format (has nested dicts)
+        if any(isinstance(v, dict) for v in self.layout_config.values()):
+            return  # Already migrated
+        
+        # Old format keys
+        old_keys = {
+            'callsign_x', 'callsign_y',
+            'diploma_name_x', 'diploma_name_y',
+            'date_x', 'date_y',
+            'points_x', 'points_y',
+            'diploma_number_x', 'diploma_number_y',
+            'qr_x', 'qr_y'
+        }
+        
+        # Check if this is old format
+        if not any(k in self.layout_config for k in old_keys):
+            return  # Not old format
+        
+        # Migrate to new format
+        new_config = {}
+        
+        # Migrate callsign
+        if 'callsign_x' in self.layout_config or 'callsign_y' in self.layout_config:
+            new_config['callsign'] = {
+                'enabled': True,
+                'x': self.layout_config.get('callsign_x', 14.5),
+                'y': self.layout_config.get('callsign_y', 10),
+                'font': 'Lato',
+                'size': 24,
+                'bold': True,
+                'italic': False,
+                'color': '#333333'
+            }
+        
+        # Migrate diploma_name
+        if 'diploma_name_x' in self.layout_config or 'diploma_name_y' in self.layout_config:
+            new_config['diploma_name'] = {
+                'enabled': True,
+                'x': self.layout_config.get('diploma_name_x', 14.5),
+                'y': self.layout_config.get('diploma_name_y', 12),
+                'font': 'Lato',
+                'size': 16,
+                'bold': False,
+                'italic': False,
+                'color': '#333333'
+            }
+        
+        # Migrate date
+        if 'date_x' in self.layout_config or 'date_y' in self.layout_config:
+            new_config['date'] = {
+                'enabled': True,
+                'x': self.layout_config.get('date_x', 14.5),
+                'y': self.layout_config.get('date_y', 14),
+                'font': 'Lato',
+                'size': 12,
+                'bold': False,
+                'italic': False,
+                'color': '#666666'
+            }
+        
+        # Migrate points
+        if 'points_x' in self.layout_config or 'points_y' in self.layout_config:
+            new_config['points'] = {
+                'enabled': True,
+                'x': self.layout_config.get('points_x', 14.5),
+                'y': self.layout_config.get('points_y', 16),
+                'font': 'Lato',
+                'size': 12,
+                'bold': False,
+                'italic': False,
+                'color': '#666666'
+            }
+        
+        # Migrate diploma_number
+        if 'diploma_number_x' in self.layout_config or 'diploma_number_y' in self.layout_config:
+            new_config['diploma_number'] = {
+                'enabled': True,
+                'x': self.layout_config.get('diploma_number_x', 14.5),
+                'y': self.layout_config.get('diploma_number_y', 10.5),
+                'font': 'Lato',
+                'size': 10,
+                'bold': False,
+                'italic': False,
+                'color': '#999999'
+            }
+        
+        # Migrate QR code
+        if 'qr_x' in self.layout_config or 'qr_y' in self.layout_config:
+            new_config['qr_code'] = {
+                'enabled': True,
+                'x': self.layout_config.get('qr_x', 2),
+                'y': self.layout_config.get('qr_y', 2),
+                'size': 3
+            }
+        
+        # Update with migrated config
+        self.layout_config = new_config
+    
+    def get_layout_config_from_elements(self):
+        """
+        Build layout config dict from DiplomaLayoutElement objects.
+        Returns config compatible with pdf_generator.py format.
+        """
+        config = {}
+        
+        for element in self.layout_elements.all():
+            element_config = {
+                'enabled': element.enabled,
+                'x': float(element.x_position),
+                'y': float(element.y_position),
+                'font': element.font_family,
+                'size': element.font_size,
+                'bold': element.bold,
+                'italic': element.italic,
+                'color': element.color,
+            }
+            
+            # Add QR size for qr_code element
+            if element.element_type == 'qr_code' and element.qr_size:
+                element_config['size'] = float(element.qr_size)
+            
+            config[element.element_type] = element_config
+        
+        # If no elements exist yet, return default config
+        if not config:
+            return self.get_default_layout_config()
+        
+        return config
+    
+    def migrate_old_layout_config(self):
+        """
+        Migrate old flat JSON format to new DiplomaLayoutElement objects.
+        Old format: {"callsign_x": 14.5, "callsign_y": 10}
+        New format: DiplomaLayoutElement objects in database
+        """
+        # Check if we already have layout elements
+        if self.layout_elements.exists():
+            return  # Already migrated
+        
+        # Check if we have old-style layout_config
+        if not self.layout_config:
+            return  # No old config to migrate
+        
+        # Old format keys
+        old_keys = {
+            'callsign_x', 'callsign_y',
+            'diploma_name_x', 'diploma_name_y',
+            'date_x', 'date_y',
+            'points_x', 'points_y',
+            'diploma_number_x', 'diploma_number_y',
+            'qr_x', 'qr_y'
+        }
+        
+        # Check if this is old format
+        if not any(k in self.layout_config for k in old_keys):
+            # Check if it's nested format (also needs migration to DB)
+            if any(k in self.layout_config for k in ['callsign', 'diploma_name', 'date', 'points', 'diploma_number', 'qr_code']):
+                # Migrate from nested JSON to DiplomaLayoutElement
+                for element_type, config in self.layout_config.items():
+                    if not isinstance(config, dict):
+                        continue
+                    
+                    element_data = {
+                        'diploma_type': self,
+                        'element_type': element_type,
+                        'enabled': config.get('enabled', True),
+                        'x_position': config.get('x', 14.5),
+                        'y_position': config.get('y', 10),
+                        'font_family': config.get('font', 'Lato'),
+                        'font_size': config.get('size', 12),
+                        'bold': config.get('bold', False),
+                        'italic': config.get('italic', False),
+                        'color': config.get('color', '#333333'),
+                    }
+                    
+                    if element_type == 'qr_code':
+                        element_data['qr_size'] = config.get('size', 3.0)
+                    
+                    DiplomaLayoutElement.objects.create(**element_data)
+                
+                # Clear old JSON config
+                self.layout_config = {}
+                return
+            
+            return  # Not old format
+        
+        # Migrate from flat old format to DiplomaLayoutElement
+        element_defaults = {
+            'callsign': {'font_size': 24, 'bold': True, 'x': 14.5, 'y': 10},
+            'diploma_name': {'font_size': 16, 'bold': False, 'x': 14.5, 'y': 12},
+            'date': {'font_size': 12, 'bold': False, 'x': 14.5, 'y': 14, 'color': '#666666'},
+            'points': {'font_size': 12, 'bold': False, 'x': 14.5, 'y': 16, 'color': '#666666'},
+            'diploma_number': {'font_size': 10, 'bold': False, 'x': 14.5, 'y': 10.5, 'color': '#999999'},
+            'qr_code': {'font_size': 10, 'bold': False, 'x': 2, 'y': 2, 'qr_size': 3.0},
+        }
+        
+        for element_type, defaults in element_defaults.items():
+            x_key = f'{element_type}_x' if element_type != 'qr_code' else 'qr_x'
+            y_key = f'{element_type}_y' if element_type != 'qr_code' else 'qr_y'
+            
+            if x_key in self.layout_config or y_key in self.layout_config:
+                element_data = {
+                    'diploma_type': self,
+                    'element_type': element_type,
+                    'enabled': True,
+                    'x_position': self.layout_config.get(x_key, defaults['x']),
+                    'y_position': self.layout_config.get(y_key, defaults['y']),
+                    'font_family': 'Lato',
+                    'font_size': defaults['font_size'],
+                    'bold': defaults['bold'],
+                    'italic': False,
+                    'color': defaults.get('color', '#333333'),
+                }
+                
+                if 'qr_size' in defaults:
+                    element_data['qr_size'] = defaults['qr_size']
+                
+                DiplomaLayoutElement.objects.create(**element_data)
+        
+        # Clear old JSON config
+        self.layout_config = {}
+    
+    def get_merged_layout_config(self):
+        """Get layout config - now from DiplomaLayoutElement objects"""
+        # First migrate old format if needed
+        self.migrate_old_layout_config()
+        
+        # Get config from layout elements
+        return self.get_layout_config_from_elements()
+    
+    def migrate_old_layout_config_json_to_json(self):
+        """DEPRECATED: Old migration method for JSON-to-JSON migration"""
+        
+        default_config = self.get_default_layout_config()
+        if not self.layout_config:
+            return default_config
+        
+        # Deep merge: update defaults with custom values
+        import copy
+        merged = copy.deepcopy(default_config)
+        for element, settings in self.layout_config.items():
+            if element in merged:
+                if isinstance(settings, dict):
+                    merged[element].update(settings)
+                else:
+                    merged[element] = settings
+            else:
+                merged[element] = settings
+        
+        return merged
 
 
 class Diploma(models.Model):

@@ -292,289 +292,52 @@ def diplomas_view(request):
 
 @login_required
 def download_certificate(request, diploma_id):
-    """Download diploma certificate as PDF"""
+    """Download diploma certificate as PDF using advanced customization"""
     from django.http import HttpResponse
-    from reportlab.lib.pagesizes import A4, landscape
-    from reportlab.lib.units import cm
-    from reportlab.lib import colors
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle, Frame, PageTemplate
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_CENTER, TA_LEFT
-    from reportlab.pdfgen import canvas as pdfcanvas
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
-    import qrcode
-    import io
     from django.utils.translation import get_language
+    from diplomas.pdf_generator import generate_diploma_pdf
     
     # Get the diploma (ensure user owns it)
     diploma = get_object_or_404(Diploma, id=diploma_id, user=request.user)
-    
-    # Create PDF in memory
-    buffer = io.BytesIO()
-    
-    # Register Lato fonts (supports Polish characters)
-    try:
-        import os
-        from pathlib import Path
-        from django.conf import settings
-        
-        # Path to Lato fonts in static/fonts
-        fonts_dir = Path(settings.BASE_DIR) / 'static' / 'fonts'
-        
-        lato_regular = fonts_dir / 'Lato-Regular.ttf'
-        lato_bold = fonts_dir / 'Lato-Bold.ttf'
-        lato_italic = fonts_dir / 'Lato-Italic.ttf'
-        lato_bolditalic = fonts_dir / 'Lato-BoldItalic.ttf'
-        
-        # Register Lato fonts if they exist
-        if lato_regular.exists() and lato_bold.exists() and lato_italic.exists():
-            pdfmetrics.registerFont(TTFont('Lato', str(lato_regular)))
-            pdfmetrics.registerFont(TTFont('Lato-Bold', str(lato_bold)))
-            pdfmetrics.registerFont(TTFont('Lato-Italic', str(lato_italic)))
-            if lato_bolditalic.exists():
-                pdfmetrics.registerFont(TTFont('Lato-BoldItalic', str(lato_bolditalic)))
-            default_font = 'Lato'
-            bold_font = 'Lato-Bold'
-            italic_font = 'Lato-Italic'
-        else:
-            # Fallback to Helvetica
-            default_font = 'Helvetica'
-            bold_font = 'Helvetica-Bold'
-            italic_font = 'Helvetica-Oblique'
-    except Exception as e:
-        # Fallback to Helvetica on any error
-        default_font = 'Helvetica'
-        bold_font = 'Helvetica-Bold'
-        italic_font = 'Helvetica-Oblique'
-    
-    # Custom page template with border
-    def add_page_decorations(canvas, doc):
-        """Add decorative border to each page"""
-        canvas.saveState()
-        # Draw border
-        canvas.setStrokeColor(colors.HexColor('#1a5490'))
-        canvas.setLineWidth(3)
-        canvas.rect(1.5*cm, 1.5*cm, 26*cm, 17.5*cm, stroke=1, fill=0)
-        canvas.restoreState()
-    
-    # Create the PDF object using landscape A4
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=landscape(A4),
-        rightMargin=2.5*cm,
-        leftMargin=2.5*cm,
-        topMargin=2.5*cm,
-        bottomMargin=2.5*cm
-    )
-    
-    # Container for the 'Flowable' objects
-    elements = []
-    
-    # Get styles
-    styles = getSampleStyleSheet()
-    
-    # Create custom styles with Unicode-supporting fonts
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=28,
-        textColor=colors.HexColor('#1a5490'),
-        spaceAfter=15,
-        alignment=TA_CENTER,
-        fontName=bold_font
-    )
-    
-    subtitle_style = ParagraphStyle(
-        'CustomSubtitle',
-        parent=styles['Normal'],
-        fontSize=16,
-        textColor=colors.HexColor('#2c5aa0'),
-        spaceAfter=8,
-        alignment=TA_CENTER,
-        fontName=bold_font
-    )
-    
-    body_style = ParagraphStyle(
-        'CustomBody',
-        parent=styles['Normal'],
-        fontSize=12,
-        spaceAfter=8,
-        alignment=TA_CENTER,
-        fontName=default_font
-    )
-    
-    info_style = ParagraphStyle(
-        'CustomInfo',
-        parent=styles['Normal'],
-        fontSize=10,
-        textColor=colors.grey,
-        alignment=TA_CENTER,
-        fontName=default_font
-    )
     
     # Determine language
     current_lang = get_language()
     is_polish = current_lang == 'pl'
     
-    # Get diploma names and descriptions
+    # Prepare data
+    callsign = diploma.user.callsign
     diploma_name = diploma.diploma_type.name_pl if is_polish else diploma.diploma_type.name_en
-    diploma_desc = diploma.diploma_type.description_pl if is_polish else diploma.diploma_type.description_en
+    date_text = f"{'Data wydania' if is_polish else 'Issue Date'}: {diploma.issue_date.strftime('%Y-%m-%d')}"
     
-    # Title
-    if is_polish:
-        title_text = "CERTYFIKAT DYPLOMU"
-    else:
-        title_text = "DIPLOMA CERTIFICATE"
-    elements.append(Paragraph(title_text, title_style))
-    elements.append(Spacer(1, 0.3*cm))
+    # Points information
+    points_parts = []
+    if diploma.activator_points_earned > 0:
+        points_parts.append(f"ACT: {diploma.activator_points_earned}")
+    if diploma.hunter_points_earned > 0:
+        points_parts.append(f"HNT: {diploma.hunter_points_earned}")
+    if diploma.b2b_points_earned > 0:
+        points_parts.append(f"B2B: {diploma.b2b_points_earned}")
     
-    # Subtitle - Program name
-    program_text = "BOTA - Bunkers On The Air"
-    elements.append(Paragraph(program_text, subtitle_style))
-    elements.append(Spacer(1, 0.6*cm))
+    points_text = f"{'Punkty' if is_polish else 'Points'}: {' | '.join(points_parts)}" if points_parts else ""
     
-    # Award text
-    if is_polish:
-        award_text = "Niniejszym certyfikuje się, że"
-    else:
-        award_text = "This certifies that"
-    elements.append(Paragraph(award_text, body_style))
-    elements.append(Spacer(1, 0.3*cm))
-    
-    # Callsign (large and bold)
-    callsign_style = ParagraphStyle(
-        'Callsign',
-        parent=styles['Normal'],
-        fontSize=22,
-        textColor=colors.HexColor('#1a5490'),
-        spaceAfter=8,
-        alignment=TA_CENTER,
-        fontName=bold_font
-    )
-    elements.append(Paragraph(diploma.user.callsign, callsign_style))
-    elements.append(Spacer(1, 0.4*cm))
-    
-    # Achievement text
-    if is_polish:
-        achievement_text = f"osiągnął wymagania dla dyplomu"
-    else:
-        achievement_text = f"has achieved the requirements for the"
-    elements.append(Paragraph(achievement_text, body_style))
-    elements.append(Spacer(1, 0.3*cm))
-    
-    # Diploma name (highlighted)
-    diploma_name_style = ParagraphStyle(
-        'DiplomaName',
-        parent=styles['Normal'],
-        fontSize=18,
-        textColor=colors.HexColor('#d4af37'),  # Gold color
-        spaceAfter=8,
-        alignment=TA_CENTER,
-        fontName=bold_font
-    )
-    elements.append(Paragraph(diploma_name, diploma_name_style))
-    
-    # Description
-    if diploma_desc:
-        elements.append(Spacer(1, 0.2*cm))
-        desc_style = ParagraphStyle(
-            'Description',
-            parent=styles['Normal'],
-            fontSize=10,
-            textColor=colors.grey,
-            alignment=TA_CENTER,
-            fontName=italic_font
-        )
-        elements.append(Paragraph(diploma_desc, desc_style))
-    
-    elements.append(Spacer(1, 0.6*cm))
-    
-    # Requirements met - show minimum required points
-    req_text_parts = []
-    if diploma.diploma_type.min_activator_points > 0:
-        if is_polish:
-            req_text_parts.append(f"Zdobyto wymaganą liczbę punktów: {diploma.diploma_type.min_activator_points} (aktywator)")
-        else:
-            req_text_parts.append(f"Required points achieved: {diploma.diploma_type.min_activator_points} (activator)")
-    if diploma.diploma_type.min_hunter_points > 0:
-        if is_polish:
-            req_text_parts.append(f"Zdobyto wymaganą liczbę punktów: {diploma.diploma_type.min_hunter_points} (łowca)")
-        else:
-            req_text_parts.append(f"Required points achieved: {diploma.diploma_type.min_hunter_points} (hunter)")
-    if diploma.diploma_type.min_b2b_points > 0:
-        if is_polish:
-            req_text_parts.append(f"Zdobyto wymaganą liczbę punktów: {diploma.diploma_type.min_b2b_points} (B2B)")
-        else:
-            req_text_parts.append(f"Required points achieved: {diploma.diploma_type.min_b2b_points} (B2B)")
-    
-    if req_text_parts:
-        req_text = " • ".join(req_text_parts)
-        elements.append(Paragraph(req_text, info_style))
-        elements.append(Spacer(1, 0.3*cm))
-    
-    # Certificate info table (removed verification code row)
-    if is_polish:
-        info_data = [
-            ['Numer dyplomu:', diploma.diploma_number],
-            ['Data wydania:', diploma.issue_date.strftime('%Y-%m-%d')],
-        ]
-    else:
-        info_data = [
-            ['Diploma Number:', diploma.diploma_number],
-            ['Issue Date:', diploma.issue_date.strftime('%Y-%m-%d')],
-        ]
-    
-    info_table = Table(info_data, colWidths=[6*cm, 10*cm])
-    info_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (0, -1), bold_font),
-        ('FONTNAME', (1, 0), (1, -1), default_font),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('TEXTCOLOR', (0, 0), (-1, -1), colors.grey),
-        ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
-        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    ]))
-    elements.append(info_table)
-    elements.append(Spacer(1, 0.6*cm))
-    
-    # Generate QR code for verification
+    diploma_number = diploma.diploma_number
     verification_url = request.build_absolute_uri(f'/verify-diploma/{diploma.diploma_number}/')
-    qr = qrcode.QRCode(version=1, box_size=10, border=2)
-    qr.add_data(verification_url)
-    qr.make(fit=True)
-    qr_img = qr.make_image(fill_color="black", back_color="white")
     
-    # Save QR code to buffer
-    qr_buffer = io.BytesIO()
-    qr_img.save(qr_buffer, format='PNG')
-    qr_buffer.seek(0)
-    
-    # Add QR code to PDF (without text label, just the code)
-    qr_image = Image(qr_buffer, width=3*cm, height=3*cm)
-    
-    # Center the QR code in a table
-    qr_table = Table(
-        [[qr_image]],
-        colWidths=[3*cm]
+    # Generate PDF
+    buffer = generate_diploma_pdf(
+        diploma_type=diploma.diploma_type,
+        callsign=callsign,
+        diploma_name=diploma_name,
+        date_text=date_text,
+        points_text=points_text,
+        diploma_number=diploma_number,
+        verification_url=verification_url,
+        is_preview=False
     )
-    qr_table.setStyle(TableStyle([
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    ]))
-    elements.append(qr_table)
-    
-    # Build PDF with custom page decorations
-    doc.build(elements, onFirstPage=add_page_decorations, onLaterPages=add_page_decorations)
-    
-    # Get PDF from buffer
-    pdf = buffer.getvalue()
-    buffer.close()
     
     # Create response
-    response = HttpResponse(content_type='application/pdf')
+    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="BOTA_Diploma_{diploma.diploma_number}.pdf"'
-    response.write(pdf)
     
     return response
 
