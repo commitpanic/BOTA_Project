@@ -5,7 +5,7 @@ Handles user authentication, statistics, and role management.
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from .models import UserStatistics, UserRole, UserRoleAssignment
+from .models import UserStatistics, UserRole, UserRoleAssignment, PointsTransaction, PointsTransactionBatch
 
 User = get_user_model()
 
@@ -143,3 +143,72 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def get_total_diplomas(self, obj):
         """Get total number of diplomas earned"""
         return obj.diplomas.count()
+
+
+class PointsTransactionSerializer(serializers.ModelSerializer):
+    """Serializer for PointsTransaction model - read-only"""
+    user_callsign = serializers.CharField(source='user.callsign', read_only=True)
+    transaction_type_display = serializers.CharField(source='get_transaction_type_display', read_only=True)
+    bunker_reference = serializers.CharField(source='bunker.reference_number', read_only=True, allow_null=True)
+    diploma_name = serializers.CharField(source='diploma.diploma_type.name_en', read_only=True, allow_null=True)
+    
+    class Meta:
+        model = PointsTransaction
+        fields = [
+            'id', 'user', 'user_callsign',
+            'transaction_type', 'transaction_type_display',
+            'activator_points', 'hunter_points', 'b2b_points',
+            'event_points', 'diploma_points', 'total_points',
+            'activation_log', 'bunker', 'bunker_reference',
+            'diploma', 'diploma_name',
+            'reverses', 'reversed_by', 'is_reversed',
+            'reason', 'notes',
+            'created_by', 'created_at'
+        ]
+        read_only_fields = fields  # All fields are read-only
+
+
+class PointsTransactionBatchSerializer(serializers.ModelSerializer):
+    """Serializer for PointsTransactionBatch model"""
+    transaction_count = serializers.SerializerMethodField()
+    total_points_awarded = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = PointsTransactionBatch
+        fields = [
+            'id', 'name', 'description',
+            'log_upload', 'created_by', 'created_at',
+            'transaction_count', 'total_points_awarded'
+        ]
+        read_only_fields = ['id', 'created_at']
+    
+    def get_transaction_count(self, obj):
+        """Get total number of transactions in batch"""
+        return obj.transactions.count()
+    
+    def get_total_points_awarded(self, obj):
+        """Get sum of all points in batch"""
+        from django.db.models import Sum
+        result = obj.transactions.aggregate(
+            activator=Sum('activator_points'),
+            hunter=Sum('hunter_points'),
+            b2b=Sum('b2b_points'),
+            event=Sum('event_points'),
+            diploma=Sum('diploma_points')
+        )
+        total = sum(v or 0 for v in result.values())
+        return total
+
+
+class PointsHistorySerializer(serializers.Serializer):
+    """Serializer for points history summary"""
+    user = serializers.IntegerField(source='user.id')
+    user_callsign = serializers.CharField(source='user.callsign')
+    total_transactions = serializers.IntegerField()
+    total_points = serializers.IntegerField()
+    activator_points = serializers.IntegerField()
+    hunter_points = serializers.IntegerField()
+    b2b_points = serializers.IntegerField()
+    event_points = serializers.IntegerField()
+    diploma_points = serializers.IntegerField()
+    transactions = PointsTransactionSerializer(many=True, read_only=True)

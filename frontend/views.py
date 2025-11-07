@@ -412,7 +412,7 @@ def profile_view(request):
         'bunker__name_pl'
     ).annotate(
         activation_count=Count('activation_date_only', distinct=True),
-        total_qso=Count('id'),
+        total_qso=Sum('qso_count'),
         last_activation=Max('activation_date')
     ).order_by('-activation_count')
     
@@ -542,6 +542,39 @@ def profile_view(request):
         count=Count('id')
     ).order_by('-count')
     
+    # Get non-activated bunkers (for activator)
+    activated_bunker_ids = [b['bunker__id'] for b in activated_bunkers]
+    non_activated_bunkers = Bunker.objects.exclude(
+        id__in=activated_bunker_ids
+    ).select_related('category').order_by('reference_number')
+    
+    # Check which non-activated bunkers have planned activations by this user
+    from planned_activations.models import PlannedActivation
+    user_planned_bunker_ids = PlannedActivation.objects.filter(
+        user=request.user
+    ).values_list('bunker_id', flat=True)
+    
+    # Get non-hunted bunkers (for hunter)
+    hunted_bunker_ids = [b['bunker__id'] for b in hunted_bunkers]
+    non_hunted_bunkers = Bunker.objects.exclude(
+        id__in=hunted_bunker_ids
+    ).select_related('category').order_by('reference_number')
+    
+    # Check which non-hunted bunkers have ANY planned activations (excluding current user's plans)
+    planned_bunker_ids = PlannedActivation.objects.exclude(
+        user=request.user
+    ).values_list('bunker_id', flat=True).distinct()
+    
+    # Check which non-hunted bunkers have active spots
+    from cluster.models import Spot
+    from django.utils import timezone
+    from datetime import timedelta
+    active_spot_bunker_ids = Spot.objects.filter(
+        bunker__isnull=False,
+        is_active=True,
+        expires_at__gte=timezone.now()  # Not expired yet
+    ).values_list('bunker_id', flat=True).distinct()
+    
     context = {
         'stats': stats,
         'activated_bunkers': activated_bunkers,
@@ -552,6 +585,11 @@ def profile_view(request):
         'activator_modes': activator_modes,
         'hunter_bands': hunter_bands,
         'hunter_modes': hunter_modes,
+        'non_activated_bunkers': non_activated_bunkers,
+        'user_planned_bunker_ids': list(user_planned_bunker_ids),
+        'non_hunted_bunkers': non_hunted_bunkers,
+        'planned_bunker_ids': list(planned_bunker_ids),
+        'active_spot_bunker_ids': list(active_spot_bunker_ids),
     }
     return render(request, 'profile.html', context)
 

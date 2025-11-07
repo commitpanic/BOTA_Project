@@ -295,6 +295,11 @@ class UserStatistics(models.Model):
         
         self.total_b2b_qso = ActivationLog.objects.filter(
             activator=self.user,
+            is_b2b=True
+        ).count()
+        
+        self.activator_b2b_qso = ActivationLog.objects.filter(
+            activator=self.user,
             is_b2b=True,
             b2b_confirmed=True
         ).count()

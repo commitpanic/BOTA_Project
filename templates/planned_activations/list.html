@@ -16,7 +16,18 @@
         <!-- Search and Filter -->
         <div class="card mb-4">
             <div class="card-body">
+                {% if bunker_ref %}
+                <div class="alert alert-info mb-3">
+                    <i class="bi bi-funnel"></i> {% trans "Filtered by bunker:" %} <strong>{{ bunker_ref }}</strong>
+                    <a href="{% url 'planned_activation_list' %}" class="btn btn-sm btn-outline-primary ms-2">
+                        <i class="bi bi-x"></i> {% trans "Clear filter" %}
+                    </a>
+                </div>
+                {% endif %}
                 <form method="get" class="row g-3">
+                    {% if bunker_ref %}
+                    <input type="hidden" name="bunker" value="{{ bunker_ref }}">
+                    {% endif %}
                     <div class="col-md-{% if can_see_past %}6{% else %}9{% endif %}">
                         <input type="text" name="search" class="form-control" 
                                placeholder="{% trans 'Search by callsign, bunker, operator...' %}" 

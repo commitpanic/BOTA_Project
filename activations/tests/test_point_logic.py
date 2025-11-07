@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 from activations.models import ActivationLog
-from bunkers.models import Bunker
+from bunkers.models import Bunker, BunkerCategory
 from accounts.models import UserStatistics
 
 User = get_user_model()
@@ -39,22 +39,26 @@ class PointAwardingLogicTest(TestCase):
             password='testpass123'
         )
         
+        # Create bunker category
+        self.category = BunkerCategory.objects.create(
+            name_pl='Testowa Kategoria',
+            name_en='Test Category'
+        )
+        
         # Create bunker
         self.bunker = Bunker.objects.create(
             reference_number='SP-0001',
             name_en='Test Bunker',
             name_pl='Testowy Bunkier',
+            category=self.category,
             latitude=Decimal('52.192798'),
-            longitude=Decimal('15.425792'),
-            type='pillbox',
-            status='approved',
-            submitted_by=self.activator
+            longitude=Decimal('15.425792')
         )
         
-        # Create stats for all users
-        self.activator_stats = UserStatistics.objects.create(user=self.activator)
-        self.hunter1_stats = UserStatistics.objects.create(user=self.hunter1)
-        self.hunter2_stats = UserStatistics.objects.create(user=self.hunter2)
+        # Stats are created automatically by signal
+        self.activator_stats = self.activator.statistics
+        self.hunter1_stats = self.hunter1.statistics
+        self.hunter2_stats = self.hunter2.statistics
     
     def test_activator_points_awarded_for_upload(self):
         """
@@ -71,10 +75,7 @@ class PointAwardingLogicTest(TestCase):
             user=self.hunter1,  # Worked SP1ABC
             bunker=self.bunker,
             activation_date=qso_time,
-            frequency='14.250',
             mode='SSB',
-            rst_sent='59',
-            rst_rcvd='59',
             is_b2b=False
         )
         
@@ -83,10 +84,7 @@ class PointAwardingLogicTest(TestCase):
             user=self.hunter2,  # Worked SP2XYZ
             bunker=self.bunker,
             activation_date=qso_time + timedelta(minutes=5),
-            frequency='14.250',
             mode='SSB',
-            rst_sent='59',
-            rst_rcvd='59',
             is_b2b=False
         )
         
@@ -95,10 +93,7 @@ class PointAwardingLogicTest(TestCase):
             user=self.hunter1,  # Worked SP1ABC again
             bunker=self.bunker,
             activation_date=qso_time + timedelta(minutes=10),
-            frequency='14.250',
             mode='SSB',
-            rst_sent='59',
-            rst_rcvd='59',
             is_b2b=False
         )
         
@@ -126,10 +121,7 @@ class PointAwardingLogicTest(TestCase):
             user=self.hunter1,
             bunker=self.bunker,
             activation_date=qso_time,
-            frequency='14.250',
             mode='SSB',
-            rst_sent='59',
-            rst_rcvd='59',
             is_b2b=False
         )
         
@@ -138,10 +130,7 @@ class PointAwardingLogicTest(TestCase):
             user=self.hunter2,
             bunker=self.bunker,
             activation_date=qso_time + timedelta(minutes=5),
-            frequency='14.250',
             mode='SSB',
-            rst_sent='59',
-            rst_rcvd='59',
             is_b2b=False
         )
         
@@ -179,10 +168,7 @@ class PointAwardingLogicTest(TestCase):
             user=self.hunter1,          # Worked SP1ABC
             bunker=self.bunker,
             activation_date=qso_time,
-            frequency='14.250',
             mode='SSB',
-            rst_sent='59',
-            rst_rcvd='59',
             is_b2b=True  # Marked as B2B in ADIF
         )
         
@@ -214,11 +200,9 @@ class PointAwardingLogicTest(TestCase):
             reference_number='SP-0002',
             name_en='Test Bunker 2',
             name_pl='Testowy Bunkier 2',
+            category=self.category,
             latitude=Decimal('52.300000'),
-            longitude=Decimal('15.500000'),
-            type='pillbox',
-            status='approved',
-            submitted_by=self.hunter1
+            longitude=Decimal('15.500000')
         )
         
         # Step 1: SP3FCK uploads log (activator at SP-0001, worked SP1ABC)
@@ -227,10 +211,7 @@ class PointAwardingLogicTest(TestCase):
             user=self.hunter1,          # Worked SP1ABC
             bunker=self.bunker,         # SP-0001
             activation_date=qso_time,
-            frequency='14.250',
             mode='SSB',
-            rst_sent='59',
-            rst_rcvd='59',
             is_b2b=True
         )
         
@@ -248,10 +229,7 @@ class PointAwardingLogicTest(TestCase):
             user=self.activator,        # Worked SP3FCK (now hunter!)
             bunker=bunker2,             # SP-0002
             activation_date=qso_time + timedelta(minutes=5),  # Within 30 min window
-            frequency='14.250',
             mode='SSB',
-            rst_sent='59',
-            rst_rcvd='59',
             is_b2b=True
         )
         
@@ -298,11 +276,9 @@ class PointAwardingLogicTest(TestCase):
             reference_number='SP-0002',
             name_en='Test Bunker 2',
             name_pl='Testowy Bunkier 2',
+            category=self.category,
             latitude=Decimal('52.300000'),
-            longitude=Decimal('15.500000'),
-            type='pillbox',
-            status='approved',
-            submitted_by=self.hunter1
+            longitude=Decimal('15.500000')
         )
         
         # Log 1: SP3FCK at 14:00
@@ -311,10 +287,7 @@ class PointAwardingLogicTest(TestCase):
             user=self.hunter1,
             bunker=self.bunker,
             activation_date=qso_time,
-            frequency='14.250',
             mode='SSB',
-            rst_sent='59',
-            rst_rcvd='59',
             is_b2b=True
         )
         
@@ -324,10 +297,7 @@ class PointAwardingLogicTest(TestCase):
             user=self.activator,
             bunker=bunker2,
             activation_date=qso_time + timedelta(minutes=35),
-            frequency='14.250',
             mode='SSB',
-            rst_sent='59',
-            rst_rcvd='59',
             is_b2b=True
         )
         
@@ -358,10 +328,7 @@ class PointAwardingLogicTest(TestCase):
                 user=self.hunter1,
                 bunker=self.bunker,
                 activation_date=qso_time + timedelta(minutes=i*5),
-                frequency='14.250',
                 mode='SSB',
-                rst_sent='59',
-                rst_rcvd='59',
                 is_b2b=False
             )
         
@@ -393,40 +360,33 @@ class PointAwardingLogicTest(TestCase):
             reference_number='SP-0002',
             name_en='Bunker 2',
             name_pl='Bunkier 2',
+            category=self.category,
             latitude=Decimal('52.300000'),
-            longitude=Decimal('15.500000'),
-            type='pillbox',
-            status='approved',
-            submitted_by=self.hunter1
+            longitude=Decimal('15.500000')
         )
         
         # SP3FCK activates SP-0001
         ActivationLog.objects.create(
             activator=self.activator, user=self.hunter1, bunker=self.bunker,
-            activation_date=qso_time, frequency='14.250', mode='SSB',
-            rst_sent='59', rst_rcvd='59', is_b2b=False
+            activation_date=qso_time, mode='SSB', is_b2b=False
         )
         ActivationLog.objects.create(
             activator=self.activator, user=self.hunter1, bunker=self.bunker,
-            activation_date=qso_time + timedelta(minutes=5), frequency='14.250', mode='SSB',
-            rst_sent='59', rst_rcvd='59', is_b2b=False
+            activation_date=qso_time + timedelta(minutes=5), mode='SSB', is_b2b=False
         )
         ActivationLog.objects.create(
             activator=self.activator, user=self.hunter2, bunker=self.bunker,
-            activation_date=qso_time + timedelta(minutes=10), frequency='14.250', mode='SSB',
-            rst_sent='59', rst_rcvd='59', is_b2b=False
+            activation_date=qso_time + timedelta(minutes=10), mode='SSB', is_b2b=False
         )
         
         # SP1ABC activates SP-0002
         ActivationLog.objects.create(
             activator=self.hunter1, user=self.activator, bunker=bunker2,
-            activation_date=qso_time + timedelta(hours=1), frequency='14.250', mode='SSB',
-            rst_sent='59', rst_rcvd='59', is_b2b=False
+            activation_date=qso_time + timedelta(hours=1), mode='SSB', is_b2b=False
         )
         ActivationLog.objects.create(
             activator=self.hunter1, user=self.hunter2, bunker=bunker2,
-            activation_date=qso_time + timedelta(hours=1, minutes=5), frequency='14.250', mode='SSB',
-            rst_sent='59', rst_rcvd='59', is_b2b=False
+            activation_date=qso_time + timedelta(hours=1, minutes=5), mode='SSB', is_b2b=False
         )
         
         # Calculate points

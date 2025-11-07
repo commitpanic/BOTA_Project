@@ -279,6 +279,9 @@ msgstr "Moje Statystyki"
 msgid "Total Points"
 msgstr "Łączne Punkty"
 
+msgid "QSO - total"
+msgstr "QSO - suma"
+
 msgid "Activator QSOs"
 msgstr "QSO Aktywatora"
 
@@ -291,14 +294,23 @@ msgstr "QSO B2B"
 msgid "Activator Statistics"
 msgstr "Statystyki Aktywatora"
 
+msgid "Activator Summary"
+msgstr "Podsumowanie Aktywatora"
+
 msgid "Total Activator QSOs"
 msgstr "Wszystkie QSO Aktywatora"
 
 msgid "Activator B2B QSOs"
 msgstr "QSO B2B Aktywatora"
 
+msgid "B2B Activator"
+msgstr "B2B aktywatora"
+
 msgid "Hunter Statistics"
 msgstr "Statystyki Łowcy"
+
+msgid "Hunter Summary"
+msgstr "Podsumowanie Łowcy"
 
 msgid "Total Hunter QSOs"
 msgstr "Wszystkie QSO Łowcy"
@@ -1845,6 +1857,73 @@ msgstr "Początkowy Spot"
 
 msgid "Last Respot"
 msgstr "Ostatni Respot"
+
+# Non-activated and non-hunted bunkers
+msgid "Non-Activated Bunkers"
+msgstr "Nie Aktywowane Bunkry"
+
+msgid "Non-Hunted Bunkers"
+msgstr "Nie Złowione Bunkry"
+
+msgid "Planned"
+msgstr "Zaplanowany"
+
+msgid "Not planned"
+msgstr "Nie zaplanowany"
+
+msgid "Planned activation"
+msgstr "Zaplanowana aktywacja"
+
+msgid "No planned activation"
+msgstr "Brak planowanej aktywacji"
+
+msgid "Active spot!"
+msgstr "Aktywny spot!"
+
+msgid "No active spot"
+msgstr "Brak aktywnego spota"
+
+msgid "Plan Activation"
+msgstr "Zaplanuj Aktywację"
+
+msgid "Edit Planning"
+msgstr "Edytuj Planowanie"
+
+msgid "Check Planned Activations"
+msgstr "Sprawdź planowane aktywacje"
+
+msgid "View Spots"
+msgstr "Zobacz spoty"
+
+msgid "All bunkers activated!"
+msgstr "Wszystkie bunkry aktywowane!"
+
+msgid "All bunkers hunted!"
+msgstr "Wszystkie bunkry złowione!"
+
+msgid "Show Planned Only"
+msgstr "Tylko zaplanowane"
+
+msgid "Planned only"
+msgstr "Tylko zaplanowane"
+
+msgid "Show All"
+msgstr "Pokaż wszystkie"
+
+msgid "Filtered by bunker:"
+msgstr "Filtrowane po bunkerze:"
+
+msgid "Clear filter"
+msgstr "Wyczyść filtr"
+
+msgid "Bunker with reference %(ref)s not found."
+msgstr "Nie znaleziono bunkra o referencji %(ref)s."
+
+msgid "Show only planned bunkers"
+msgstr "Pokaż tylko zaplanowane bunkry"
+
+msgid "Show only bunkers with planned activations"
+msgstr "Pokaż tylko bunkry z zaplanowanymi aktywacjami"
 
 msgid "No respots yet"
 msgstr "Brak respotów"

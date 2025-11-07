@@ -15,6 +15,7 @@ def planned_activation_list(request):
     # Get filter parameters
     show_past = request.GET.get('show_past', 'no')
     search = request.GET.get('search', '')
+    bunker_ref = request.GET.get('bunker', '')
     
     # Only staff and superuser can see past activations
     can_see_past = request.user.is_staff or request.user.is_superuser
@@ -28,6 +29,10 @@ def planned_activation_list(request):
     if show_past != 'yes':
         today = timezone.now().date()
         activations = activations.filter(planned_date__gte=today)
+    
+    # Filter by bunker reference if provided
+    if bunker_ref:
+        activations = activations.filter(bunker__reference_number=bunker_ref)
     
     # Search functionality
     if search:
@@ -49,6 +54,7 @@ def planned_activation_list(request):
         'page_obj': page_obj,
         'show_past': show_past,
         'search': search,
+        'bunker_ref': bunker_ref,
         'can_see_past': can_see_past,
     }
     return render(request, 'planned_activations/list.html', context)
@@ -80,7 +86,19 @@ def planned_activation_create(request):
             messages.success(request, _('Planned activation created successfully!'))
             return redirect('planned_activation_list')
     else:
-        form = PlannedActivationForm(user=request.user)
+        # Check if bunker reference is provided in URL
+        bunker_ref = request.GET.get('bunker')
+        initial_data = {}
+        
+        if bunker_ref:
+            from bunkers.models import Bunker
+            try:
+                bunker = Bunker.objects.get(reference_number=bunker_ref)
+                initial_data['bunker'] = bunker
+            except Bunker.DoesNotExist:
+                messages.warning(request, _('Bunker with reference %(ref)s not found.') % {'ref': bunker_ref})
+        
+        form = PlannedActivationForm(user=request.user, initial=initial_data)
     
     context = {
         'form': form,

@@ -4,7 +4,8 @@ Registers all viewsets and configures URL routing.
 """
 from rest_framework.routers import DefaultRouter
 from accounts.views import (
-    UserViewSet, UserStatisticsViewSet, UserRoleViewSet, UserRoleAssignmentViewSet
+    UserViewSet, UserStatisticsViewSet, UserRoleViewSet, UserRoleAssignmentViewSet,
+    PointsTransactionViewSet, PointsTransactionBatchViewSet
 )
 from bunkers.views import (
     BunkerCategoryViewSet, BunkerViewSet, BunkerPhotoViewSet,
@@ -28,6 +29,8 @@ router.register(r'users', UserViewSet, basename='user')
 router.register(r'statistics', UserStatisticsViewSet, basename='userstatistics')
 router.register(r'roles', UserRoleViewSet, basename='userrole')
 router.register(r'role-assignments', UserRoleAssignmentViewSet, basename='userroleassignment')
+router.register(r'points-transactions', PointsTransactionViewSet, basename='pointstransaction')
+router.register(r'points-batches', PointsTransactionBatchViewSet, basename='pointstransactionbatch')
 
 # Register bunkers viewsets
 router.register(r'bunker-categories', BunkerCategoryViewSet, basename='bunkercategory')

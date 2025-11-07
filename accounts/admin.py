@@ -338,8 +338,7 @@ class PointsTransactionAdmin(admin.ModelAdmin):
     list_filter = (
         'transaction_type',
         'is_reversed',
-        'created_at',
-        'batch__log_upload'
+        'created_at'
     )
     search_fields = (
         'user__callsign',
@@ -360,14 +359,14 @@ class PointsTransactionAdmin(admin.ModelAdmin):
         'activation_log',
         'bunker',
         'diploma',
-        'batch',
         'reverses',
         'reversed_by',
         'reason',
         'notes',
         'created_by',
         'created_at',
-        'is_reversed'
+        'is_reversed',
+        'batches_display'
     )
     ordering = ('-created_at',)
     date_hierarchy = 'created_at'
@@ -397,7 +396,7 @@ class PointsTransactionAdmin(admin.ModelAdmin):
                 'activation_log',
                 'bunker',
                 'diploma',
-                'batch'
+                'batches_display'
             )
         }),
         (_('Reversal Info'), {
@@ -426,6 +425,23 @@ class PointsTransactionAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         """Prevent deletion - transactions are immutable audit trail"""
         return False
+    
+    def batches_display(self, obj):
+        """Display batches this transaction belongs to"""
+        if not obj.pk:
+            return '-'
+        
+        batches = obj.batches.all()
+        if not batches.exists():
+            return format_html('<span style="color: #999;">No batch</span>')
+        
+        html = []
+        for batch in batches:
+            admin_url = reverse('admin:accounts_pointstransactionbatch_change', args=[batch.pk])
+            html.append(f'<a href="{admin_url}">{batch.name}</a>')
+        
+        return format_html('<br>'.join(html))
+    batches_display.short_description = _('Batches')
     
     def user_link(self, obj):
         """Link to user admin"""

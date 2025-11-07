@@ -243,6 +243,7 @@ class LogImportService:
                     is_b2b=is_b2b,
                     mode=self.parser.get_qso_mode(qso),
                     band=self.parser.get_qso_band(qso),
+                    qso_count=1,  # Each ADIF record represents 1 QSO
                     notes=f"Imported from ADIF log",
                     verified=True,  # Auto-verify activator-uploaded logs
                     log_upload=self.log_upload  # Link to upload batch
