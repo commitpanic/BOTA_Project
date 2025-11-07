@@ -49,7 +49,7 @@
         <div class="card">
             <div class="card-body text-center">
                 <h6 class="text-muted mb-2">{% trans "B2B QSOs" %}</h6>
-                <h2 class="text-warning">{{ stats.total_b2b_qso }}</h2>
+                <h2 class="text-warning">{{ stats.activator_b2b_qso }}</h2>
             </div>
         </div>
     </div>
@@ -69,7 +69,7 @@
                 <div class="card-body">
                     <div class="row">
                         <!-- Activator Summary -->
-                        <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="col-lg-4 col-md-6 mb-3">
                             <div class="card h-100">
                                 <div class="card-header bg-dark">
                                     <h6 class="mb-0">{% trans "Summary" %}</h6>
@@ -102,7 +102,7 @@
                         </div>
                         
                         <!-- Activations by Band -->
-                        <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="col-lg-4 col-md-6 mb-3">
                             <div class="card h-100 bands-modes-card">
                                 <div class="card-header bg-dark">
                                     <h6 class="mb-0"><i class="bi bi-bar-chart"></i> {% trans "By Band" %}</h6>
@@ -125,7 +125,7 @@
                         </div>
                         
                         <!-- Activations by Mode -->
-                        <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="col-lg-4 col-md-6 mb-3">
                             <div class="card h-100 bands-modes-card">
                                 <div class="card-header bg-dark">
                                     <h6 class="mb-0"><i class="bi bi-broadcast"></i> {% trans "By Mode" %}</h6>
@@ -146,33 +146,38 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Activated Bunkers List -->
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="card h-100">
-                                <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                        </div>
+                    </div>
+                    
+                    <!-- Activated Bunkers List - Full Width Row -->
+                    <div class="row mb-4">
+                        <div class="col-lg-12 px-4">
+                            <div class="card">
+                                <div class="card-header bg-dark">
                                     <h6 class="mb-0">
-                                        {% trans "Activated Bunkers" %} 
+                                        <i class="bi bi-geo-alt-fill"></i> {% trans "Activated Bunkers" %} 
                                         <small>({{ activated_bunkers|length }})</small>
                                     </h6>
                                 </div>
-                                <div class="card-body" style="max-height: 340px; overflow-y: auto;">
-                                    <input type="text" class="form-control form-control-sm mb-2" id="activatedBunkersFilter" placeholder="{% trans 'Filter...' %}">
+                                <div class="card-body">
+                                    <input type="text" class="form-control form-control-sm mb-3" id="activatedBunkersFilter" placeholder="{% trans 'Filter...' %}" style="max-width: 300px;">
                                     {% if activated_bunkers %}
-                                    <div class="table-responsive">
+                                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                                         <table class="table table-sm table-hover" id="activatedBunkersTable">
-                                            <thead>
+                                            <thead class="sticky-top bg-white">
                                                 <tr>
-                                                    <th>{% trans "Ref" %}</th>
-                                                    <th class="text-end">{% trans "Act" %}</th>
+                                                    <th>{% trans "Reference" %}</th>
+                                                    <th>{% trans "Name" %}</th>
+                                                    <th class="text-end">{% trans "Activations" %}</th>
                                                     <th class="text-end">{% trans "QSOs" %}</th>
-                                                    <th class="text-center">{% trans "+" %}</th>
+                                                    <th class="text-center">{% trans "Details" %}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {% for bunker in activated_bunkers %}
                                                 <tr class="bunker-row">
                                                     <td><strong>{{ bunker.bunker__reference_number }}</strong></td>
+                                                    <td>{{ bunker.bunker__name_en }}</td>
                                                     <td class="text-end"><span class="badge bg-success">{{ bunker.activation_count }}</span></td>
                                                     <td class="text-end"><span class="badge bg-info">{{ bunker.total_qso|default:0 }}</span></td>
                                                     <td class="text-center">
@@ -182,9 +187,9 @@
                                                     </td>
                                                 </tr>
                                                 <tr class="details-row" id="activations-{{ bunker.bunker__id }}" style="display: none;">
-                                                    <td colspan="4" class="bg-dark">
-                                                        <div class="p-2">
-                                                            <strong>{{ bunker.bunker__name_en }}</strong>
+                                                    <td colspan="5" class="bg-light">
+                                                        <div class="p-3">
+                                                            <strong>{% trans "Activation History" %}:</strong>
                                                             <table class="table table-sm table-bordered mt-2 mb-0">
                                                                 <thead>
                                                                     <tr>
@@ -241,7 +246,7 @@
                 <div class="card-body">
                     <div class="row">
                         <!-- Hunter Summary -->
-                        <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="col-lg-4 col-md-6 mb-3">
                             <div class="card h-100">
                                 <div class="card-header bg-dark">
                                     <h6 class="mb-0">{% trans "Summary" %}</h6>
@@ -266,7 +271,7 @@
                         </div>
                         
                         <!-- Hunter QSOs by Band -->
-                        <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="col-lg-4 col-md-6 mb-3">
                             <div class="card h-100 bands-modes-card">
                                 <div class="card-header bg-dark">
                                     <h6 class="mb-0"><i class="bi bi-bar-chart"></i> {% trans "By Band" %}</h6>
@@ -289,7 +294,7 @@
                         </div>
                         
                         <!-- Hunter QSOs by Mode -->
-                        <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="col-lg-4 col-md-6 mb-3">
                             <div class="card h-100 bands-modes-card">
                                 <div class="card-header bg-dark">
                                     <h6 class="mb-0"><i class="bi bi-broadcast"></i> {% trans "By Mode" %}</h6>
@@ -310,32 +315,37 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Hunted Bunkers List -->
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="card h-100">
-                                <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                        </div>
+                    </div>
+                    
+                    <!-- Hunted Bunkers List - Full Width Row -->
+                    <div class="row mb-4">
+                        <div class="col-lg-12 px-4">
+                            <div class="card ">
+                                <div class="card-header bg-dark">
                                     <h6 class="mb-0">
-                                        {% trans "Hunted Bunkers" %}
+                                        <i class="bi bi-binoculars-fill"></i> {% trans "Hunted Bunkers" %}
                                         <small>({{ hunted_bunkers|length }})</small>
                                     </h6>
                                 </div>
-                                <div class="card-body" style="max-height: 340px; overflow-y: auto;">
-                                    <input type="text" class="form-control form-control-sm mb-2" id="huntedBunkersFilter" placeholder="{% trans 'Filter...' %}">
+                                <div class="card-body">
+                                    <input type="text" class="form-control form-control-sm mb-3" id="huntedBunkersFilter" placeholder="{% trans 'Filter...' %}" style="max-width: 300px;">
                                     {% if hunted_bunkers %}
-                                    <div class="table-responsive">
+                                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                                         <table class="table table-sm table-hover" id="huntedBunkersTable">
-                                            <thead>
+                                            <thead class="sticky-top bg-white">
                                                 <tr>
                                                     <th>{% trans "Reference" %}</th>
+                                                    <th>{% trans "Name" %}</th>
                                                     <th class="text-end">{% trans "QSOs" %}</th>
-                                                    <th class="text-center">{% trans "+" %}</th>
+                                                    <th class="text-center">{% trans "Details" %}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {% for bunker in hunted_bunkers %}
                                                 <tr class="bunker-row">
                                                     <td><strong>{{ bunker.bunker__reference_number }}</strong></td>
+                                                    <td>{{ bunker.bunker__name_en }}</td>
                                                     <td class="text-end"><span class="badge bg-info">{{ bunker.qso_count }}</span></td>
                                                     <td class="text-center">
                                                         <button class="btn btn-sm btn-outline-primary toggle-details" data-bunker-id="{{ bunker.bunker__id }}" data-target="hunted">
@@ -344,9 +354,9 @@
                                                     </td>
                                                 </tr>
                                                 <tr class="details-row" id="hunted-{{ bunker.bunker__id }}" style="display: none;">
-                                                    <td colspan="3" class="bg-dark">
-                                                        <div class="p-2">
-                                                            <strong>{{ bunker.bunker__name_en }}</strong>
+                                                    <td colspan="4" class="bg-light">
+                                                        <div class="p-3">
+                                                            <strong>{% trans "QSO History" %}:</strong>
                                                             <table class="table table-sm table-bordered mt-2 mb-0">
                                                                 <thead>
                                                                     <tr>
@@ -442,11 +452,11 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                            {% trans "Actions" %}
+                                    <div class="dropdown position-static">
+                                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true">
+                                            <i class="bi bi-list-task"></i>
                                         </button>
-                                        <ul class="dropdown-menu">
+                                        <ul class="dropdown-menu dropdown-menu-end">
                                             {% if bunker.id in user_planned_bunker_ids %}
                                                 <li><a class="dropdown-item" href="{% url 'planned_activation_list' %}?bunker={{ bunker.reference_number }}">
                                                     <i class="bi bi-pencil"></i> {% trans "Edit Planning" %}
@@ -531,11 +541,11 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                            {% trans "Actions" %}
+                                    <div class="dropdown position-static">
+                                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true">
+                                            <i class="bi bi-list-task"></i>
                                         </button>
-                                        <ul class="dropdown-menu">
+                                        <ul class="dropdown-menu dropdown-menu-end">
                                             <li><a class="dropdown-item" href="{% url 'planned_activation_list' %}?bunker={{ bunker.reference_number }}">
                                                 <i class="bi bi-calendar"></i> {% trans "Check Planned Activations" %}
                                             </a></li>
@@ -575,6 +585,13 @@
             max-height: 500px;
             overflow-y: auto;
         }
+    }
+    
+    /* Fix dropdown positioning in tables with few rows */
+    .table-responsive .dropdown.position-static .dropdown-menu {
+        position: absolute !important;
+        z-index: 1050;
+        transform: translateX(-80%);
     }
 </style>
 

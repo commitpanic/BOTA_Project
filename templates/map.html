@@ -165,22 +165,26 @@
     <div class="col-md-12">
         <div class="map-stats">
             <div class="row text-center">
-                <div class="col-md-3">
-                    <h3 id="total-bunkers">{{ bunkers_count }}</h3>
+                <div class="col-md-4">
+                    <h3 id="total-count">-</h3>
                     <small>{% trans "Total Bunkers" %}</small>
                 </div>
                 {% if user.is_authenticated %}
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <h3 id="activated-count">-</h3>
                     <small>{% trans "Activated by You" %}</small>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <h3 id="hunted-count">-</h3>
                     <small>{% trans "Hunted by You" %}</small>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <h3 id="remaining-count">-</h3>
                     <small>{% trans "Not Yet Worked" %}</small>
+                </div>
+                <div class="col-md-2">
+                    <h3 id="under-activation-count">-</h3>
+                    <small>{% trans "Under Activation" %}</small>
                 </div>
                 {% endif %}
             </div>
@@ -395,10 +399,14 @@
         const activatedCount = bunkersData.filter(b => b.is_activated).length;
         const huntedCount = bunkersData.filter(b => b.is_hunted).length;
         const notWorkedCount = bunkersData.filter(b => !b.is_activated && !b.is_hunted).length;
+        const totalBunkers = bunkersData.length;
+        const under_activation = bunkersData.filter(b => b.is_under_activation).length;
         
         document.getElementById('activated-count').textContent = activatedCount;
         document.getElementById('hunted-count').textContent = huntedCount;
         document.getElementById('remaining-count').textContent = notWorkedCount;
+        document.getElementById('total-count').textContent = notWorkedCount + huntedCount;
+        document.getElementById('under-activation-count').textContent = under_activation;
     }
     
     // Fit map to show all markers

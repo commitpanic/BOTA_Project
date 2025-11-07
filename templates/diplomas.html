@@ -26,9 +26,19 @@
                     <div>
                         <h5 class="mb-1">
                             <i class="bi bi-trophy-fill text-warning"></i>
-                            {{ diploma.diploma_type.name }}
+                            {% if LANGUAGE_CODE == 'pl' %}
+                                {{ diploma.diploma_type.name_pl }}
+                            {% else %}
+                                {{ diploma.diploma_type.name_en }}
+                            {% endif %}
                         </h5>
-                        <p class="text-muted small mb-2">{{ diploma.diploma_type.description }}</p>
+                        <p class="text-muted small mb-2">
+                            {% if LANGUAGE_CODE == 'pl' %}
+                                {{ diploma.diploma_type.description_pl }}
+                            {% else %}
+                                {{ diploma.diploma_type.description_en }}
+                            {% endif %}
+                        </p>
                     </div>
                     <span class="badge bg-success">
                         <i class="bi bi-check-circle"></i> {% trans "Earned" %}
