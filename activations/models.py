@@ -209,6 +209,56 @@ class ActivationLog(models.Model):
         verbose_name=_("Bunker-to-Bunker (B2B)"),
         help_text=_("Was this a B2B activation?")
     )
+    
+    # B2B tracking (NEW)
+    b2b_confirmed = models.BooleanField(
+        default=False,
+        verbose_name=_("B2B Confirmed"),
+        help_text=_("Has reciprocal B2B QSO been uploaded and confirmed?"),
+        db_index=True
+    )
+    b2b_confirmed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("B2B Confirmed At"),
+        help_text=_("When was the B2B confirmed?")
+    )
+    b2b_partner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='b2b_partnerships',
+        verbose_name=_("B2B Partner"),
+        help_text=_("The other operator in this B2B contact")
+    )
+    b2b_partner_log = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reciprocal_b2b',
+        verbose_name=_("Reciprocal B2B Log"),
+        help_text=_("Link to the partner's matching log entry")
+    )
+    
+    # Points tracking (NEW)
+    points_awarded = models.BooleanField(
+        default=False,
+        verbose_name=_("Points Awarded"),
+        help_text=_("Have points been awarded for this QSO?"),
+        db_index=True
+    )
+    points_transaction = models.ForeignKey(
+        'accounts.PointsTransaction',  # String reference to avoid circular import
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='activation_logs_link',
+        verbose_name=_("Points Transaction"),
+        help_text=_("Link to the points transaction for this QSO")
+    )
+    
     notes = models.TextField(
         blank=True,
         verbose_name=_("Notes"),
@@ -240,6 +290,12 @@ class ActivationLog(models.Model):
             models.Index(fields=['bunker', 'activation_date']),
             models.Index(fields=['verified']),
             models.Index(fields=['is_b2b', 'verified']),
+            models.Index(fields=['points_awarded']),
+            models.Index(fields=['b2b_confirmed']),
+        ]
+        # Prevent duplicate QSOs from same upload
+        unique_together = [
+            ['activator', 'user', 'bunker', 'activation_date']
         ]
 
     def __str__(self):
@@ -388,6 +444,14 @@ class LogUpload(models.Model):
         max_length=255,
         verbose_name=_("Filename"),
         help_text=_("Original filename of the uploaded log")
+    )
+    file_checksum = models.CharField(
+        max_length=64,
+        null=True,
+        blank=True,
+        verbose_name=_("File Checksum (SHA256)"),
+        help_text=_("SHA256 hash of file content for duplicate detection"),
+        db_index=True
     )
     file_format = models.CharField(
         max_length=20,

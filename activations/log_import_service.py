@@ -2,6 +2,7 @@
 Service for processing ADIF log imports and updating user statistics.
 Handles activator log uploads and hunter point calculations.
 """
+import hashlib
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -12,6 +13,7 @@ from .adif_parser import ADIFParser
 from .models import ActivationLog, ActivationKey
 from bunkers.models import Bunker
 from accounts.models import UserStatistics
+from accounts.points_service import PointsService
 
 User = get_user_model()
 
@@ -25,6 +27,7 @@ class LogImportService:
         self.activator = None
         self.errors = []
         self.warnings = []
+        self.transactions = []  # Track all point transactions for batch creation
     
     @transaction.atomic
     def process_adif_upload(self, file_content: str, uploader_user: User, filename: str = None) -> Dict:
@@ -41,14 +44,34 @@ class LogImportService:
         """
         from .models import LogUpload
         
+        # Calculate file checksum for duplicate detection
+        file_checksum = hashlib.sha256(file_content.encode('utf-8')).hexdigest()
+        
+        # Check for duplicate upload
+        existing_upload = LogUpload.objects.filter(
+            file_checksum=file_checksum,
+            user=uploader_user
+        ).first()
+        
+        if existing_upload:
+            return {
+                'success': False,
+                'errors': [f'This file was already uploaded on {existing_upload.uploaded_at.strftime("%Y-%m-%d %H:%M")}'],
+                'qsos_processed': 0,
+                'hunters_updated': 0,
+                'duplicate_upload': True
+            }
+        
         # Create LogUpload record
         log_upload = LogUpload.objects.create(
             user=uploader_user,
             filename=filename or 'unknown.adi',
             file_format='ADIF',
+            file_checksum=file_checksum,
             status='processing'
         )
         self.log_upload = log_upload
+        self.transactions = []  # Reset transactions list
         
         # Parse ADIF file
         self.parser = ADIFParser(file_content)
@@ -133,8 +156,15 @@ class LogImportService:
                 elif result.get('duplicate'):
                     qsos_duplicates += 1
         
-        # Update activator statistics
-        self._update_activator_stats(qsos_processed, b2b_qsos)
+        # Create points transaction batch for audit trail
+        if self.transactions:
+            batch = PointsService.create_batch(
+                name=f"Log import: {filename or 'unknown.adi'}",
+                transactions=self.transactions,
+                log_upload=log_upload,
+                created_by=uploader_user
+            )
+            log_upload.points_batch = batch
         
         # Update diploma progress for activator
         self._update_diploma_progress(self.activator)
@@ -164,7 +194,8 @@ class LogImportService:
             'activator': activator_callsign,
             'warnings': self.warnings,
             'errors': [],
-            'log_upload_id': log_upload.id
+            'log_upload_id': log_upload.id,
+            'batch_id': batch.id if self.transactions else None
         }
     
     def _process_qso(self, qso: Dict) -> Dict:
@@ -202,45 +233,54 @@ class LogImportService:
             
             # Note: Placeholder accounts are created silently - no need to inform user
             
-            # Check for duplicate log entry
-            existing = ActivationLog.objects.filter(
-                user=hunter_user,
-                bunker=self.bunker,
-                activator=self.activator,
-                activation_date=qso_datetime
-            ).exists()
+            # Create activation log entry (unique_together will prevent duplicates at DB level)
+            try:
+                log = ActivationLog.objects.create(
+                    user=hunter_user,
+                    bunker=self.bunker,
+                    activator=self.activator,
+                    activation_date=qso_datetime,
+                    is_b2b=is_b2b,
+                    mode=self.parser.get_qso_mode(qso),
+                    band=self.parser.get_qso_band(qso),
+                    notes=f"Imported from ADIF log",
+                    verified=True,  # Auto-verify activator-uploaded logs
+                    log_upload=self.log_upload  # Link to upload batch
+                )
+            except Exception as e:
+                # Catch IntegrityError from unique_together constraint
+                if 'UNIQUE constraint failed' in str(e) or 'duplicate key' in str(e).lower():
+                    # Silently skip duplicates
+                    return {
+                        'success': False,
+                        'error': None,
+                        'duplicate': True
+                    }
+                else:
+                    # Re-raise other exceptions
+                    raise
             
-            if existing:
-                # Silently skip duplicates - don't show warnings
-                return {
-                    'success': False, 
-                    'error': None,  # No error message for duplicates
-                    'duplicate': True
-                }
-            
-            # Create activation log entry
-            log = ActivationLog.objects.create(
-                user=hunter_user,
-                bunker=self.bunker,
-                activator=self.activator,
-                activation_date=qso_datetime,
-                is_b2b=is_b2b,
-                mode=self.parser.get_qso_mode(qso),
-                band=self.parser.get_qso_band(qso),
-                notes=f"Imported from ADIF log",
-                verified=True,  # Auto-verify activator-uploaded logs
-                log_upload=self.log_upload  # Link to upload batch
+            # Award points to ACTIVATOR using PointsService
+            activator_tx = PointsService.award_activator_points(
+                user=self.activator,
+                activation_log=log,
+                created_by=self.activator
             )
+            if activator_tx:
+                self.transactions.append(activator_tx)
             
-            # Award points to ACTIVATOR (person who uploaded the log = person who was at the bunker)
-            self._award_activator_points(self.activator)
-            
-            # Award points to HUNTER (person who worked the bunker = person in the log)
-            self._award_hunter_points(hunter_user)
+            # Award points to HUNTER using PointsService
+            hunter_tx = PointsService.award_hunter_points(
+                user=hunter_user,
+                activation_log=log,
+                created_by=self.activator
+            )
+            if hunter_tx:
+                self.transactions.append(hunter_tx)
             
             # Check if B2B can be confirmed (both logs uploaded)
             if is_b2b:
-                self._check_and_award_b2b(self.activator, hunter_user, qso_datetime)
+                self._check_and_award_b2b(self.activator, hunter_user, log)
             
             return {
                 'success': True,
@@ -255,45 +295,9 @@ class LogImportService:
                 'error': f'Error processing QSO: {str(e)}'
             }
     
-    def _award_hunter_points(self, hunter_user: User):
+    def _check_and_award_b2b(self, activator: User, hunter: User, current_log: ActivationLog):
         """
-        Award points to hunter for working a bunker
-        
-        Args:
-            hunter_user: Hunter User object (person who worked the bunker)
-        """
-        stats, _ = UserStatistics.objects.get_or_create(user=hunter_user)
-        
-        # Hunter gets 1 point per QSO with a bunker
-        stats.hunter_points += 1
-        stats.total_hunter_qso += 1
-        
-        # Update unique bunkers hunted count
-        unique_bunkers = ActivationLog.objects.filter(
-            user=hunter_user
-        ).values('bunker').distinct().count()
-        stats.unique_bunkers_hunted = unique_bunkers
-        
-        stats.save()
-    
-    def _award_activator_points(self, activator_user: User):
-        """
-        Award points to activator for making QSO from bunker
-        
-        Args:
-            activator_user: Activator User object (person who was at the bunker)
-        """
-        stats, _ = UserStatistics.objects.get_or_create(user=activator_user)
-        
-        # Activator gets 1 point per QSO made from bunker
-        stats.activator_points += 1
-        stats.total_activator_qso += 1
-        
-        stats.save()
-    
-    def _check_and_award_b2b(self, activator: User, hunter: User, qso_datetime):
-        """
-        Check if B2B can be confirmed (both logs uploaded) and award points
+        Check if B2B can be confirmed (both logs uploaded) and award points using PointsService.
         
         B2B is only confirmed when:
         1. Activator A uploads log showing they worked Activator B
@@ -303,13 +307,13 @@ class LogImportService:
         Args:
             activator: The activator who just uploaded their log
             hunter: The hunter in the log (who might also be an activator)
-            qso_datetime: The datetime of this QSO
+            current_log: The ActivationLog just created
         """
-        from django.utils import timezone
         from datetime import timedelta
         
-        # Check if the "hunter" has also uploaded a log showing they worked this activator
-        # Look for a reciprocal QSO within ±30 minutes
+        qso_datetime = current_log.activation_date
+        
+        # Look for reciprocal log within ±30 minutes
         time_window_start = qso_datetime - timedelta(minutes=30)
         time_window_end = qso_datetime + timedelta(minutes=30)
         
@@ -317,58 +321,29 @@ class LogImportService:
         reciprocal_log = ActivationLog.objects.filter(
             activator=hunter,  # Hunter was the activator
             user=activator,    # Current activator was in their log
+            bunker=current_log.bunker,  # Same bunker
             activation_date__gte=time_window_start,
             activation_date__lte=time_window_end,
             is_b2b=True  # They also marked it as B2B
         ).first()
         
         if reciprocal_log:
-            # B2B confirmed! Award points to both
-            activator_stats, _ = UserStatistics.objects.get_or_create(user=activator)
-            hunter_stats, _ = UserStatistics.objects.get_or_create(user=hunter)
-            
-            # Check if we haven't already counted this B2B pair
-            # (to avoid double-counting if logs are uploaded multiple times)
-            current_log = ActivationLog.objects.get(
-                activator=activator,
-                user=hunter,
-                activation_date=qso_datetime
+            # Try to confirm B2B using PointsService
+            tx1, tx2 = PointsService.confirm_b2b(
+                log1=current_log,
+                log2=reciprocal_log,
+                created_by=activator
             )
             
-            # Mark both logs as B2B confirmed
-            if not hasattr(current_log, 'b2b_confirmed') or not current_log.b2b_confirmed:
-                # Award B2B points - each confirmed B2B gives 1 point
-                activator_stats.activator_b2b_qso += 1
-                activator_stats.b2b_points += 1
-                activator_stats.total_b2b_qso += 1
-                activator_stats.save()
-                
-                hunter_stats.activator_b2b_qso += 1
-                hunter_stats.b2b_points += 1
-                hunter_stats.total_b2b_qso += 1
-                hunter_stats.save()
+            if tx1 and tx2:
+                # B2B confirmed! Add transactions to batch
+                self.transactions.append(tx1)
+                self.transactions.append(tx2)
                 
                 self.warnings.append(
-                    f"B2B confirmed between {activator.callsign} and {hunter.callsign}!"
+                    f"✅ B2B confirmed between {activator.callsign} and {hunter.callsign}!"
                 )
     
-    def _update_activator_stats(self, qso_count: int, b2b_count: int):
-        """
-        Update activator-specific statistics
-        
-        Args:
-            qso_count: Total QSOs processed
-            b2b_count: Number of B2B QSOs
-        """
-        stats, _ = UserStatistics.objects.get_or_create(user=self.activator)
-        
-        # Update unique bunkers activated
-        unique_activations = ActivationLog.objects.filter(
-            activator=self.activator
-        ).values('bunker').distinct().count()
-        stats.unique_activations = unique_activations
-        
-        stats.save()
     
     def _update_diploma_progress(self, user: User):
         """
