@@ -172,20 +172,23 @@ STATICFILES_DIRS = [
 ]
 
 # WhiteNoise configuration for serving static files
-# Use Django's basic static files storage for maximum compatibility
+# Important: WhiteNoise middleware must be listed after SecurityMiddleware
+# but before all other middleware in MIDDLEWARE setting above
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        # Using WhiteNoise storage to serve static files in production
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
 # WhiteNoise settings
 WHITENOISE_MANIFEST_STRICT = False
-WHITENOISE_AUTOREFRESH = os.environ.get('DEBUG', 'False') == 'True'
-WHITENOISE_USE_FINDERS = os.environ.get('DEBUG', 'False') == 'True'
+WHITENOISE_AUTOREFRESH = False
+WHITENOISE_ALLOW_ALL_ORIGINS = True  # Allow serving from any domain
+WHITENOISE_INDEX_FILE = False  # Disable directory index
 
 # Media files (User uploads)
 MEDIA_URL = 'media/'
