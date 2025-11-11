@@ -178,9 +178,12 @@ STORAGES = {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+# Disable WhiteNoise autorefresh in production for better performance
+WHITENOISE_AUTOREFRESH = os.environ.get('DEBUG', 'False') == 'True'
 
 # Media files (User uploads)
 MEDIA_URL = 'media/'
