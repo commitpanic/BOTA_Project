@@ -16,8 +16,12 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from .api_router import router
+from frontend.health import health_check
 
 urlpatterns = [
+    # Health check (for monitoring)
+    path('health/', health_check, name='health_check'),
+    
     # Language switcher (not translated)
     path('i18n/setlang/', set_language, name='set_language'),
     
