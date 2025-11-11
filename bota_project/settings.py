@@ -27,7 +27,13 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-9t6r7v=q1sx0k!i!b$t6a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
+# Parse ALLOWED_HOSTS from environment variable
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Render.com specific: also accept the internal .onrender.com domain
+if os.environ.get('RENDER'):
+    RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+    if RENDER_EXTERNAL_HOSTNAME:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
 # Application definition
@@ -97,13 +103,17 @@ WSGI_APPLICATION = 'bota_project.wsgi.application'
 
 # Use Render PostgreSQL if DATABASE_URL is set, otherwise SQLite for local dev
 if 'DATABASE_URL' in os.environ:
+    print(f"Using PostgreSQL from DATABASE_URL")
     DATABASES = {
         'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
             conn_max_age=600,
             conn_health_checks=True,
+            ssl_require=True,  # Render requires SSL
         )
     }
 else:
+    print(f"Using SQLite for local development")
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -299,13 +309,16 @@ CACHE_MIDDLEWARE_SECONDS = 600  # 10 minutes for full page caching (if needed)
 
 # Security settings for production
 if not DEBUG:
+    # Render.com already handles SSL, so we trust X-Forwarded-Proto header
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    # Disable HSTS for initial testing, enable later
+    # SECURE_HSTS_SECONDS = 31536000
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # SECURE_HSTS_PRELOAD = True
 
