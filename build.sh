@@ -24,7 +24,7 @@ python manage.py migrate --no-input
 
 echo ""
 echo "=== Compiling translations ==="
-python compile_planned_activations.py || echo "Translation compilation skipped"
+python compile_translations.py || echo "Translation compilation skipped"
 
 echo ""
 echo "=== Build completed successfully! ==="
