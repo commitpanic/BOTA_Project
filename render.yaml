@@ -5,8 +5,8 @@ services:
     env: python
     region: frankfurt  # Najbliżej Polski
     plan: free  # Darmowy plan dla testów
-    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --no-input && ls -la staticfiles/images/ && python manage.py migrate --no-input && python compile_translations.py"
-    startCommand: "gunicorn bota_project.wsgi:application"
+    buildCommand: python manage.py collectstatic --no-input --verbosity=2 && python manage.py migrate --no-input && python compile_translations.py
+    startCommand: gunicorn bota_project.wsgi:application
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
