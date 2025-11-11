@@ -1,17 +1,18 @@
 from django.utils import timezone
-from planned_activations.models import PlannedActivation
+from cluster.models import Cluster
 
 
 def active_activations(request):
-    """Context processor to provide active activations globally"""
+    """Context processor to show LIVE badge when there are active spots"""
     today = timezone.now().date()
     
-    # Check if there are any activations planned for today
-    active_count = PlannedActivation.objects.filter(
-        planned_date=today
+    # Check if there are any active spots (clusters) from today
+    # This shows real ON AIR activity
+    active_spots_count = Cluster.objects.filter(
+        timestamp__date=today
     ).count()
     
     return {
-        'has_active_activations': active_count > 0,
-        'active_activations_count': active_count,
+        'has_active_activations': active_spots_count > 0,
+        'active_spots_count': active_spots_count,
     }
