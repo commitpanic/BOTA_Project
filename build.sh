@@ -16,7 +16,18 @@ pip install -r requirements.txt
 
 echo ""
 echo "=== Collecting static files ==="
-python manage.py collectstatic --no-input
+python manage.py collectstatic --no-input --verbosity 2
+echo ""
+echo "=== Verifying static files were collected ==="
+echo "Contents of staticfiles directory:"
+ls -la staticfiles/ | head -20
+echo ""
+echo "Checking for images directory:"
+ls -la staticfiles/images/ 2>/dev/null || echo "WARNING: No images directory found in staticfiles!"
+echo ""
+echo "Checking specific files:"
+test -f staticfiles/images/bota_logo.png && echo "✓ bota_logo.png found" || echo "✗ bota_logo.png NOT FOUND"
+test -f staticfiles/images/favicon.svg && echo "✓ favicon.svg found" || echo "✗ favicon.svg NOT FOUND"
 
 echo ""
 echo "=== Running migrations ==="
