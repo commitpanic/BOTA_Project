@@ -172,17 +172,17 @@ STATICFILES_DIRS = [
 ]
 
 # WhiteNoise configuration for serving static files
-# Use simpler storage backend for Render to avoid manifest issues
+# Use Django's basic static files storage for maximum compatibility
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
-# WhiteNoise settings - disable manifest and allow missing files
+# WhiteNoise settings
 WHITENOISE_MANIFEST_STRICT = False
 WHITENOISE_AUTOREFRESH = os.environ.get('DEBUG', 'False') == 'True'
 WHITENOISE_USE_FINDERS = os.environ.get('DEBUG', 'False') == 'True'
