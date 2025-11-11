@@ -1,15 +1,14 @@
 from django.utils import timezone
-from cluster.models import Cluster
+from cluster.models import Spot
 
 
 def active_activations(request):
     """Context processor to show LIVE badge when there are active spots"""
-    today = timezone.now().date()
-    
-    # Check if there are any active spots (clusters) from today
+    # Check if there are any active spots (not expired)
     # This shows real ON AIR activity
-    active_spots_count = Cluster.objects.filter(
-        timestamp__date=today
+    active_spots_count = Spot.objects.filter(
+        is_active=True,
+        expires_at__gt=timezone.now()
     ).count()
     
     return {
