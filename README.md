@@ -202,6 +202,15 @@ The deployment guide includes:
 - Automated deployment scripts
 - Monitoring and backup procedures
 
+🚀 **For quick deployment on Render.com, see [RENDER_DEPLOYMENT.md](RENDER_DEPLOYMENT.md)**
+
+Render deployment includes:
+- One-click deployment from GitHub
+- Free PostgreSQL database (90 days trial)
+- Automatic HTTPS/SSL
+- Auto-deploy on git push
+- Perfect for testing and demos
+
 ### Step 1: Clone Repository
 ```bash
 git clone <repository-url>

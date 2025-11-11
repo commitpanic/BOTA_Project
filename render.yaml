@@ -1,0 +1,32 @@
+services:
+  # Web Service
+  - type: web
+    name: bota-project
+    env: python
+    region: frankfurt  # Najbliżej Polski
+    plan: free  # Darmowy plan dla testów
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn bota_project.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bota-db
+          property: connectionString
+      - key: WEB_CONCURRENCY
+        value: 2
+
+  # PostgreSQL Database
+  - type: psgql
+    name: bota-db
+    region: frankfurt
+    plan: free  # 90 dni za darmo, potem $7/miesiąc
+    databaseName: bota_db
+    databaseUser: bota_user
