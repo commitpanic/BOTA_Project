@@ -190,6 +190,18 @@ BOTA_Project/
 - pip (Python package manager)
 - Virtual environment tool (venv)
 
+### Production Deployment
+
+📘 **For production deployment on a server, see [DEPLOYMENT.md](DEPLOYMENT.md)**
+
+The deployment guide includes:
+- Complete server setup (Ubuntu/Debian)
+- PostgreSQL configuration
+- Nginx + Gunicorn setup
+- SSL/HTTPS with Let's Encrypt
+- Automated deployment scripts
+- Monitoring and backup procedures
+
 ### Step 1: Clone Repository
 ```bash
 git clone <repository-url>

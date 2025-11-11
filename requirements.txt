@@ -19,3 +19,25 @@ polib>=1.2.0  # For compiling translation files
 # PDF generation and QR codes
 reportlab>=4.0.0
 qrcode>=7.4.0
+
+# Production server
+gunicorn>=21.2.0
+
+# Database drivers (uncomment what you need)
+# psycopg2-binary>=2.9.9  # PostgreSQL
+# mysqlclient>=2.2.0  # MySQL
+
+# Cache and performance (optional)
+# redis>=5.0.0
+# django-redis>=5.4.0
+# hiredis>=2.2.3
+
+# Background tasks (optional)
+# celery>=5.3.4
+# django-celery-beat>=2.5.0
+
+# Monitoring (optional)
+# sentry-sdk>=1.40.0
+
+# Security and SSL
+# certifi>=2023.11.17
