@@ -5,17 +5,7 @@ services:
     env: python
     region: frankfurt  # Najbliżej Polski
     plan: free  # Darmowy plan dla testów
-    buildCommand: |
-      echo "=== Installing dependencies ===" &&
-      pip install -r requirements.txt &&
-      echo "=== Collecting static files ===" &&
-      python manage.py collectstatic --no-input --verbosity 2 &&
-      echo "=== Checking staticfiles ===" &&
-      ls -la staticfiles/images/ &&
-      echo "=== Running migrations ===" &&
-      python manage.py migrate --no-input &&
-      echo "=== Compiling translations ===" &&
-      python compile_translations.py
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --no-input && ls -la staticfiles/images/ && python manage.py migrate --no-input && python compile_translations.py"
     startCommand: "gunicorn bota_project.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
