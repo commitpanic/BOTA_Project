@@ -17,10 +17,14 @@ from drf_spectacular.views import (
 )
 from .api_router import router
 from frontend.health import health_check
+from frontend.static_debug import static_files_debug
 
 urlpatterns = [
     # Health check (for monitoring)
     path('health/', health_check, name='health_check'),
+    
+    # Static files debug (for troubleshooting)
+    path('static-debug/', static_files_debug, name='static_debug'),
     
     # Language switcher (not translated)
     path('i18n/setlang/', set_language, name='set_language'),
