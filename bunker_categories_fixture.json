@@ -1,0 +1,608 @@
+[
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 1,
+  "fields": {
+    "name_pl": "Wojskowy",
+    "name_en": "Military",
+    "description_pl": "Bunkry i fortyfikacje wojskowe",
+    "description_en": "Military bunkers and fortifications",
+    "icon": "",
+    "display_order": 1,
+    "created_at": "2025-11-05T06:57:43.390Z",
+    "updated_at": "2025-11-05T06:57:43.390Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 2,
+  "fields": {
+    "name_pl": "Obserwacyjny",
+    "name_en": "Observation",
+    "description_pl": "Stanowiska i wie¿e obserwacyjne",
+    "description_en": "Observation posts and towers",
+    "icon": "",
+    "display_order": 2,
+    "created_at": "2025-11-05T06:57:43.406Z",
+    "updated_at": "2025-11-05T06:57:43.406Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 3,
+  "fields": {
+    "name_pl": "Schron",
+    "name_en": "Shelter",
+    "description_pl": "Schrony cywilne",
+    "description_en": "Civilian shelters",
+    "icon": "",
+    "display_order": 3,
+    "created_at": "2025-11-05T06:57:43.415Z",
+    "updated_at": "2025-11-05T06:57:43.415Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 4,
+  "fields": {
+    "name_pl": "Dowodzenia",
+    "name_en": "Command",
+    "description_pl": "Bunkry dowodzenia",
+    "description_en": "Command and control bunkers",
+    "icon": "",
+    "display_order": 4,
+    "created_at": "2025-11-05T06:57:43.422Z",
+    "updated_at": "2025-11-05T06:57:43.422Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 5,
+  "fields": {
+    "name_pl": "WW2 Battle Bunker",
+    "name_en": "WW2 Battle Bunker",
+    "description_pl": "Bunkry typu WW2 Battle Bunker",
+    "description_en": "WW2 Battle Bunker bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.711Z",
+    "updated_at": "2025-11-05T07:19:46.712Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 6,
+  "fields": {
+    "name_pl": "WW2 Weir and Bridge",
+    "name_en": "WW2 Weir and Bridge",
+    "description_pl": "Bunkry typu WW2 Weir and Bridge",
+    "description_en": "WW2 Weir and Bridge bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.731Z",
+    "updated_at": "2025-11-05T07:19:46.731Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 7,
+  "fields": {
+    "name_pl": "WW2 Fortress Weir",
+    "name_en": "WW2 Fortress Weir",
+    "description_pl": "Bunkry typu WW2 Fortress Weir",
+    "description_en": "WW2 Fortress Weir bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.739Z",
+    "updated_at": "2025-11-05T07:19:46.739Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 8,
+  "fields": {
+    "name_pl": "WW2 Fortress Weir and Bridge",
+    "name_en": "WW2 Fortress Weir and Bridge",
+    "description_pl": "Bunkry typu WW2 Fortress Weir and Bridge",
+    "description_en": "WW2 Fortress Weir and Bridge bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.752Z",
+    "updated_at": "2025-11-05T07:19:46.752Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 9,
+  "fields": {
+    "name_pl": "WW2 Machine Gun Bunker",
+    "name_en": "WW2 Machine Gun Bunker",
+    "description_pl": "Bunkry typu WW2 Machine Gun Bunker",
+    "description_en": "WW2 Machine Gun Bunker bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.761Z",
+    "updated_at": "2025-11-05T07:19:46.761Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 10,
+  "fields": {
+    "name_pl": "WW2 Bunker for an Anti-Tank Gun and Machine Gun",
+    "name_en": "WW2 Bunker for an Anti-Tank Gun and Machine Gun",
+    "description_pl": "Bunkry typu WW2 Bunker for an Anti-Tank Gun and Machine Gun",
+    "description_en": "WW2 Bunker for an Anti-Tank Gun and Machine Gun bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.771Z",
+    "updated_at": "2025-11-05T07:19:46.771Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 11,
+  "fields": {
+    "name_pl": "WW2 Fortress Bridge",
+    "name_en": "WW2 Fortress Bridge",
+    "description_pl": "Bunkry typu WW2 Fortress Bridge",
+    "description_en": "WW2 Fortress Bridge bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.787Z",
+    "updated_at": "2025-11-05T07:19:46.787Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 12,
+  "fields": {
+    "name_pl": "WW2 Swing Bridge",
+    "name_en": "WW2 Swing Bridge",
+    "description_pl": "Bunkry typu WW2 Swing Bridge",
+    "description_en": "WW2 Swing Bridge bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.791Z",
+    "updated_at": "2025-11-05T07:19:46.791Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 13,
+  "fields": {
+    "name_pl": "WW2 Sliding Bridge",
+    "name_en": "WW2 Sliding Bridge",
+    "description_pl": "Bunkry typu WW2 Sliding Bridge",
+    "description_en": "WW2 Sliding Bridge bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.807Z",
+    "updated_at": "2025-11-05T07:19:46.807Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 14,
+  "fields": {
+    "name_pl": "WW2 Bunker for an Armored Tower with a 15 cm Howitzer - Partially Built",
+    "name_en": "WW2 Bunker for an Armored Tower with a 15 cm Howitzer - Partially Built",
+    "description_pl": "Bunkry typu WW2 Bunker for an Armored Tower with a 15 cm Howitzer - Partially Built",
+    "description_en": "WW2 Bunker for an Armored Tower with a 15 cm Howitzer - Partially Built bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.814Z",
+    "updated_at": "2025-11-05T07:19:46.814Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 15,
+  "fields": {
+    "name_pl": "WW2 Bunker for Anti-Tank Gun",
+    "name_en": "WW2 Bunker for Anti-Tank Gun",
+    "description_pl": "Bunkry typu WW2 Bunker for Anti-Tank Gun",
+    "description_en": "WW2 Bunker for Anti-Tank Gun bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.872Z",
+    "updated_at": "2025-11-05T07:19:46.872Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 16,
+  "fields": {
+    "name_pl": "WW2 Main entrance to the underground system",
+    "name_en": "WW2 Main entrance to the underground system",
+    "description_pl": "Bunkry typu WW2 Main entrance to the underground system",
+    "description_en": "WW2 Main entrance to the underground system bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.882Z",
+    "updated_at": "2025-11-05T07:19:46.882Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 17,
+  "fields": {
+    "name_pl": "WW2 Ammunition Factory  - Combined Heat and Power Plant",
+    "name_en": "WW2 Ammunition Factory  - Combined Heat and Power Plant",
+    "description_pl": "Bunkry typu WW2 Ammunition Factory  - Combined Heat and Power Plant",
+    "description_en": "WW2 Ammunition Factory  - Combined Heat and Power Plant bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.889Z",
+    "updated_at": "2025-11-05T07:19:46.889Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 18,
+  "fields": {
+    "name_pl": "WW2 Ammunition Factory - Water Section of the Factory",
+    "name_en": "WW2 Ammunition Factory - Water Section of the Factory",
+    "description_pl": "Bunkry typu WW2 Ammunition Factory - Water Section of the Factory",
+    "description_en": "WW2 Ammunition Factory - Water Section of the Factory bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.897Z",
+    "updated_at": "2025-11-05T07:19:46.897Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 19,
+  "fields": {
+    "name_pl": "WW2 Ammunition Factory - Silos",
+    "name_en": "WW2 Ammunition Factory - Silos",
+    "description_pl": "Bunkry typu WW2 Ammunition Factory - Silos",
+    "description_en": "WW2 Ammunition Factory - Silos bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.905Z",
+    "updated_at": "2025-11-05T07:19:46.905Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 20,
+  "fields": {
+    "name_pl": "WW2 Ammunition Factory - Fire Tower",
+    "name_en": "WW2 Ammunition Factory - Fire Tower",
+    "description_pl": "Bunkry typu WW2 Ammunition Factory - Fire Tower",
+    "description_en": "WW2 Ammunition Factory - Fire Tower bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.913Z",
+    "updated_at": "2025-11-05T07:19:46.913Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 21,
+  "fields": {
+    "name_pl": "WW2 Ammunition Factory - Shooting Range",
+    "name_en": "WW2 Ammunition Factory - Shooting Range",
+    "description_pl": "Bunkry typu WW2 Ammunition Factory - Shooting Range",
+    "description_en": "WW2 Ammunition Factory - Shooting Range bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.920Z",
+    "updated_at": "2025-11-05T07:19:46.920Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 22,
+  "fields": {
+    "name_pl": "WW2 Ammunition Factory Headquarter",
+    "name_en": "WW2 Ammunition Factory Headquarter",
+    "description_pl": "Bunkry typu WW2 Ammunition Factory Headquarter",
+    "description_en": "WW2 Ammunition Factory Headquarter bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.929Z",
+    "updated_at": "2025-11-05T07:19:46.929Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 23,
+  "fields": {
+    "name_pl": "Fort",
+    "name_en": "Fort",
+    "description_pl": "Bunkry typu Fort",
+    "description_en": "Fort bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.943Z",
+    "updated_at": "2025-11-05T07:19:46.943Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 24,
+  "fields": {
+    "name_pl": "Bunker",
+    "name_en": "Bunker",
+    "description_pl": "Bunkry typu Bunker",
+    "description_en": "Bunker bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.952Z",
+    "updated_at": "2025-11-05T07:19:46.952Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 25,
+  "fields": {
+    "name_pl": "Redoubt",
+    "name_en": "Redoubt",
+    "description_pl": "Bunkry typu Redoubt",
+    "description_en": "Redoubt bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.960Z",
+    "updated_at": "2025-11-05T07:19:46.960Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 26,
+  "fields": {
+    "name_pl": "Single-rampart artillery fort",
+    "name_en": "Single-rampart artillery fort",
+    "description_pl": "Bunkry typu Single-rampart artillery fort",
+    "description_en": "Single-rampart artillery fort bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.975Z",
+    "updated_at": "2025-11-05T07:19:46.975Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 27,
+  "fields": {
+    "name_pl": "Artillery fort",
+    "name_en": "Artillery fort",
+    "description_pl": "Bunkry typu Artillery fort",
+    "description_en": "Artillery fort bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.983Z",
+    "updated_at": "2025-11-05T07:19:46.983Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 28,
+  "fields": {
+    "name_pl": "Armored fort",
+    "name_en": "Armored fort",
+    "description_pl": "Bunkry typu Armored fort",
+    "description_en": "Armored fort bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:46.991Z",
+    "updated_at": "2025-11-05T07:19:46.991Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 29,
+  "fields": {
+    "name_pl": "Destroyed artillery fort",
+    "name_en": "Destroyed artillery fort",
+    "description_pl": "Bunkry typu Destroyed artillery fort",
+    "description_en": "Destroyed artillery fort bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.004Z",
+    "updated_at": "2025-11-05T07:19:47.004Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 30,
+  "fields": {
+    "name_pl": "Close-defense armored fort",
+    "name_en": "Close-defense armored fort",
+    "description_pl": "Bunkry typu Close-defense armored fort",
+    "description_en": "Close-defense armored fort bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.012Z",
+    "updated_at": "2025-11-05T07:19:47.012Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 31,
+  "fields": {
+    "name_pl": "Auxiliary artillery fort",
+    "name_en": "Auxiliary artillery fort",
+    "description_pl": "Bunkry typu Auxiliary artillery fort",
+    "description_en": "Auxiliary artillery fort bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.020Z",
+    "updated_at": "2025-11-05T07:19:47.020Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 32,
+  "fields": {
+    "name_pl": "Auxiliary fort",
+    "name_en": "Auxiliary fort",
+    "description_pl": "Bunkry typu Auxiliary fort",
+    "description_en": "Auxiliary fort bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.027Z",
+    "updated_at": "2025-11-05T07:19:47.027Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 33,
+  "fields": {
+    "name_pl": "Undergrounds. Shelters",
+    "name_en": "Undergrounds. Shelters",
+    "description_pl": "Bunkry typu Undergrounds. Shelters",
+    "description_en": "Undergrounds. Shelters bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.038Z",
+    "updated_at": "2025-11-05T07:19:47.038Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 34,
+  "fields": {
+    "name_pl": "Anti-tank shelter",
+    "name_en": "Anti-tank shelter",
+    "description_pl": "Bunkry typu Anti-tank shelter",
+    "description_en": "Anti-tank shelter bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.046Z",
+    "updated_at": "2025-11-05T07:19:47.046Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 35,
+  "fields": {
+    "name_pl": "Citadel",
+    "name_en": "Citadel",
+    "description_pl": "Bunkry typu Citadel",
+    "description_en": "Citadel bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.054Z",
+    "updated_at": "2025-11-05T07:19:47.054Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 36,
+  "fields": {
+    "name_pl": "Artillery Fort",
+    "name_en": "Artillery Fort",
+    "description_pl": "Bunkry typu Artillery Fort",
+    "description_en": "Artillery Fort bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.063Z",
+    "updated_at": "2025-11-05T07:19:47.063Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 37,
+  "fields": {
+    "name_pl": "Auxiliary Armored Fort",
+    "name_en": "Auxiliary Armored Fort",
+    "description_pl": "Bunkry typu Auxiliary Armored Fort",
+    "description_en": "Auxiliary Armored Fort bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.071Z",
+    "updated_at": "2025-11-05T07:19:47.071Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 38,
+  "fields": {
+    "name_pl": "Main Armored Fort 44 Tonie",
+    "name_en": "Main Armored Fort 44 Tonie",
+    "description_pl": "Bunkry typu Main Armored Fort 44 Tonie",
+    "description_en": "Main Armored Fort 44 Tonie bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.079Z",
+    "updated_at": "2025-11-05T07:19:47.079Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 39,
+  "fields": {
+    "name_pl": "Accompanying Battery B3 Tonie",
+    "name_en": "Accompanying Battery B3 Tonie",
+    "description_pl": "Bunkry typu Accompanying Battery B3 Tonie",
+    "description_en": "Accompanying Battery B3 Tonie bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.087Z",
+    "updated_at": "2025-11-05T07:19:47.087Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 40,
+  "fields": {
+    "name_pl": "Auxiliary Infantry Fort 41a “Mydlniki”",
+    "name_en": "Auxiliary Infantry Fort 41a “Mydlniki”",
+    "description_pl": "Bunkry typu Auxiliary Infantry Fort 41a “Mydlniki”",
+    "description_en": "Auxiliary Infantry Fort 41a “Mydlniki” bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.095Z",
+    "updated_at": "2025-11-05T07:19:47.095Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 41,
+  "fields": {
+    "name_pl": "Main Artillery Fort 50 “Prokocim”",
+    "name_en": "Main Artillery Fort 50 “Prokocim”",
+    "description_pl": "Bunkry typu Main Artillery Fort 50 “Prokocim”",
+    "description_en": "Main Artillery Fort 50 “Prokocim” bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.103Z",
+    "updated_at": "2025-11-05T07:19:47.103Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 42,
+  "fields": {
+    "name_pl": "Artillery Fort 48 “Batowice”",
+    "name_en": "Artillery Fort 48 “Batowice”",
+    "description_pl": "Bunkry typu Artillery Fort 48 “Batowice”",
+    "description_en": "Artillery Fort 48 “Batowice” bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.111Z",
+    "updated_at": "2025-11-05T07:19:47.111Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 43,
+  "fields": {
+    "name_pl": "Ammunition Shelter “Rajsko”",
+    "name_en": "Ammunition Shelter “Rajsko”",
+    "description_pl": "Bunkry typu Ammunition Shelter “Rajsko”",
+    "description_en": "Ammunition Shelter “Rajsko” bunkers",
+    "icon": "",
+    "display_order": 0,
+    "created_at": "2025-11-05T07:19:47.120Z",
+    "updated_at": "2025-11-05T07:19:47.120Z"
+  }
+},
+{
+  "model": "bunkers.bunkercategory",
+  "pk": 44,
+  "fields": {
+    "name_pl": 
