@@ -20,30 +20,21 @@ class ForcePasswordChangeMiddleware:
             if request.user.force_password_change:
                 # Paths that don't require password change
                 # Note: Frontend URLs use i18n patterns (/pl/, /en/, etc.)
-                exempt_url_names = [
-                    'change_password_required',
-                    'logout',
-                    'login',
-                    'set_language',
+                exempt_path_patterns = [
+                    '/change-password-required/',  # Password change page (with any language prefix)
+                    '/logout/',                     # Logout page
+                    '/login/',                      # Login page  
+                    '/admin/logout/',              # Admin logout
+                    '/static/',                    # Static files
+                    '/media/',                     # Media files
+                    '/jsi18n/',                    # JavaScript i18n
+                    '/i18n/',                      # Language switcher
                 ]
                 
-                exempt_path_prefixes = [
-                    '/admin/logout/',
-                    '/static/',
-                    '/media/',
-                    '/jsi18n/',
-                    '/i18n/',
-                ]
+                # Check if current path matches any exempt pattern
+                is_exempt = any(pattern in request.path for pattern in exempt_path_patterns)
                 
-                # Check if current path is exempt by prefix
-                path_exempt = any(request.path.startswith(prefix) for prefix in exempt_path_prefixes)
-                
-                # Check if current URL name is exempt (handles i18n patterns)
-                url_name_exempt = False
-                if hasattr(request, 'resolver_match') and request.resolver_match:
-                    url_name_exempt = request.resolver_match.url_name in exempt_url_names
-                
-                if not path_exempt and not url_name_exempt:
+                if not is_exempt:
                     # Only add message once per session
                     if not request.session.get('password_change_warning_shown'):
                         messages.warning(
