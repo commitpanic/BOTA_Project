@@ -18,20 +18,32 @@ class ForcePasswordChangeMiddleware:
         # Check if user is authenticated and must change password
         if request.user.is_authenticated and hasattr(request.user, 'force_password_change'):
             if request.user.force_password_change:
-                # Paths that don't require password change (check dynamically)
-                exempt_paths = [
-                    '/change-password-required/',  # Frontend URL for password change
-                    '/accounts/logout/',
-                    '/accounts/login/',
-                    '/set-language/',
+                # Paths that don't require password change
+                # Note: Frontend URLs use i18n patterns (/pl/, /en/, etc.)
+                exempt_url_names = [
+                    'change_password_required',
+                    'logout',
+                    'login',
+                    'set_language',
+                ]
+                
+                exempt_path_prefixes = [
                     '/admin/logout/',
                     '/static/',
                     '/media/',
                     '/jsi18n/',
+                    '/i18n/',
                 ]
                 
-                # Allow access to exempt paths
-                if not any(request.path.startswith(path) for path in exempt_paths):
+                # Check if current path is exempt by prefix
+                path_exempt = any(request.path.startswith(prefix) for prefix in exempt_path_prefixes)
+                
+                # Check if current URL name is exempt (handles i18n patterns)
+                url_name_exempt = False
+                if hasattr(request, 'resolver_match') and request.resolver_match:
+                    url_name_exempt = request.resolver_match.url_name in exempt_url_names
+                
+                if not path_exempt and not url_name_exempt:
                     # Only add message once per session
                     if not request.session.get('password_change_warning_shown'):
                         messages.warning(
