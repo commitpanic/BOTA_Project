@@ -2,7 +2,7 @@
 Middleware to force password change on first login for users with force_password_change=True
 """
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
 from django.contrib import messages
 from django.utils.translation import gettext as _
 
@@ -13,25 +13,33 @@ class ForcePasswordChangeMiddleware:
     """
     def __init__(self, get_response):
         self.get_response = get_response
-        # Paths that don't require password change
-        self.exempt_paths = [
-            reverse('change_password_required'),
-            reverse('logout'),
-            '/admin/logout/',
-            '/static/',
-            '/media/',
-        ]
 
     def __call__(self, request):
         # Check if user is authenticated and must change password
         if request.user.is_authenticated and hasattr(request.user, 'force_password_change'):
             if request.user.force_password_change:
-                # Allow access to password change page and logout
-                if not any(request.path.startswith(path) for path in self.exempt_paths):
-                    messages.warning(
-                        request,
-                        _('You must change your password before continuing.')
-                    )
+                # Paths that don't require password change (check dynamically)
+                exempt_paths = [
+                    '/change-password-required/',  # Frontend URL for password change
+                    '/accounts/logout/',
+                    '/accounts/login/',
+                    '/set-language/',
+                    '/admin/logout/',
+                    '/static/',
+                    '/media/',
+                    '/jsi18n/',
+                ]
+                
+                # Allow access to exempt paths
+                if not any(request.path.startswith(path) for path in exempt_paths):
+                    # Only add message once per session
+                    if not request.session.get('password_change_warning_shown'):
+                        messages.warning(
+                            request,
+                            _('You must change your password before continuing.')
+                        )
+                        request.session['password_change_warning_shown'] = True
+                    
                     return redirect('change_password_required')
 
         response = self.get_response(request)
