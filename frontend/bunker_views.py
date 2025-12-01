@@ -116,8 +116,6 @@ def request_bunker(request):
                 bunker_type=request.POST.get('bunker_type', ''),
                 latitude=Decimal(request.POST.get('latitude')),
                 longitude=Decimal(request.POST.get('longitude')),
-                locator=request.POST.get('locator', ''),
-                photo_url=request.POST.get('photo_url', ''),
                 additional_info=request.POST.get('additional_info', ''),
                 requested_by=request.user,
                 status='pending'

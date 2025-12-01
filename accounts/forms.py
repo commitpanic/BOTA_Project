@@ -44,9 +44,9 @@ class CallsignPasswordResetForm(PasswordResetForm):
         email = cleaned_data.get('email')
         
         if callsign and email:
-            # Check if user exists with both callsign and email
+            # Check if user exists with both callsign and email (case-insensitive)
             try:
-                user = User.objects.get(callsign=callsign, email=email)
+                user = User.objects.get(callsign__iexact=callsign, email__iexact=email)
                 if not user.is_active:
                     raise forms.ValidationError(
                         _("This account is inactive. Please contact support.")
@@ -65,9 +65,9 @@ class CallsignPasswordResetForm(PasswordResetForm):
         """
         callsign = self.cleaned_data.get('callsign')
         
-        # Get active users matching both callsign and email
+        # Get active users matching both callsign and email (case-insensitive)
         active_users = User._default_manager.filter(
-            callsign=callsign,
+            callsign__iexact=callsign,
             email__iexact=email,
             is_active=True
         )

@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from .models import PlannedActivation
 
 
@@ -72,3 +73,14 @@ class PlannedActivationForm(forms.ModelForm):
         
         # Make bunker field show reference and name
         self.fields['bunker'].label_from_instance = lambda obj: f"{obj.reference_number} - {obj.name_pl}"
+    
+    def clean_planned_date(self):
+        """Validate that planned date is not in the past"""
+        planned_date = self.cleaned_data.get('planned_date')
+        if planned_date:
+            today = timezone.now().date()
+            if planned_date < today:
+                raise forms.ValidationError(
+                    _('Planned date cannot be in the past. Please select today or a future date.')
+                )
+        return planned_date

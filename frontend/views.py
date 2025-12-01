@@ -605,6 +605,10 @@ def register_view(request):
         password2 = request.POST.get('password2')
         callsign = request.POST.get('callsign')
         
+        # Normalize callsign to uppercase for consistency
+        if callsign:
+            callsign = callsign.upper().strip()
+        
         # Validation
         if not all([email, password, password2, callsign]):
             messages.error(request, _('All fields are required'))
@@ -618,8 +622,8 @@ def register_view(request):
             messages.error(request, _('Email already registered'))
             return redirect('register')
         
-        # Check if callsign exists
-        existing_user = User.objects.filter(callsign=callsign).first()
+        # Check if callsign exists (case-insensitive)
+        existing_user = User.objects.filter(callsign__iexact=callsign).first()
         
         if existing_user:
             # If user was auto-created (from log import), allow them to "claim" the account
