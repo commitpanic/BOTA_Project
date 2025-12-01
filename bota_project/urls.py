@@ -19,6 +19,9 @@ from .api_router import router
 from frontend.health import health_check
 from frontend.static_debug import static_files_debug
 
+# Import admin customizations
+from . import admin as admin_customizations
+
 urlpatterns = [
     # Health check (for monitoring)
     path('health/', health_check, name='health_check'),

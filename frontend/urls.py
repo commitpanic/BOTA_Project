@@ -55,6 +55,10 @@ urlpatterns = [
     path('cookies/', views.cookie_policy, name='cookie_policy'),
     path('terms/', views.terms_of_service, name='terms_of_service'),
     
+    # Statistics
+    path('statistics/', views.public_stats, name='public_stats'),
+    path('statistics/user/', views.user_stats_search, name='user_stats_search'),
+    
     # Bunker views
     path('bunkers/', bunker_views.bunker_list, name='bunker_list'),
     path('bunkers/<path:reference>/', bunker_views.bunker_detail, name='bunker_detail'),

@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Public Statistics" %} - BOTA Project{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="bi bi-bar-chart"></i> {% trans "Public Statistics" %}</h1>
+            <p class="lead">{% trans "Top activators, hunters, and bunker statistics" %}</p>
+        </div>
+    </div>
+
+    <!-- Search User Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="bi bi-search"></i> {% trans "Search User Statistics" %}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{% url 'user_stats_search' %}">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="callsign" placeholder="{% trans 'Enter callsign' %}" required>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-search"></i> {% trans "Search" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top 10 Activators -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="bi bi-broadcast"></i> {% trans "Top 10 Activators" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>{% trans "Callsign" %}</th>
+                                    <th class="text-end">{% trans "QSOs" %}</th>
+                                    <th class="text-end">{% trans "Bunkers" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in top_activators %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <a href="{% url 'user_stats_search' %}?callsign={{ stat.user__callsign }}" class="text-decoration-none">
+                                            <strong>{{ stat.user__callsign }}</strong>
+                                        </a>
+                                    </td>
+                                    <td class="text-end">{{ stat.total_activator_qso|default:0 }}</td>
+                                    <td class="text-end">{{ stat.unique_activations|default:0 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">{% trans "No data available" %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 10 Hunters -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="bi bi-binoculars"></i> {% trans "Top 10 Hunters" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>{% trans "Callsign" %}</th>
+                                    <th class="text-end">{% trans "QSOs" %}</th>
+                                    <th class="text-end">{% trans "Bunkers" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in top_hunters %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <a href="{% url 'user_stats_search' %}?callsign={{ stat.user__callsign }}" class="text-decoration-none">
+                                            <strong>{{ stat.user__callsign }}</strong>
+                                        </a>
+                                    </td>
+                                    <td class="text-end">{{ stat.total_hunter_qso|default:0 }}</td>
+                                    <td class="text-end">{{ stat.unique_hunts|default:0 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">{% trans "No data available" %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Most Active Bunkers -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5><i class="bi bi-trophy"></i> {% trans "Most Active Bunkers" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>{% trans "Reference" %}</th>
+                                    <th>{% trans "Name" %}</th>
+                                    <th class="text-end">{% trans "Activations" %}</th>
+                                    <th class="text-end">{% trans "QSOs" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bunker in most_active_bunkers %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <a href="{% url 'bunker_detail' bunker.bunker__id %}" class="text-decoration-none">
+                                            <strong>{{ bunker.bunker__reference_number }}</strong>
+                                        </a>
+                                    </td>
+                                    <td>{{ bunker.bunker__name_en }}</td>
+                                    <td class="text-end">{{ bunker.activation_count }}</td>
+                                    <td class="text-end">{{ bunker.qso_count }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">{% trans "No data available" %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-people fs-1 text-primary"></i>
+                    <h3 class="mt-2">{{ total_users }}</h3>
+                    <p class="text-muted">{% trans "Registered Users" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-geo-alt fs-1 text-warning"></i>
+                    <h3 class="mt-2">{{ total_bunkers }}</h3>
+                    <p class="text-muted">{% trans "Total Bunkers" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-broadcast fs-1 text-success"></i>
+                    <h3 class="mt-2">{{ total_activations }}</h3>
+                    <p class="text-muted">{% trans "Total Activations" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-chat-dots fs-1 text-info"></i>
+                    <h3 class="mt-2">{{ total_qsos }}</h3>
+                    <p class="text-muted">{% trans "Total QSOs" %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
