@@ -177,9 +177,27 @@ def manage_bunker_requests(request):
     
     requests_list = requests_list.order_by('-created_at')
     
+    # Get counts for badges
+    total_count = BunkerRequest.objects.count()
+    pending_count = BunkerRequest.objects.filter(status='pending').count()
+    approved_count = BunkerRequest.objects.filter(status='approved').count()
+    rejected_count = BunkerRequest.objects.filter(status='rejected').count()
+    
+    # Get unique bunker types for filter
+    bunker_types = BunkerRequest.objects.exclude(
+        bunker_type__isnull=True
+    ).exclude(
+        bunker_type=''
+    ).values_list('bunker_type', flat=True).distinct().order_by('bunker_type')
+    
     context = {
         'requests': requests_list,
         'status_filter': status_filter,
+        'total_count': total_count,
+        'pending_count': pending_count,
+        'approved_count': approved_count,
+        'rejected_count': rejected_count,
+        'bunker_types': bunker_types,
     }
     return render(request, 'bunkers/manage_requests.html', context)
 

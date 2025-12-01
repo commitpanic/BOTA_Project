@@ -273,8 +273,8 @@ msgstr "Mój Profil"
 msgid "My Statistics"
 msgstr "Moje Statystyki"
 
-msgid "Total Points"
-msgstr "Łączne Punkty"
+msgid "Total QSOs"
+msgstr "Łącznie QSO"
 
 msgid "Activator QSOs"
 msgstr "QSO Aktywatora"

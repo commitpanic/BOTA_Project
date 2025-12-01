@@ -750,7 +750,6 @@
         // Pause auto-refresh during submission
         const wasAutoRefreshEnabled = !isPaused;
         if (wasAutoRefreshEnabled) {
-            clearInterval(autoRefreshInterval);
             isPaused = true;
         }
         
@@ -819,11 +818,24 @@
         }
     });
     
-    // Clear result message when modal is opened
+    // Clear result message when modal is opened and pause refresh
     document.getElementById('spotModal').addEventListener('show.bs.modal', function() {
         document.getElementById('spotResult').innerHTML = '';
         document.getElementById('bunker_reference').value = '';
         loadBunkerList();
+        
+        // Pause auto-refresh when modal opens
+        if (!isPaused) {
+            isPaused = true;
+            const pauseIcon = document.getElementById('pauseIcon');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const refreshIcon = document.getElementById('refreshIcon');
+            
+            pauseIcon.className = 'bi bi-play-fill';
+            pauseBtn.classList.remove('btn-outline-primary');
+            pauseBtn.classList.add('btn-warning');
+            refreshIcon.style.opacity = '0.5';
+        }
     });
     
     // Load bunker list for autocomplete
@@ -854,7 +866,8 @@
         bunkerListCache.forEach(bunker => {
             const option = document.createElement('option');
             option.value = bunker.reference_number;
-            option.textContent = `${bunker.reference_number} - ${bunker.name_en}`;
+            // Use label attribute to show full text in dropdown
+            option.setAttribute('label', `${bunker.reference_number} - ${bunker.name_en}`);
             datalist.appendChild(option);
         });
     }
@@ -872,7 +885,7 @@
         datalist.innerHTML = '';
         
         const filtered = bunkerListCache.filter(bunker => 
-            bunker.reference_number.includes(searchTerm) || 
+            bunker.reference_number.toUpperCase().includes(searchTerm) || 
             bunker.name_en.toUpperCase().includes(searchTerm) ||
             (bunker.name_pl && bunker.name_pl.toUpperCase().includes(searchTerm))
         );
@@ -880,7 +893,8 @@
         filtered.slice(0, 20).forEach(bunker => {
             const option = document.createElement('option');
             option.value = bunker.reference_number;
-            option.textContent = `${bunker.reference_number} - ${bunker.name_en}`;
+            // Use label attribute to show full text in dropdown
+            option.setAttribute('label', `${bunker.reference_number} - ${bunker.name_en}`);
             datalist.appendChild(option);
         });
     });
@@ -903,6 +917,19 @@
             
             // Clear result message
             document.getElementById('respotResult').innerHTML = '';
+            
+            // Pause auto-refresh when modal opens
+            if (!isPaused) {
+                isPaused = true;
+                const pauseIcon = document.getElementById('pauseIcon');
+                const pauseBtn = document.getElementById('pauseBtn');
+                const refreshIcon = document.getElementById('refreshIcon');
+                
+                pauseIcon.className = 'bi bi-play-fill';
+                pauseBtn.classList.remove('btn-outline-primary');
+                pauseBtn.classList.add('btn-warning');
+                refreshIcon.style.opacity = '0.5';
+            }
             
             // Show modal
             const respotModal = new bootstrap.Modal(document.getElementById('respotModal'));

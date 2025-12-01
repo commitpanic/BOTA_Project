@@ -4,7 +4,6 @@ Hide unused default Django admin models from sidebar
 """
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from django.contrib.sites.models import Site
 
 # Unregister unused models to clean up admin interface
 try:
@@ -12,10 +11,7 @@ try:
 except admin.sites.NotRegistered:
     pass
 
-try:
-    admin.site.unregister(Site)
-except admin.sites.NotRegistered:
-    pass
+# Note: Site model removed - django.contrib.sites not in INSTALLED_APPS
 
 # Customize admin site headers
 admin.site.site_header = "BOTA Project Administration"

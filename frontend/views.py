@@ -1089,7 +1089,7 @@ def public_stats(request):
         .select_related('user')
         .filter(total_hunter_qso__gt=0)
         .order_by('-total_hunter_qso')[:10]
-        .values('user__callsign', 'total_hunter_qso', 'unique_hunts')
+        .values('user__callsign', 'total_hunter_qso', 'unique_bunkers_hunted')
     )
     
     # Most Active Bunkers (by activation sessions)

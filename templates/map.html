@@ -160,22 +160,6 @@
     </div>
 </div>
 
-<!-- Location Search -->
-<div class="row mb-3">
-    <div class="col-md-8 col-lg-6">
-        <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input type="text" class="form-control" id="locationSearch" placeholder="{% trans 'Search location (city, address, coordinates)' %}">
-            <button class="btn btn-primary" type="button" id="searchButton">
-                {% trans "Search" %}
-            </button>
-        </div>
-        <small class="text-muted">
-            {% trans "Examples: Warsaw, Krakow, ul. Piotrkowska 1 Łódź, 52.2297,21.0122" %}
-        </small>
-    </div>
-</div>
-
 <!-- Statistics -->
 <div class="row mb-3">
     <div class="col-md-12">
@@ -305,6 +289,22 @@
     </div>
 </div>
 {% endif %}
+
+<!-- Location Search -->
+<div class="row mb-3">
+    <div class="col-md-8 col-lg-6">
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="locationSearch" placeholder="{% trans 'Search location (city, address, coordinates)' %}">
+            <button class="btn btn-primary" type="button" id="searchButton">
+                {% trans "Search" %}
+            </button>
+        </div>
+        <small class="text-muted">
+            {% trans "Examples: Warsaw, Krakow, ul. Piotrkowska 1 Łódź, 52.2297,21.0122" %}
+        </small>
+    </div>
+</div>
 
 <!-- Map -->
 <div class="row">
