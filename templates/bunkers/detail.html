@@ -74,6 +74,43 @@
                 </div>
             </div>
 
+            <!-- Activator Details -->
+            {% if activator_details %}
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5><i class="bi bi-people"></i> {% trans "Activator Details" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>{% trans "Callsign" %}</th>
+                                    <th>{% trans "Portable Callsign" %}</th>
+                                    <th class="text-end">{% trans "QSOs" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for detail in activator_details %}
+                                <tr>
+                                    <td><strong>{{ detail.activator__callsign }}</strong></td>
+                                    <td>
+                                        {% if detail.activator_callsign and detail.activator_callsign != detail.activator__callsign %}
+                                            <span class="badge bg-info">{{ detail.activator_callsign }}</span>
+                                        {% else %}
+                                            —
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">{{ detail.qso_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             {% if bunker.verified_by %}
             <div class="card">
                 <div class="card-header">

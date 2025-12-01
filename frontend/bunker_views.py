@@ -316,11 +316,24 @@ def bunker_detail(request, reference):
     # Total QSOs for reference
     total_qsos = ActivationLog.objects.filter(bunker=bunker).count()
     
+    # Get activator details with portable callsigns
+    activator_details = (
+        ActivationLog.objects
+        .filter(bunker=bunker)
+        .values('activator__callsign', 'activator_callsign')
+        .annotate(
+            qso_count=Count('id'),
+            session_count=Count('activation_date', distinct=True)
+        )
+        .order_by('-qso_count')
+    )
+    
     context = {
         'bunker': bunker,
         'activation_count': activation_count,
         'unique_activators': unique_activators,
         'total_qsos': total_qsos,
+        'activator_details': activator_details,
     }
     return render(request, 'bunkers/detail.html', context)
 
