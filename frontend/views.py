@@ -605,6 +605,10 @@ def register_view(request):
         password2 = request.POST.get('password2')
         callsign = request.POST.get('callsign')
         
+        # Normalize callsign to uppercase for consistency
+        if callsign:
+            callsign = callsign.upper().strip()
+        
         # Validation
         if not all([email, password, password2, callsign]):
             messages.error(request, _('All fields are required'))
@@ -618,8 +622,8 @@ def register_view(request):
             messages.error(request, _('Email already registered'))
             return redirect('register')
         
-        # Check if callsign exists
-        existing_user = User.objects.filter(callsign=callsign).first()
+        # Check if callsign exists (case-insensitive)
+        existing_user = User.objects.filter(callsign__iexact=callsign).first()
         
         if existing_user:
             # If user was auto-created (from log import), allow them to "claim" the account
@@ -1063,3 +1067,93 @@ def change_password_required(request):
         'form': form,
     }
     return render(request, 'change_password_required.html', context)
+
+
+def public_stats(request):
+    """Public statistics page - top activators, hunters, bunkers"""
+    from django.db.models import Count, Q
+    from django.db.models.functions import TruncDate
+    
+    # Top 10 Activators
+    top_activators = (
+        UserStatistics.objects
+        .select_related('user')
+        .filter(total_activator_qso__gt=0)
+        .order_by('-total_activator_qso')[:10]
+        .values('user__callsign', 'total_activator_qso', 'unique_activations')
+    )
+    
+    # Top 10 Hunters
+    top_hunters = (
+        UserStatistics.objects
+        .select_related('user')
+        .filter(total_hunter_qso__gt=0)
+        .order_by('-total_hunter_qso')[:10]
+        .values('user__callsign', 'total_hunter_qso', 'unique_bunkers_hunted')
+    )
+    
+    # Most Active Bunkers (by activation sessions)
+    most_active_bunkers = (
+        ActivationLog.objects
+        .values('bunker__id', 'bunker__reference_number', 'bunker__name_en')
+        .annotate(
+            activation_count=Count('activator', distinct=True),
+            qso_count=Count('id')
+        )
+        .order_by('-qso_count')[:10]
+    )
+    
+    # Overall statistics
+    total_users = User.objects.filter(is_active=True, auto_created=False).count()
+    total_bunkers = Bunker.objects.filter(is_verified=True).count()
+    total_activations = ActivationLog.objects.values('activator', 'bunker').distinct().count()
+    total_qsos = ActivationLog.objects.count()
+    
+    context = {
+        'top_activators': top_activators,
+        'top_hunters': top_hunters,
+        'most_active_bunkers': most_active_bunkers,
+        'total_users': total_users,
+        'total_bunkers': total_bunkers,
+        'total_activations': total_activations,
+        'total_qsos': total_qsos,
+    }
+    return render(request, 'public_stats.html', context)
+
+
+def user_stats_search(request):
+    """Search and display user statistics by callsign"""
+    from django.db.models import Count
+    
+    callsign = request.GET.get('callsign', '').strip().upper()
+    
+    if not callsign:
+        messages.warning(request, _('Please enter a callsign'))
+        return redirect('public_stats')
+    
+    try:
+        user_obj = User.objects.get(callsign__iexact=callsign)
+        stats = user_obj.statistics
+        
+        # Get activation details with portable callsigns
+        activations_detail = (
+            ActivationLog.objects
+            .filter(activator=user_obj)
+            .values('bunker__id', 'bunker__reference_number', 'activator_callsign', 'activation_date')
+            .annotate(qso_count=Count('id'))
+            .order_by('-activation_date')[:50]
+        )
+        
+        context = {
+            'callsign': callsign,
+            'user_obj': user_obj,
+            'stats': stats,
+            'activations_detail': activations_detail,
+        }
+    except User.DoesNotExist:
+        context = {
+            'callsign': callsign,
+            'user_obj': None,
+        }
+    
+    return render(request, 'user_stats_detail.html', context)

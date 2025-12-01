@@ -3,6 +3,9 @@ from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
 
+# Import correction model
+from .models_correction import BunkerCorrectionRequest
+
 
 class BunkerCategory(models.Model):
     """
@@ -419,3 +422,7 @@ class BunkerRequest(models.Model):
     
     def __str__(self):
         return f"{self.reference_number} - {self.name} ({self.get_status_display()})"
+
+
+# Re-export correction model for convenience
+__all__ = ['BunkerCategory', 'Bunker', 'BunkerPhoto', 'BunkerResource', 'BunkerInspection', 'BunkerRequest', 'BunkerCorrectionRequest']

@@ -165,6 +165,12 @@ class ActivationLog(models.Model):
         null=True,
         blank=True
     )
+    activator_callsign = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name=_("Activator Callsign"),
+        help_text=_("Full callsign used during activation (e.g., SP3FCK/P, DL/SP3FCK)")
+    )
     log_upload = models.ForeignKey(
         'LogUpload',
         on_delete=models.SET_NULL,

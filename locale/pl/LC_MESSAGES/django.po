@@ -276,8 +276,8 @@ msgstr "Mój Profil"
 msgid "My Statistics"
 msgstr "Moje Statystyki"
 
-msgid "Total Points"
-msgstr "Łączne Punkty"
+msgid "Total QSO"
+msgstr "Łącznie QSO"
 
 msgid "QSO - total"
 msgstr "QSO - suma"
@@ -1930,3 +1930,415 @@ msgstr "Brak respotów"
 
 msgid "Error loading spot history"
 msgstr "Błąd ładowania historii spota"
+
+
+# V2 Improvements - Public Statistics
+msgid "Public Statistics"
+msgstr "Statystyki Publiczne"
+
+msgid "Top activators, hunters, and bunker statistics"
+msgstr "Top aktywatorzy, łowcy i statystyki bunkerów"
+
+msgid "Search User Statistics"
+msgstr "Wyszukaj Statystyki Użytkownika"
+
+msgid "Enter callsign"
+msgstr "Wprowadź znak wywoławczy"
+
+msgid "Top 10 Activators"
+msgstr "Top 10 Aktywatorów"
+
+msgid "Top 10 Hunters"
+msgstr "Top 10 Łowców"
+
+msgid "No data available"
+msgstr "Brak danych"
+
+msgid "Most Active Bunkers"
+msgstr "Najbardziej Aktywne Bunkry"
+
+msgid "Activations"
+msgstr "Aktywacje"
+
+msgid "Registered Users"
+msgstr "Zarejestrowani Użytkownicy"
+
+msgid "Total Activations"
+msgstr "Wszystkie Aktywacje"
+
+msgid "Total QSOs"
+msgstr "Wszystkie QSO"
+
+# V2 Improvements - Bunker Correction Request
+msgid "Suggest Bunker Correction"
+msgstr "Zasugeruj Korektę Bunkra"
+
+msgid "Suggest Correction"
+msgstr "Zasugeruj Korektę"
+
+msgid "You are suggesting corrections for"
+msgstr "Sugerujesz poprawki dla"
+
+msgid "Only fill in the fields you want to change. Leave others empty."
+msgstr "Wypełnij tylko pola, które chcesz zmienić. Pozostaw inne puste."
+
+msgid "Current Information"
+msgstr "Aktualne Informacje"
+
+msgid "Name (Polish):"
+msgstr "Nazwa (polska):"
+
+msgid "Name (English):"
+msgstr "Nazwa (angielska):"
+
+msgid "Category:"
+msgstr "Kategoria:"
+
+msgid "Coordinates:"
+msgstr "Współrzędne:"
+
+msgid "Proposed Changes"
+msgstr "Proponowane Zmiany"
+
+msgid "New Name (Polish)"
+msgstr "Nowa Nazwa (polska)"
+
+msgid "New Name (English)"
+msgstr "Nowa Nazwa (angielska)"
+
+msgid "New Description (Polish)"
+msgstr "Nowy Opis (polski)"
+
+msgid "New Description (English)"
+msgstr "Nowy Opis (angielski)"
+
+msgid "New Latitude"
+msgstr "Nowa Szerokość Geograficzna"
+
+msgid "New Longitude"
+msgstr "Nowa Długość Geograficzna"
+
+msgid "Poland: 49-55°N"
+msgstr "Polska: 49-55°N"
+
+msgid "Poland: 14-24°E"
+msgstr "Polska: 14-24°E"
+
+msgid "Leave empty if no change needed"
+msgstr "Zostaw puste jeśli nie wymaga zmiany"
+
+msgid "New Category"
+msgstr "Nowa Kategoria"
+
+msgid "Reason for Change"
+msgstr "Powód Zmiany"
+
+msgid "Explain why this correction is needed"
+msgstr "Wyjaśnij dlaczego ta poprawka jest potrzebna"
+
+msgid "Submit Correction Request"
+msgstr "Wyślij Prośbę o Korektę"
+
+msgid "Your correction request has been submitted successfully!"
+msgstr "Twoja prośba o korektę została pomyślnie wysłana!"
+
+msgid "It will be reviewed by administrators."
+msgstr "Zostanie sprawdzona przez administratorów."
+
+msgid "Back to Bunker"
+msgstr "Powrót do Bunkra"
+
+# V2 Improvements - Bunker Details
+msgid "Activator Details"
+msgstr "Szczegóły Aktywatorów"
+
+msgid "Unique activation sessions"
+msgstr "Unikalne sesje aktywacyjne"
+
+msgid "Sessions"
+msgstr "Sesje"
+
+msgid "Last Activated"
+msgstr "Ostatnio Aktywowany"
+
+msgid "Never activated"
+msgstr "Nigdy nie aktywowany"
+
+# V2 Improvements - Map Location Search
+msgid "Search location (city, address, coordinates)"
+msgstr "Szukaj lokalizacji (miasto, adres, współrzędne)"
+
+msgid "Examples: Warsaw, Krakow, ul. Piotrkowska 1 Łódź, 52.2297,21.0122"
+msgstr "Przykłady: Warszawa, Kraków, ul. Piotrkowska 1 Łódź, 52.2297,21.0122"
+
+# V2 Improvements - Models verbose names
+msgid "Activator Callsign (with prefix/suffix)"
+msgstr "Znak Wywoławczy Aktywatora (z prefiksem/sufiksem)"
+
+msgid "Full callsign used during activation (e.g., SP3FCK/P)"
+msgstr "Pełny znak wywoławczy użyty podczas aktywacji (np. SP3FCK/P)"
+
+msgid "Bunker Correction Request"
+msgstr "Prośba o Korektę Bunkra"
+
+msgid "Bunker Correction Requests"
+msgstr "Prośby o Korektę Bunkerów"
+
+msgid "Requested By"
+msgstr "Zgłoszono Przez"
+
+msgid "Requested At"
+msgstr "Zgłoszono O"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Pending"
+msgstr "Oczekujące"
+
+msgid "Approved"
+msgstr "Zatwierdzone"
+
+msgid "Rejected"
+msgstr "Odrzucone"
+
+msgid "Reviewed By"
+msgstr "Sprawdzone Przez"
+
+msgid "Reviewed At"
+msgstr "Sprawdzone O"
+
+msgid "Admin Notes"
+msgstr "Notatki Admina"
+
+msgid "Internal notes for administrators"
+msgstr "Wewnętrzne notatki dla administratorów"
+
+# V2 Improvements - Admin Actions
+msgid "Approve selected correction requests"
+msgstr "Zatwierdź wybrane prośby o korektę"
+
+msgid "Reject selected correction requests"
+msgstr "Odrzuć wybrane prośby o korektę"
+
+msgid "Approved %(count)d correction request(s)"
+msgstr "Zatwierdzono %(count)d prośb(ę) o korektę"
+
+msgid "Rejected %(count)d correction request(s)"
+msgstr "Odrzucono %(count)d prośb(ę) o korektę"
+
+# V2 Improvements - Validation Messages
+msgid "Latitude must be between 49 and 55 degrees (Poland)"
+msgstr "Szerokość geograficzna musi być między 49 a 55 stopni (Polska)"
+
+msgid "Longitude must be between 14 and 24 degrees (Poland)"
+msgstr "Długość geograficzna musi być między 14 a 24 stopni (Polska)"
+
+msgid "You must provide at least one field to change"
+msgstr "Musisz podać przynajmniej jedno pole do zmiany"
+
+msgid "Maximum 3 ADIF references allowed"
+msgstr "Maksymalnie 3 referencje ADIF dozwolone"
+
+msgid "ADIF file contains too many references"
+msgstr "Plik ADIF zawiera za dużo referencji"
+
+msgid "Found %(count)d references, maximum is 3"
+msgstr "Znaleziono %(count)d referencji, maksimum to 3"
+
+# V2 Improvements - Spot Form
+msgid "Start typing bunker reference..."
+msgstr "Zacznij wpisywać referencję bunkra..."
+
+# V2 Improvements - Manage Bunker Requests
+msgid "Manage Bunker Requests"
+msgstr "Zarządzaj Prośbami o Bunkry"
+
+msgid "No pending bunker requests."
+msgstr "Brak oczekujących próśb o bunkry."
+
+msgid "No approved bunker requests."
+msgstr "Brak zatwierdzonych próśb o bunkry."
+
+msgid "No rejected bunker requests."
+msgstr "Brak odrzuconych próśb o bunkry."
+
+msgid "No bunker requests found."
+msgstr "Nie znaleziono próśb o bunkry."
+
+# V2 Improvements - Correction Form Details
+msgid "Explanation"
+msgstr "Wyjaśnienie"
+
+msgid "Correction Reason"
+msgstr "Powód Korekty"
+
+msgid "Explain why this correction is needed (required)"
+msgstr "Wyjaśnij dlaczego ta korekta jest potrzebna (wymagane)"
+
+msgid "Additional Information"
+msgstr "Dodatkowe Informacje"
+
+msgid "Any additional information or evidence (optional)"
+msgstr "Wszelkie dodatkowe informacje lub dowody (opcjonalne)"
+
+msgid "Submit Correction"
+msgstr "Wyślij Korektę"
+
+msgid "Guidelines"
+msgstr "Wskazówki"
+
+msgid "Only fill in fields that need correction"
+msgstr "Wypełnij tylko pola, które wymagają korekty"
+
+msgid "Provide clear explanation for changes"
+msgstr "Podaj jasne wyjaśnienie zmian"
+
+msgid "Coordinates must be within Poland"
+msgstr "Współrzędne muszą być w granicach Polski"
+
+msgid "Your request will be reviewed by administrators"
+msgstr "Twoja prośba zostanie sprawdzona przez administratorów"
+
+msgid "You will be notified when reviewed"
+msgstr "Zostaniesz powiadomiony po sprawdzeniu"
+
+msgid "Cancel"
+msgstr "Anuluj"
+
+# V2 Improvements - My Bunker Requests
+msgid "My Bunker Requests"
+msgstr "Moje Prośby o Bunkry"
+
+msgid "Track the status of your bunker submissions"
+msgstr "Śledź status swoich zgłoszeń bunkerów"
+
+msgid "You haven't submitted any bunker requests yet."
+msgstr "Nie wysłałeś jeszcze żadnych próśb o bunkry."
+
+msgid "Submit Your First Request"
+msgstr "Wyślij Swoją Pierwszą Prośbę"
+
+msgid "Submitted"
+msgstr "Wysłano"
+
+msgid "Rejection reason:"
+msgstr "Powód odrzucenia:"
+
+msgid "Bunker created:"
+msgstr "Utworzono bunker:"
+
+# V2 Improvements - Request New Bunker Form
+msgid "Request New Bunker"
+msgstr "Zgłoś Nowy Bunker"
+
+msgid "Your request will be reviewed by staff before the bunker is added to the database."
+msgstr "Twoja prośba zostanie sprawdzona przez personel zanim bunker zostanie dodany do bazy danych."
+
+msgid "Reference number will be assigned automatically upon approval."
+msgstr "Numer referencyjny zostanie przypisany automatycznie po zatwierdzeniu."
+
+msgid "Bunker Name"
+msgstr "Nazwa Bunkra"
+
+msgid "Type"
+msgstr "Typ"
+
+msgid "e.g., WW2 Battle Bunker"
+msgstr "np. Bunker Bojowy z II WŚ"
+
+msgid "Latitude"
+msgstr "Szerokość Geograficzna"
+
+msgid "Decimal format, e.g., 52.237049"
+msgstr "Format dziesiętny, np. 52.237049"
+
+msgid "Longitude"
+msgstr "Długość Geograficzna"
+
+msgid "Decimal format, e.g., 21.008804"
+msgstr "Format dziesiętny, np. 21.008804"
+
+msgid "Description"
+msgstr "Opis"
+
+msgid "Submit Request"
+msgstr "Wyślij Prośbę"
+
+# V2 Improvements - Planned Activations Bunker Search
+msgid "Start typing bunker reference or name..."
+msgstr "Zacznij wpisywać referencję lub nazwę bunkra..."
+
+msgid "Start typing to search bunkers"
+msgstr "Zacznij pisać aby wyszukać bunkry"
+
+msgid "Invalid bunker selected. Please choose from the list."
+msgstr "Nieprawidłowy bunker. Wybierz z listy."
+
+msgid "Please select a bunker."
+msgstr "Proszę wybrać bunker."
+
+# V2 Improvements - User Statistics
+msgid "User Statistics"
+msgstr "Statystyki Użytkownika"
+
+# V2 Improvements - Profile Filters
+msgid "Filter by reference or name..."
+msgstr "Filtruj po referencji lub nazwie..."
+
+msgid "Showing"
+msgstr "Wyświetlanie"
+
+msgid "You have planned this bunker"
+msgstr "Zaplanowałeś ten bunker"
+
+msgid "Others have planned this bunker"
+msgstr "Inni zaplanowali ten bunker"
+
+# V2 Improvements - Manage Requests UI
+msgid "Search by reference, name, or callsign..."
+msgstr "Szukaj po referencji, nazwie lub znaku..."
+
+msgid "Newest first"
+msgstr "Najnowsze najpierw"
+
+msgid "Oldest first"
+msgstr "Najstarsze najpierw"
+
+msgid "By reference"
+msgstr "Po referencji"
+
+msgid "By name"
+msgstr "Po nazwie"
+
+msgid "All types"
+msgstr "Wszystkie typy"
+
+msgid "No requests match your search criteria."
+msgstr "Brak zgłoszeń pasujących do kryteriów wyszukiwania."
+
+# V2 Improvements - Planned Activations Validation
+msgid "Planned date cannot be in the past. Please select today or a future date."
+msgstr "Data planowanej aktywacji nie może być w przeszłości. Wybierz dzisiaj lub datę w przyszłości."
+
+# V2 Improvements - Bunker Details
+msgid "Total Activations:"
+msgstr "Łączna liczba aktywacji:"
+
+msgid "Unique Activators:"
+msgstr "Unikalni aktywatorzy:"
+
+msgid "Total QSOs:"
+msgstr "Łączna liczba QSO:"
+
+msgid "All logged contacts"
+msgstr "Wszystkie zalogowane kontakty"
+
+msgid "Verification Info"
+msgstr "Informacje o weryfikacji"
+
+msgid "Verified by:"
+msgstr "Zweryfikowane przez:"
+
+msgid "View on google maps"
+msgstr "Zobacz w Google Maps"

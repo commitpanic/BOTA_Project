@@ -3,6 +3,7 @@ Service for processing ADIF log imports and updating user statistics.
 Handles activator log uploads and hunter point calculations.
 """
 import hashlib
+import re
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -25,8 +26,39 @@ class LogImportService:
         self.parser = None
         self.bunker = None
         self.activator = None
+        self.activator_callsign_full = None
         self.errors = []
         self.warnings = []
+        self.log_upload = None
+        self.transactions = []
+    
+    def _extract_base_callsign(self, callsign: str) -> str:
+        """
+        Extract base callsign from portable callsign.
+        Examples:
+            SP3FCK/P -> SP3FCK
+            DL/SP3FCK -> SP3FCK
+            DL/SP3FCK/P -> SP3FCK
+        
+        Args:
+            callsign: Full callsign with possible portable indicators
+            
+        Returns:
+            Base callsign without prefixes/suffixes
+        """
+        if not callsign:
+            return callsign
+        
+        # Remove leading prefix (e.g., DL/, G/)
+        parts = callsign.split('/')
+        
+        # Find the main callsign part (usually has digits)
+        for part in parts:
+            if any(char.isdigit() for char in part) and len(part) >= 3:
+                return part.upper().strip()
+        
+        # If no part with digits found, return the longest part
+        return max(parts, key=len).upper().strip() if parts else callsign.upper().strip()
         self.transactions = []  # Track all point transactions for batch creation
     
     @transaction.atomic
@@ -94,6 +126,29 @@ class LogImportService:
         bunker_ref = self.parser.extract_bunker_reference()
         activator_callsign = self.parser.extract_activator_callsign()
         
+        # Extract base callsign (remove portable indicators)
+        base_callsign = self._extract_base_callsign(activator_callsign)
+        
+        # Count unique bunker references in the log
+        unique_bunker_refs = set()
+        for qso in self.parser.qsos:
+            if 'MY_SIG_INFO' in qso:
+                bunker_ref_qso = qso['MY_SIG_INFO'].strip()
+                if re.match(r'^B/[A-Z]{2}-\d{4}$', bunker_ref_qso):
+                    unique_bunker_refs.add(bunker_ref_qso)
+        
+        # Validate max 3 references per ADIF session
+        if len(unique_bunker_refs) > 3:
+            log_upload.status = 'failed'
+            log_upload.error_message = f"Too many bunker references in log ({len(unique_bunker_refs)}). Maximum 3 references per upload allowed."
+            log_upload.save()
+            return {
+                'success': False,
+                'errors': [f"Too many bunker references in log ({len(unique_bunker_refs)}). Maximum 3 references per upload allowed. Found: {', '.join(sorted(unique_bunker_refs))}"],
+                'qsos_processed': 0,
+                'hunters_updated': 0
+            }
+        
         # Verify bunker exists
         try:
             self.bunker = Bunker.objects.get(reference_number=bunker_ref)
@@ -108,23 +163,29 @@ class LogImportService:
                 'hunters_updated': 0
             }
         
-        # Verify activator user
+        # Verify activator user (use base callsign)
         try:
-            self.activator = User.objects.get(callsign=activator_callsign)
+            self.activator = User.objects.get(callsign=base_callsign)
         except User.DoesNotExist:
-            # Create user if doesn't exist (optional - could require pre-registration)
-            log_upload.status = 'failed'
-            log_upload.error_message = f"Activator user {activator_callsign} not found"
-            log_upload.save()
-            return {
-                'success': False,
-                'errors': [f"Activator user {activator_callsign} not found. Please register first."],
-                'qsos_processed': 0,
-                'hunters_updated': 0
-            }
+            # Try case-insensitive lookup
+            try:
+                self.activator = User.objects.get(callsign__iexact=base_callsign)
+            except User.DoesNotExist:
+                log_upload.status = 'failed'
+                log_upload.error_message = f"Activator user {base_callsign} not found"
+                log_upload.save()
+                return {
+                    'success': False,
+                    'errors': [f"Activator user {base_callsign} not found. Please register first."],
+                    'qsos_processed': 0,
+                    'hunters_updated': 0
+                }
         
-        # Verify uploader is the activator (security check)
-        if uploader_user.callsign != activator_callsign and not uploader_user.is_staff:
+        # Store full callsign with portable indicators
+        self.activator_callsign_full = activator_callsign
+        
+        # Verify uploader is the activator (security check - use base callsign)
+        if uploader_user.callsign != base_callsign and not uploader_user.is_staff:
             log_upload.status = 'failed'
             log_upload.error_message = "Security: You can only upload logs for your own callsign"
             log_upload.save()
@@ -239,6 +300,7 @@ class LogImportService:
                     user=hunter_user,
                     bunker=self.bunker,
                     activator=self.activator,
+                    activator_callsign=self.activator_callsign_full,
                     activation_date=qso_datetime,
                     is_b2b=is_b2b,
                     mode=self.parser.get_qso_mode(qso),

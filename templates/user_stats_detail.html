@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ callsign }} {% trans "Statistics" %} - BOTA Project{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'public_stats' %}">{% trans "Statistics" %}</a></li>
+            <li class="breadcrumb-item active">{{ callsign }}</li>
+        </ol>
+    </nav>
+
+    {% if user_obj %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="bi bi-person-badge"></i> {{ callsign }}</h1>
+            <p class="lead">{% trans "User Statistics" %}</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="bi bi-broadcast"></i> {% trans "Activator Statistics" %}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>{% trans "Total QSOs:" %}</strong> {{ stats.total_activator_qso|default:0 }}</p>
+                    <p><strong>{% trans "Unique Bunkers Activated:" %}</strong> {{ stats.unique_activations|default:0 }}</p>
+                    <p><strong>{% trans "B2B QSOs:" %}</strong> {{ stats.activator_b2b_qso|default:0 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="bi bi-binoculars"></i> {% trans "Hunter Statistics" %}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>{% trans "Total QSOs:" %}</strong> {{ stats.total_hunter_qso|default:0 }}</p>
+                    <p><strong>{% trans "Unique Bunkers Hunted:" %}</strong> {{ stats.unique_hunts|default:0 }}</p>
+                    <p><strong>{% trans "B2B QSOs:" %}</strong> {{ stats.hunter_b2b_qso|default:0 }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activations with Portable Callsigns -->
+    {% if activations_detail %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-list-check"></i> {% trans "Activation Details" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>{% trans "Bunker" %}</th>
+                                    <th>{% trans "Callsign Used" %}</th>
+                                    <th class="text-end">{% trans "QSOs" %}</th>
+                                    <th>{% trans "Date" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for act in activations_detail %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'bunker_detail' act.bunker__id %}">
+                                            {{ act.bunker__reference_number }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if act.activator_callsign and act.activator_callsign != callsign %}
+                                            <span class="badge bg-info">{{ act.activator_callsign }}</span>
+                                        {% else %}
+                                            {{ callsign }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">{{ act.qso_count }}</td>
+                                    <td>{{ act.activation_date|date:"Y-m-d" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle"></i>
+        {% trans "User not found. Please check the callsign and try again." %}
+    </div>
+    <a href="{% url 'public_stats' %}" class="btn btn-primary">
+        <i class="bi bi-arrow-left"></i> {% trans "Back to Statistics" %}
+    </a>
+    {% endif %}
+</div>
+{% endblock %}

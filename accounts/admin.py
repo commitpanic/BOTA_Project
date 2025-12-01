@@ -332,7 +332,6 @@ class PointsTransactionAdmin(admin.ModelAdmin):
         'points_breakdown',
         'total_points_colored',
         'activation_log_link',
-        'batch_link',
         'is_reversed'
     )
     list_filter = (
@@ -485,13 +484,7 @@ class PointsTransactionAdmin(admin.ModelAdmin):
         return '-'
     activation_log_link.short_description = _('QSO Log')
     
-    def batch_link(self, obj):
-        """Link to batch"""
-        if obj.batch:
-            url = reverse('admin:accounts_pointstransactionbatch_change', args=[obj.batch.id])
-            return format_html('<a href="{}">Batch #{}</a>', url, obj.batch.id)
-        return '-'
-    batch_link.short_description = _('Batch')
+
     
     def reverse_selected_transactions(self, request, queryset):
         """Admin action to reverse selected transactions"""

@@ -3,6 +3,39 @@
 
 {% block title %}{% trans "Manage Bunker Requests" %} - BOTA{% endblock %}
 
+{% block extra_css %}
+<style>
+    .nav-tabs .nav-link {
+        color: #212529 !important;
+    }
+    .nav-tabs .nav-link.active {
+        color: #0d6efd !important;
+    }
+    
+    .request-card {
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    
+    .request-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .badge-status {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .filter-controls {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="row">
@@ -17,136 +50,122 @@
                     <a class="nav-link {% if status_filter == 'pending' %}active{% endif %}" 
                        href="?status=pending">
                         <i class="bi bi-clock-history"></i> {% trans "Pending" %}
+                        <span class="badge bg-warning text-dark ms-1">{{ pending_count }}</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if status_filter == 'approved' %}active{% endif %}" 
                        href="?status=approved">
                         <i class="bi bi-check-circle"></i> {% trans "Approved" %}
+                        <span class="badge bg-success ms-1">{{ approved_count }}</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if status_filter == 'rejected' %}active{% endif %}" 
                        href="?status=rejected">
                         <i class="bi bi-x-circle"></i> {% trans "Rejected" %}
+                        <span class="badge bg-danger ms-1">{{ rejected_count }}</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if not status_filter %}active{% endif %}" 
                        href="?status=">
                         <i class="bi bi-list"></i> {% trans "All" %}
+                        <span class="badge bg-secondary ms-1">{{ total_count }}</span>
                     </a>
                 </li>
             </ul>
+            
+            <!-- Search and Filter Controls -->
+            <div class="filter-controls">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="searchInput" 
+                                   placeholder="{% trans 'Search by reference, name, or callsign...' %}">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="sortBy">
+                            <option value="date-desc">{% trans "Newest first" %}</option>
+                            <option value="date-asc">{% trans "Oldest first" %}</option>
+                            <option value="reference">{% trans "By reference" %}</option>
+                            <option value="name">{% trans "By name" %}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="typeFilter">
+                            <option value="">{% trans "All types" %}</option>
+                            {% for type in bunker_types %}
+                                <option value="{{ type }}">{{ type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
 
             {% if requests %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>{% trans "Reference" %}</th>
-                                <th>{% trans "Name" %}</th>
-                                <th>{% trans "Type" %}</th>
-                                <th>{% trans "Location" %}</th>
-                                <th>{% trans "Requested By" %}</th>
-                                <th>{% trans "Date" %}</th>
-                                <th>{% trans "Status" %}</th>
-                                <th>{% trans "Actions" %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for req in requests %}
-                            <tr>
-                                <td>
-                                    <strong>{{ req.reference_number }}</strong>
-                                </td>
-                                <td>{{ req.name }}</td>
-                                <td>
-                                    <span class="badge bg-secondary">{{ req.bunker_type|default:"-" }}</span>
-                                </td>
-                                <td>
-                                    <small>
-                                        <i class="bi bi-geo-alt"></i>
-                                        {{ req.latitude|floatformat:4 }}, {{ req.longitude|floatformat:4 }}
-                                        {% if req.locator %}
-                                            <br>
-                                            <span class="text-muted">{{ req.locator }}</span>
-                                        {% endif %}
-                                    </small>
-                                </td>
-                                <td>
-                                    <a href="{% url 'profile' %}?user={{ req.requested_by.id }}" class="text-decoration-none">
-                                        {{ req.requested_by.callsign }}
-                                    </a>
-                                </td>
-                                <td>
-                                    <small>{{ req.created_at|date:"Y-m-d H:i" }}</small>
-                                </td>
-                                <td>
+                <!-- Cards View -->
+                <div class="row" id="requestsContainer">
+                    {% for req in requests %}
+                    <div class="col-md-6 col-lg-4 mb-3 request-item" 
+                         data-reference="{{ req.reference_number }}"
+                         data-name="{{ req.name }}"
+                         data-callsign="{{ req.requested_by.callsign }}"
+                         data-type="{{ req.bunker_type|default:'' }}"
+                         data-date="{{ req.created_at.isoformat }}">
+                        <div class="card request-card h-100" 
+                             onclick="showRequestModal('{{ req.id }}')">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title mb-0">{{ req.reference_number }}</h5>
                                     {% if req.status == 'pending' %}
-                                        <span class="badge bg-warning text-dark">
+                                        <span class="badge badge-status bg-warning text-dark">
                                             <i class="bi bi-clock-history"></i> {% trans "Pending" %}
                                         </span>
                                     {% elif req.status == 'approved' %}
-                                        <span class="badge bg-success">
+                                        <span class="badge badge-status bg-success">
                                             <i class="bi bi-check-circle"></i> {% trans "Approved" %}
                                         </span>
                                     {% elif req.status == 'rejected' %}
-                                        <span class="badge bg-danger">
+                                        <span class="badge badge-status bg-danger">
                                             <i class="bi bi-x-circle"></i> {% trans "Rejected" %}
                                         </span>
                                     {% endif %}
-                                </td>
-                                <td>
-                                    {% if req.status == 'pending' %}
-                                        <div class="btn-group btn-group-sm" role="group">
-                                            <!-- Details Modal Button -->
-                                            <button type="button" class="btn btn-info" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#detailsModal{{ req.id }}">
-                                                <i class="bi bi-eye"></i>
-                                            </button>
-                                            
-                                            <!-- Approve Form -->
-                                            <form method="post" action="{% url 'approve_bunker_request' req.id %}" 
-                                                  style="display: inline;">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-success" 
-                                                        onclick="return confirm('{% trans "Approve this bunker request?" %}');">
-                                                    <i class="bi bi-check-lg"></i>
-                                                </button>
-                                            </form>
-                                            
-                                            <!-- Reject Button -->
-                                            <a href="{% url 'reject_bunker_request' req.id %}" 
-                                               class="btn btn-danger">
-                                                <i class="bi bi-x-lg"></i>
-                                            </a>
-                                        </div>
-                                    {% elif req.status == 'approved' %}
-                                        {% if req.bunker %}
-                                            <a href="{% url 'bunker_detail' req.bunker.reference_number %}" 
-                                               class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-eye"></i> {% trans "View Bunker" %}
-                                            </a>
-                                        {% endif %}
-                                        <button type="button" class="btn btn-sm btn-info" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#detailsModal{{ req.id }}">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                    {% elif req.status == 'rejected' %}
-                                        <button type="button" class="btn btn-sm btn-info" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#detailsModal{{ req.id }}">
-                                            <i class="bi bi-eye"></i> {% trans "Details" %}
-                                        </button>
+                                </div>
+                                
+                                <h6 class="card-subtitle mb-2 text-muted">{{ req.name }}</h6>
+                                
+                                <div class="mb-2">
+                                    {% if req.bunker_type %}
+                                        <span class="badge bg-secondary">{{ req.bunker_type }}</span>
                                     {% endif %}
-                                </td>
-                            </tr>
-                            
-                            <!-- Details Modal -->
-                            <div class="modal fade" id="detailsModal{{ req.id }}" tabindex="-1" 
+                                </div>
+                                
+                                <p class="card-text small mb-2">
+                                    <i class="bi bi-person"></i> {{ req.requested_by.callsign }}<br>
+                                    <i class="bi bi-calendar"></i> {{ req.created_at|date:"Y-m-d H:i" }}<br>
+                                    <i class="bi bi-geo-alt"></i> {{ req.latitude|floatformat:4 }}, {{ req.longitude|floatformat:4 }}
+                                </p>
+                                
+                                {% if req.photo_url %}
+                                    <img src="{{ req.photo_url }}" alt="{{ req.name }}" 
+                                         class="img-fluid rounded mt-2" style="max-height: 150px; object-fit: cover; width: 100%;">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div id="noResults" class="alert alert-info" style="display: none;">
+                    <i class="bi bi-info-circle"></i> {% trans "No requests match your search criteria." %}
+                </div>
+                
+                <!-- Modals for each request -->
+                {% for req in requests %}
+                <div class="modal fade" id="detailsModal{{ req.id }}" tabindex="-1" 
                                  aria-labelledby="detailsModalLabel{{ req.id }}" aria-hidden="true">
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
@@ -164,7 +183,7 @@
                                                     <table class="table table-sm">
                                                         <tr>
                                                             <th>{% trans "Reference" %}:</th>
-                                                            <td>{{ req.reference_number }}</td>
+                                                            <td><strong>{{ req.reference_number }}</strong></td>
                                                         </tr>
                                                         <tr>
                                                             <th>{% trans "Name" %}:</th>
@@ -172,11 +191,40 @@
                                                         </tr>
                                                         <tr>
                                                             <th>{% trans "Type" %}:</th>
-                                                            <td>{{ req.bunker_type|default:"-" }}</td>
+                                                            <td>
+                                                                {% if req.bunker_type %}
+                                                                    <span class="badge bg-secondary">{{ req.bunker_type }}</span>
+                                                                {% else %}
+                                                                    -
+                                                                {% endif %}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>{% trans "Status" %}:</th>
+                                                            <td>
+                                                                {% if req.status == 'pending' %}
+                                                                    <span class="badge bg-warning text-dark">
+                                                                        <i class="bi bi-clock-history"></i> {% trans "Pending" %}
+                                                                    </span>
+                                                                {% elif req.status == 'approved' %}
+                                                                    <span class="badge bg-success">
+                                                                        <i class="bi bi-check-circle"></i> {% trans "Approved" %}
+                                                                    </span>
+                                                                {% elif req.status == 'rejected' %}
+                                                                    <span class="badge bg-danger">
+                                                                        <i class="bi bi-x-circle"></i> {% trans "Rejected" %}
+                                                                    </span>
+                                                                {% endif %}
+                                                            </td>
                                                         </tr>
                                                         <tr>
                                                             <th>{% trans "Requested By" %}:</th>
-                                                            <td>{{ req.requested_by.callsign }}</td>
+                                                            <td>
+                                                                <a href="{% url 'profile' %}?user={{ req.requested_by.id }}" 
+                                                                   class="text-decoration-none">
+                                                                    {{ req.requested_by.callsign }}
+                                                                </a>
+                                                            </td>
                                                         </tr>
                                                         <tr>
                                                             <th>{% trans "Date" %}:</th>
@@ -200,40 +248,55 @@
                                                             <td>{{ req.locator|default:"-" }}</td>
                                                         </tr>
                                                     </table>
+                                                    
+                                                    <!-- Mini map -->
+                                                    <div id="miniMap{{ req.id }}" style="height: 200px; border-radius: 0.5rem;" class="mt-2"></div>
                                                 </div>
                                             </div>
                                             
                                             {% if req.description %}
                                             <h6 class="mt-3">{% trans "Description" %}</h6>
-                                            <p>{{ req.description }}</p>
+                                            <p class="border p-2 rounded bg-light">{{ req.description }}</p>
                                             {% endif %}
                                             
                                             {% if req.photo_url %}
                                             <h6 class="mt-3">{% trans "Photo" %}</h6>
-                                            <img src="{{ req.photo_url }}" alt="{{ req.name }}" 
-                                                 class="img-fluid rounded" style="max-height: 300px;">
+                                            <div class="text-center">
+                                                <img src="{{ req.photo_url }}" alt="{{ req.name }}" 
+                                                     class="img-fluid rounded" style="max-height: 400px;">
+                                            </div>
                                             {% endif %}
                                             
                                             {% if req.additional_info %}
                                             <h6 class="mt-3">{% trans "Additional Information" %}</h6>
-                                            <p>{{ req.additional_info }}</p>
+                                            <p class="border p-2 rounded bg-light">{{ req.additional_info }}</p>
                                             {% endif %}
                                             
                                             {% if req.status == 'rejected' and req.rejection_reason %}
                                             <div class="alert alert-danger mt-3">
-                                                <h6>{% trans "Rejection Reason" %}</h6>
+                                                <h6><i class="bi bi-exclamation-triangle"></i> {% trans "Rejection Reason" %}</h6>
                                                 <p class="mb-0">{{ req.rejection_reason }}</p>
                                             </div>
                                             {% endif %}
                                             
                                             {% if req.reviewed_by %}
-                                            <div class="mt-3">
+                                            <div class="mt-3 p-2 bg-light rounded">
                                                 <small class="text-muted">
-                                                    {% trans "Reviewed by" %}: {{ req.reviewed_by.callsign }} 
+                                                    <i class="bi bi-person-check"></i>
+                                                    {% trans "Reviewed by" %}: <strong>{{ req.reviewed_by.callsign }}</strong>
                                                     {% if req.reviewed_at %}
                                                         {% trans "on" %} {{ req.reviewed_at|date:"Y-m-d H:i" }}
                                                     {% endif %}
                                                 </small>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if req.status == 'approved' and req.bunker %}
+                                            <div class="mt-3">
+                                                <a href="{% url 'bunker_detail' req.bunker.reference_number %}" 
+                                                   class="btn btn-primary w-100">
+                                                    <i class="bi bi-eye"></i> {% trans "View Bunker" %}
+                                                </a>
                                             </div>
                                             {% endif %}
                                         </div>
@@ -259,10 +322,103 @@
                                     </div>
                                 </div>
                             </div>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                {% endfor %}
+                
+                <script>
+                    // Search and filter functionality
+                    const searchInput = document.getElementById('searchInput');
+                    const sortBy = document.getElementById('sortBy');
+                    const typeFilter = document.getElementById('typeFilter');
+                    const requestsContainer = document.getElementById('requestsContainer');
+                    const noResults = document.getElementById('noResults');
+                    
+                    function filterAndSort() {
+                        const searchTerm = searchInput.value.toLowerCase();
+                        const sortValue = sortBy.value;
+                        const typeValue = typeFilter.value.toLowerCase();
+                        
+                        let items = Array.from(document.querySelectorAll('.request-item'));
+                        let visibleCount = 0;
+                        
+                        // Filter
+                        items.forEach(item => {
+                            const reference = item.dataset.reference.toLowerCase();
+                            const name = item.dataset.name.toLowerCase();
+                            const callsign = item.dataset.callsign.toLowerCase();
+                            const type = item.dataset.type.toLowerCase();
+                            
+                            const matchesSearch = reference.includes(searchTerm) || 
+                                                 name.includes(searchTerm) || 
+                                                 callsign.includes(searchTerm);
+                            const matchesType = !typeValue || type === typeValue;
+                            
+                            if (matchesSearch && matchesType) {
+                                item.style.display = '';
+                                visibleCount++;
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        });
+                        
+                        // Sort visible items
+                        const visibleItems = items.filter(item => item.style.display !== 'none');
+                        visibleItems.sort((a, b) => {
+                            switch(sortValue) {
+                                case 'date-desc':
+                                    return new Date(b.dataset.date) - new Date(a.dataset.date);
+                                case 'date-asc':
+                                    return new Date(a.dataset.date) - new Date(b.dataset.date);
+                                case 'reference':
+                                    return a.dataset.reference.localeCompare(b.dataset.reference);
+                                case 'name':
+                                    return a.dataset.name.localeCompare(b.dataset.name);
+                            }
+                        });
+                        
+                        // Reorder DOM
+                        visibleItems.forEach(item => requestsContainer.appendChild(item));
+                        
+                        // Show/hide no results message
+                        if (visibleCount === 0) {
+                            noResults.style.display = '';
+                        } else {
+                            noResults.style.display = 'none';
+                        }
+                    }
+                    
+                    searchInput.addEventListener('input', filterAndSort);
+                    sortBy.addEventListener('change', filterAndSort);
+                    typeFilter.addEventListener('change', filterAndSort);
+                    
+                    // Modal functionality
+                    function showRequestModal(requestId) {
+                        const modal = new bootstrap.Modal(document.getElementById('detailsModal' + requestId));
+                        modal.show();
+                        
+                        // Initialize map when modal is shown
+                        document.getElementById('detailsModal' + requestId).addEventListener('shown.bs.modal', function() {
+                            initMiniMap(requestId);
+                        }, { once: true });
+                    }
+                    
+                    // Initialize mini maps
+                    function initMiniMap(requestId) {
+                        const mapElement = document.getElementById('miniMap' + requestId);
+                        if (!mapElement || mapElement.dataset.initialized) return;
+                        
+                        const lat = parseFloat(mapElement.closest('.modal-body').querySelector('tr:has(th:contains("Latitude")) td').textContent);
+                        const lng = parseFloat(mapElement.closest('.modal-body').querySelector('tr:has(th:contains("Longitude")) td').textContent);
+                        
+                        if (lat && lng) {
+                            const map = L.map('miniMap' + requestId).setView([lat, lng], 13);
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '© OpenStreetMap contributors'
+                            }).addTo(map);
+                            L.marker([lat, lng]).addTo(map);
+                            mapElement.dataset.initialized = 'true';
+                        }
+                    }
+                </script>
             {% else %}
                 <div class="alert alert-info">
                     <i class="bi bi-info-circle"></i>

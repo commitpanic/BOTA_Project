@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Suggest Bunker Correction" %} - BOTA Project{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'bunker_list' %}">{% trans "Bunkers" %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'bunker_detail' bunker.id %}">{{ bunker.reference_number }}</a></li>
+            <li class="breadcrumb-item active">{% trans "Suggest Correction" %}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h3><i class="bi bi-pencil-square"></i> {% trans "Suggest Bunker Correction" %}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        {% trans "You are suggesting corrections for" %}: <strong>{{ bunker.reference_number }} - {{ bunker.name_en }}</strong><br>
+                        {% trans "Only fill in the fields you want to change. Leave others empty." %}
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <h5 class="mt-3">{% trans "Current Information" %}</h5>
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <p><strong>{% trans "Name (Polish):" %}</strong> {{ bunker.name_pl }}</p>
+                                <p><strong>{% trans "Name (English):" %}</strong> {{ bunker.name_en }}</p>
+                                <p><strong>{% trans "Category:" %}</strong> {{ bunker.category.name_en }}</p>
+                                <p><strong>{% trans "Coordinates:" %}</strong> {{ bunker.latitude }}, {{ bunker.longitude }}</p>
+                            </div>
+                        </div>
+
+                        <h5 class="mt-4">{% trans "Proposed Changes" %}</h5>
+                        
+                        <div class="mb-3">
+                            <label for="id_new_name_pl" class="form-label">{% trans "New Name (Polish)" %}</label>
+                            {{ form.new_name_pl }}
+                            <small class="form-text text-muted">{% trans "Leave empty if no change needed" %}</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_new_name_en" class="form-label">{% trans "New Name (English)" %}</label>
+                            {{ form.new_name_en }}
+                            <small class="form-text text-muted">{% trans "Leave empty if no change needed" %}</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_new_description_pl" class="form-label">{% trans "New Description (Polish)" %}</label>
+                            {{ form.new_description_pl }}
+                            <small class="form-text text-muted">{% trans "Leave empty if no change needed" %}</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_new_description_en" class="form-label">{% trans "New Description (English)" %}</label>
+                            {{ form.new_description_en }}
+                            <small class="form-text text-muted">{% trans "Leave empty if no change needed" %}</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_new_latitude" class="form-label">{% trans "New Latitude" %}</label>
+                                    {{ form.new_latitude }}
+                                    <small class="form-text text-muted">{% trans "Poland: 49-55°N" %}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_new_longitude" class="form-label">{% trans "New Longitude" %}</label>
+                                    {{ form.new_longitude }}
+                                    <small class="form-text text-muted">{% trans "Poland: 14-24°E" %}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_new_category" class="form-label">{% trans "New Category" %}</label>
+                            {{ form.new_category }}
+                            <small class="form-text text-muted">{% trans "Leave empty if no change needed" %}</small>
+                        </div>
+
+                        <h5 class="mt-4">{% trans "Explanation" %} <span class="text-danger">*</span></h5>
+                        
+                        <div class="mb-3">
+                            <label for="id_correction_reason" class="form-label">{% trans "Correction Reason" %} <span class="text-danger">*</span></label>
+                            {{ form.correction_reason }}
+                            <small class="form-text text-muted">{% trans "Explain why this correction is needed (required)" %}</small>
+                            {% if form.correction_reason.errors %}
+                                <div class="text-danger">{{ form.correction_reason.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_additional_info" class="form-label">{% trans "Additional Information" %}</label>
+                            {{ form.additional_info }}
+                            <small class="form-text text-muted">{% trans "Any additional information or evidence (optional)" %}</small>
+                        </div>
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'bunker_detail' bunker.id %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-send"></i> {% trans "Submit Correction" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-info-circle"></i> {% trans "Guidelines" %}</h5>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>{% trans "Only fill in fields that need correction" %}</li>
+                        <li>{% trans "Provide clear explanation for changes" %}</li>
+                        <li>{% trans "Coordinates must be within Poland" %}</li>
+                        <li>{% trans "Your request will be reviewed by administrators" %}</li>
+                        <li>{% trans "You will be notified when reviewed" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

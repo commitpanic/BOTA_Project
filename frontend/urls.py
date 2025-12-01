@@ -55,8 +55,13 @@ urlpatterns = [
     path('cookies/', views.cookie_policy, name='cookie_policy'),
     path('terms/', views.terms_of_service, name='terms_of_service'),
     
+    # Statistics
+    path('statistics/', views.public_stats, name='public_stats'),
+    path('statistics/user/', views.user_stats_search, name='user_stats_search'),
+    
     # Bunker views
     path('bunkers/', bunker_views.bunker_list, name='bunker_list'),
+    path('bunkers/<int:bunker_id>/correction/', bunker_views.bunker_correction_request, name='bunker_correction_request'),
     path('bunkers/<path:reference>/', bunker_views.bunker_detail, name='bunker_detail'),
     path('bunkers-request/', bunker_views.request_bunker, name='request_bunker'),
     path('my-bunker-requests/', bunker_views.my_bunker_requests, name='my_bunker_requests'),

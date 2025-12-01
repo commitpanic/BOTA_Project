@@ -243,7 +243,11 @@
                             <label for="bunker_reference" class="form-label">
                                 {% trans "Bunker Reference" %} ({% trans "optional" %})
                             </label>
-                            <input type="text" class="form-control" id="bunker_reference" name="bunker_reference" maxlength="20" placeholder="B/SP-0001">
+                            <input type="text" class="form-control" id="bunker_reference" name="bunker_reference" maxlength="20" placeholder="B/SP-0001" list="bunkerList" autocomplete="off">
+                            <datalist id="bunkerList"></datalist>
+                            <small class="form-text text-muted">
+                                {% trans "Start typing to search bunkers" %}
+                            </small>
                         </div>
                         <div class="col-md-6">
                             <label for="comment" class="form-label">
@@ -743,8 +747,16 @@
     document.getElementById('spotForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        // Pause auto-refresh during submission
+        const wasAutoRefreshEnabled = !isPaused;
+        if (wasAutoRefreshEnabled) {
+            isPaused = true;
+        }
+        
         const formData = new FormData(this);
         const resultDiv = document.getElementById('spotResult');
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
         
         try {
             const response = await fetch(window.location.pathname, {
@@ -783,6 +795,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 `;
+                submitButton.disabled = false;
+                
+                // Resume auto-refresh if it was enabled
+                if (wasAutoRefreshEnabled) {
+                    startAutoRefresh();
+                }
             }
         } catch (error) {
             resultDiv.innerHTML = `
@@ -791,12 +809,94 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `;
+            submitButton.disabled = false;
+            
+            // Resume auto-refresh if it was enabled
+            if (wasAutoRefreshEnabled) {
+                startAutoRefresh();
+            }
         }
     });
     
-    // Clear result message when modal is opened
+    // Clear result message when modal is opened and pause refresh
     document.getElementById('spotModal').addEventListener('show.bs.modal', function() {
         document.getElementById('spotResult').innerHTML = '';
+        document.getElementById('bunker_reference').value = '';
+        loadBunkerList();
+        
+        // Pause auto-refresh when modal opens
+        if (!isPaused) {
+            isPaused = true;
+            const pauseIcon = document.getElementById('pauseIcon');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const refreshIcon = document.getElementById('refreshIcon');
+            
+            pauseIcon.className = 'bi bi-play-fill';
+            pauseBtn.classList.remove('btn-outline-primary');
+            pauseBtn.classList.add('btn-warning');
+            refreshIcon.style.opacity = '0.5';
+        }
+    });
+    
+    // Load bunker list for autocomplete
+    let bunkerListCache = [];
+    
+    async function loadBunkerList() {
+        if (bunkerListCache.length > 0) {
+            return; // Already loaded
+        }
+        
+        try {
+            const response = await fetch('/api/bunkers/?limit=1000');
+            const data = await response.json();
+            
+            if (data.results) {
+                bunkerListCache = data.results;
+                updateBunkerDatalist();
+            }
+        } catch (error) {
+            console.error('Error loading bunker list:', error);
+        }
+    }
+    
+    function updateBunkerDatalist() {
+        const datalist = document.getElementById('bunkerList');
+        datalist.innerHTML = '';
+        
+        bunkerListCache.forEach(bunker => {
+            const option = document.createElement('option');
+            option.value = bunker.reference_number;
+            // Use label attribute to show full text in dropdown
+            option.setAttribute('label', `${bunker.reference_number} - ${bunker.name_en}`);
+            datalist.appendChild(option);
+        });
+    }
+    
+    // Filter bunker list as user types
+    document.getElementById('bunker_reference').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toUpperCase();
+        
+        if (searchTerm.length < 2) {
+            updateBunkerDatalist();
+            return;
+        }
+        
+        const datalist = document.getElementById('bunkerList');
+        datalist.innerHTML = '';
+        
+        const filtered = bunkerListCache.filter(bunker => 
+            bunker.reference_number.toUpperCase().includes(searchTerm) || 
+            bunker.name_en.toUpperCase().includes(searchTerm) ||
+            (bunker.name_pl && bunker.name_pl.toUpperCase().includes(searchTerm))
+        );
+        
+        filtered.slice(0, 20).forEach(bunker => {
+            const option = document.createElement('option');
+            option.value = bunker.reference_number;
+            // Use label attribute to show full text in dropdown
+            option.setAttribute('label', `${bunker.reference_number} - ${bunker.name_en}`);
+            datalist.appendChild(option);
+        });
     });
     
     // Respot button handler
@@ -817,6 +917,19 @@
             
             // Clear result message
             document.getElementById('respotResult').innerHTML = '';
+            
+            // Pause auto-refresh when modal opens
+            if (!isPaused) {
+                isPaused = true;
+                const pauseIcon = document.getElementById('pauseIcon');
+                const pauseBtn = document.getElementById('pauseBtn');
+                const refreshIcon = document.getElementById('refreshIcon');
+                
+                pauseIcon.className = 'bi bi-play-fill';
+                pauseBtn.classList.remove('btn-outline-primary');
+                pauseBtn.classList.add('btn-warning');
+                refreshIcon.style.opacity = '0.5';
+            }
             
             // Show modal
             const respotModal = new bootstrap.Modal(document.getElementById('respotModal'));

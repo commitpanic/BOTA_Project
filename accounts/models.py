@@ -115,6 +115,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         """Return the callsign as the short name."""
         return self.callsign
+    
+    def save(self, *args, **kwargs):
+        """Override save to normalize callsign to uppercase"""
+        if self.callsign:
+            self.callsign = self.callsign.upper().strip()
+        super().save(*args, **kwargs)
 
 
 class UserStatistics(models.Model):

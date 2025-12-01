@@ -110,14 +110,25 @@ def request_bunker(request):
     """
     if request.method == 'POST':
         try:
+            latitude = Decimal(request.POST.get('latitude'))
+            longitude = Decimal(request.POST.get('longitude'))
+            
+            # Validate coordinates are within Poland
+            # Poland approximate bounds: 49-55°N, 14-24°E
+            if not (Decimal('49') <= latitude <= Decimal('55')):
+                messages.error(request, _('Latitude must be within Poland (49-55°N)'))
+                return render(request, 'bunkers/request.html')
+            
+            if not (Decimal('14') <= longitude <= Decimal('24')):
+                messages.error(request, _('Longitude must be within Poland (14-24°E)'))
+                return render(request, 'bunkers/request.html')
+            
             bunker_request = BunkerRequest.objects.create(
                 name=request.POST.get('name'),
                 description=request.POST.get('description', ''),
                 bunker_type=request.POST.get('bunker_type', ''),
-                latitude=Decimal(request.POST.get('latitude')),
-                longitude=Decimal(request.POST.get('longitude')),
-                locator=request.POST.get('locator', ''),
-                photo_url=request.POST.get('photo_url', ''),
+                latitude=latitude,
+                longitude=longitude,
                 additional_info=request.POST.get('additional_info', ''),
                 requested_by=request.user,
                 status='pending'
@@ -166,9 +177,27 @@ def manage_bunker_requests(request):
     
     requests_list = requests_list.order_by('-created_at')
     
+    # Get counts for badges
+    total_count = BunkerRequest.objects.count()
+    pending_count = BunkerRequest.objects.filter(status='pending').count()
+    approved_count = BunkerRequest.objects.filter(status='approved').count()
+    rejected_count = BunkerRequest.objects.filter(status='rejected').count()
+    
+    # Get unique bunker types for filter
+    bunker_types = BunkerRequest.objects.exclude(
+        bunker_type__isnull=True
+    ).exclude(
+        bunker_type=''
+    ).values_list('bunker_type', flat=True).distinct().order_by('bunker_type')
+    
     context = {
         'requests': requests_list,
         'status_filter': status_filter,
+        'total_count': total_count,
+        'pending_count': pending_count,
+        'approved_count': approved_count,
+        'rejected_count': rejected_count,
+        'bunker_types': bunker_types,
     }
     return render(request, 'bunkers/manage_requests.html', context)
 
@@ -286,15 +315,78 @@ def bunker_detail(request, reference):
     
     # Get activation statistics for this bunker
     from activations.models import ActivationLog
-    activation_count = ActivationLog.objects.filter(bunker=bunker).count()
+    from django.db.models import Count
+    from django.db.models.functions import TruncDate
+    
+    # Count unique activation sessions (unique combinations of activator + date)
+    activation_count = (
+        ActivationLog.objects
+        .filter(bunker=bunker)
+        .annotate(date_only=TruncDate('activation_date'))
+        .values('activator', 'date_only')
+        .distinct()
+        .count()
+    )
+    
+    # Count unique activators
     unique_activators = ActivationLog.objects.filter(bunker=bunker).values('activator').distinct().count()
+    
+    # Total QSOs for reference
+    total_qsos = ActivationLog.objects.filter(bunker=bunker).count()
+    
+    # Get activator details with portable callsigns
+    activator_details = (
+        ActivationLog.objects
+        .filter(bunker=bunker)
+        .values('activator__callsign', 'activator_callsign')
+        .annotate(
+            qso_count=Count('id'),
+            session_count=Count('activation_date', distinct=True)
+        )
+        .order_by('-qso_count')
+    )
     
     context = {
         'bunker': bunker,
         'activation_count': activation_count,
         'unique_activators': unique_activators,
+        'total_qsos': total_qsos,
+        'activator_details': activator_details,
     }
     return render(request, 'bunkers/detail.html', context)
+
+
+@login_required
+def bunker_correction_request(request, bunker_id):
+    """
+    Submit a correction request for an existing bunker
+    """
+    from bunkers.models import Bunker, BunkerCorrectionRequest
+    from bunkers.forms_correction import BunkerCorrectionRequestForm
+    
+    bunker = get_object_or_404(Bunker, id=bunker_id)
+    
+    if request.method == 'POST':
+        form = BunkerCorrectionRequestForm(request.POST)
+        if form.is_valid():
+            correction = form.save(commit=False)
+            correction.bunker = bunker
+            correction.requested_by = request.user
+            correction.save()
+            
+            messages.success(
+                request,
+                _('Your correction request has been submitted and will be reviewed by administrators.')
+            )
+            return redirect('bunker_detail', reference=bunker.id)
+    else:
+        form = BunkerCorrectionRequestForm()
+    
+    context = {
+        'form': form,
+        'bunker': bunker,
+    }
+    return render(request, 'bunkers/correction_request.html', context)
 
 
 @staff_member_required

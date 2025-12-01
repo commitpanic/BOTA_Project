@@ -37,29 +37,18 @@
                             <div class="col-md-6 mb-3">
                                 <label for="latitude" class="form-label">{% trans "Latitude" %} *</label>
                                 <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" required>
+                                <small class="form-text text-muted">{% trans "Decimal format, e.g., 52.237049" %}</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="longitude" class="form-label">{% trans "Longitude" %} *</label>
                                 <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" required>
+                                <small class="form-text text-muted">{% trans "Decimal format, e.g., 21.008804" %}</small>
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="locator" class="form-label">{% trans "Maidenhead Locator" %}</label>
-                            <input type="text" class="form-control" id="locator" name="locator" 
-                                   placeholder="JO72RI">
                         </div>
 
                         <div class="mb-3">
                             <label for="description" class="form-label">{% trans "Description" %}</label>
                             <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="photo_url" class="form-label">{% trans "Photo URL" %}</label>
-                            <input type="url" class="form-control" id="photo_url" name="photo_url" 
-                                   placeholder="https://...">
-                            <small class="form-text text-muted">{% trans "Link to photo or documentation" %}</small>
                         </div>
 
                         <div class="mb-3">

@@ -34,18 +34,23 @@
                     
                     <!-- Bunker Selection -->
                     <div class="mb-3">
-                        <label for="{{ form.bunker.id_for_label }}" class="form-label">
-                            <i class="bi bi-geo-alt"></i> {{ form.bunker.label }} *
+                        <label for="{{ form.bunker_search.id_for_label }}" class="form-label">
+                            <i class="bi bi-geo-alt"></i> {% trans "Bunker" %} *
                         </label>
+                        {{ form.bunker_search }}
+                        <datalist id="bunkerList"></datalist>
                         {{ form.bunker }}
+                        {% if form.bunker_search.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.bunker_search.errors }}
+                            </div>
+                        {% endif %}
                         {% if form.bunker.errors %}
                             <div class="invalid-feedback d-block">
                                 {{ form.bunker.errors }}
                             </div>
                         {% endif %}
-                        {% if form.bunker.help_text %}
-                            <small class="form-text text-muted">{{ form.bunker.help_text }}</small>
-                        {% endif %}
+                        <small class="form-text text-muted">{% trans "Start typing to search bunkers" %}</small>
                     </div>
 
                     <!-- Date -->
@@ -189,4 +194,116 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Bunker search autocomplete
+    let bunkerListCache = [];
+    
+    async function loadBunkerList() {
+        if (bunkerListCache.length > 0) {
+            return; // Already loaded
+        }
+        
+        try {
+            const response = await fetch('/api/bunkers/?limit=1000');
+            const data = await response.json();
+            
+            if (data.results) {
+                bunkerListCache = data.results;
+                updateBunkerDatalist();
+            }
+        } catch (error) {
+            console.error('Error loading bunker list:', error);
+        }
+    }
+    
+    function updateBunkerDatalist() {
+        const datalist = document.getElementById('bunkerList');
+        if (!datalist) return;
+        
+        datalist.innerHTML = '';
+        
+        bunkerListCache.forEach(bunker => {
+            const option = document.createElement('option');
+            option.value = `${bunker.reference_number} - ${bunker.name_pl}`;
+            option.setAttribute('label', `${bunker.reference_number} - ${bunker.name_pl}`);
+            option.setAttribute('data-bunker-id', bunker.id);
+            datalist.appendChild(option);
+        });
+    }
+    
+    // Filter bunker list as user types
+    const bunkerSearchInput = document.getElementById('id_bunker_search');
+    const bunkerHiddenInput = document.getElementById('id_bunker');
+    
+    if (bunkerSearchInput) {
+        // Function to update hidden field based on search input
+        function updateHiddenBunkerField() {
+            const selectedValue = bunkerSearchInput.value.trim();
+            
+            if (!selectedValue) {
+                bunkerHiddenInput.value = '';
+                return;
+            }
+            
+            // Find bunker by matching the display text
+            const bunker = bunkerListCache.find(b => 
+                `${b.reference_number} - ${b.name_pl}` === selectedValue
+            );
+            
+            if (bunker) {
+                bunkerHiddenInput.value = bunker.id;
+            } else {
+                // Try to find by reference number only
+                const refMatch = selectedValue.match(/^([A-Z]+\/[A-Z]+-\d+)/);
+                if (refMatch) {
+                    const reference = refMatch[1];
+                    const bunkerByRef = bunkerListCache.find(b => b.reference_number === reference);
+                    if (bunkerByRef) {
+                        bunkerHiddenInput.value = bunkerByRef.id;
+                    } else {
+                        bunkerHiddenInput.value = '';
+                    }
+                } else {
+                    bunkerHiddenInput.value = '';
+                }
+            }
+        }
+        
+        bunkerSearchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toUpperCase();
+            
+            if (searchTerm.length < 2) {
+                updateBunkerDatalist();
+                return;
+            }
+            
+            const datalist = document.getElementById('bunkerList');
+            datalist.innerHTML = '';
+            
+            const filtered = bunkerListCache.filter(bunker => 
+                bunker.reference_number.toUpperCase().includes(searchTerm) || 
+                (bunker.name_pl && bunker.name_pl.toUpperCase().includes(searchTerm)) ||
+                (bunker.name_en && bunker.name_en.toUpperCase().includes(searchTerm))
+            );
+            
+            filtered.slice(0, 50).forEach(bunker => {
+                const option = document.createElement('option');
+                option.value = `${bunker.reference_number} - ${bunker.name_pl}`;
+                option.setAttribute('label', `${bunker.reference_number} - ${bunker.name_pl}`);
+                option.setAttribute('data-bunker-id', bunker.id);
+                datalist.appendChild(option);
+            });
+        });
+        
+        // When user selects from datalist or changes the field
+        bunkerSearchInput.addEventListener('change', updateHiddenBunkerField);
+        bunkerSearchInput.addEventListener('blur', updateHiddenBunkerField);
+        
+        // Load bunker list on page load
+        loadBunkerList();
+    }
+</script>
 {% endblock %}
