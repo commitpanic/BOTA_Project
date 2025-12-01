@@ -3,6 +3,7 @@ Service for processing ADIF log imports and updating user statistics.
 Handles activator log uploads and hunter point calculations.
 """
 import hashlib
+import re
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -93,6 +94,26 @@ class LogImportService:
         # Extract key information
         bunker_ref = self.parser.extract_bunker_reference()
         activator_callsign = self.parser.extract_activator_callsign()
+        
+        # Count unique bunker references in the log
+        unique_bunker_refs = set()
+        for qso in self.parser.qsos:
+            if 'MY_SIG_INFO' in qso:
+                bunker_ref_qso = qso['MY_SIG_INFO'].strip()
+                if re.match(r'^B/[A-Z]{2}-\d{4}$', bunker_ref_qso):
+                    unique_bunker_refs.add(bunker_ref_qso)
+        
+        # Validate max 3 references per ADIF session
+        if len(unique_bunker_refs) > 3:
+            log_upload.status = 'failed'
+            log_upload.error_message = f"Too many bunker references in log ({len(unique_bunker_refs)}). Maximum 3 references per upload allowed."
+            log_upload.save()
+            return {
+                'success': False,
+                'errors': [f"Too many bunker references in log ({len(unique_bunker_refs)}). Maximum 3 references per upload allowed. Found: {', '.join(sorted(unique_bunker_refs))}"],
+                'qsos_processed': 0,
+                'hunters_updated': 0
+            }
         
         # Verify bunker exists
         try:
