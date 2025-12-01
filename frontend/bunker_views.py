@@ -110,12 +110,25 @@ def request_bunker(request):
     """
     if request.method == 'POST':
         try:
+            latitude = Decimal(request.POST.get('latitude'))
+            longitude = Decimal(request.POST.get('longitude'))
+            
+            # Validate coordinates are within Poland
+            # Poland approximate bounds: 49-55°N, 14-24°E
+            if not (Decimal('49') <= latitude <= Decimal('55')):
+                messages.error(request, _('Latitude must be within Poland (49-55°N)'))
+                return render(request, 'bunkers/request.html')
+            
+            if not (Decimal('14') <= longitude <= Decimal('24')):
+                messages.error(request, _('Longitude must be within Poland (14-24°E)'))
+                return render(request, 'bunkers/request.html')
+            
             bunker_request = BunkerRequest.objects.create(
                 name=request.POST.get('name'),
                 description=request.POST.get('description', ''),
                 bunker_type=request.POST.get('bunker_type', ''),
-                latitude=Decimal(request.POST.get('latitude')),
-                longitude=Decimal(request.POST.get('longitude')),
+                latitude=latitude,
+                longitude=longitude,
                 additional_info=request.POST.get('additional_info', ''),
                 requested_by=request.user,
                 status='pending'
