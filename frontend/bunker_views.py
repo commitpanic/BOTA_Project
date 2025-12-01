@@ -338,6 +338,39 @@ def bunker_detail(request, reference):
     return render(request, 'bunkers/detail.html', context)
 
 
+@login_required
+def bunker_correction_request(request, bunker_id):
+    """
+    Submit a correction request for an existing bunker
+    """
+    from bunkers.models import Bunker, BunkerCorrectionRequest
+    from bunkers.forms_correction import BunkerCorrectionRequestForm
+    
+    bunker = get_object_or_404(Bunker, id=bunker_id)
+    
+    if request.method == 'POST':
+        form = BunkerCorrectionRequestForm(request.POST)
+        if form.is_valid():
+            correction = form.save(commit=False)
+            correction.bunker = bunker
+            correction.requested_by = request.user
+            correction.save()
+            
+            messages.success(
+                request,
+                _('Your correction request has been submitted and will be reviewed by administrators.')
+            )
+            return redirect('bunker_detail', reference=bunker.id)
+    else:
+        form = BunkerCorrectionRequestForm()
+    
+    context = {
+        'form': form,
+        'bunker': bunker,
+    }
+    return render(request, 'bunkers/correction_request.html', context)
+
+
 @staff_member_required
 def upload_bunkers_csv(request):
     """

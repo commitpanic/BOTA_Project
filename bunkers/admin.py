@@ -7,7 +7,8 @@ from .models import (
     BunkerPhoto,
     BunkerResource,
     BunkerInspection,
-    BunkerRequest
+    BunkerRequest,
+    BunkerCorrectionRequest
 )
 
 
@@ -432,3 +433,172 @@ class BunkerRequestAdmin(admin.ModelAdmin):
         )
         self.message_user(request, f'{updated} request(s) rejected.')
     reject_requests.short_description = 'Reject selected requests'
+
+
+@admin.register(BunkerCorrectionRequest)
+class BunkerCorrectionRequestAdmin(admin.ModelAdmin):
+    """Admin configuration for BunkerCorrectionRequest"""
+    list_display = [
+        'id',
+        'bunker_link',
+        'requested_by',
+        'status_badge',
+        'created_at',
+        'has_changes_display'
+    ]
+    list_filter = ['status', 'created_at', 'reviewed_at']
+    search_fields = [
+        'bunker__reference_number',
+        'bunker__name_en',
+        'bunker__name_pl',
+        'requested_by__callsign',
+        'correction_reason'
+    ]
+    readonly_fields = [
+        'bunker',
+        'requested_by',
+        'created_at',
+        'updated_at',
+        'reviewed_by',
+        'reviewed_at',
+        'current_values_display'
+    ]
+    ordering = ['-created_at']
+    
+    fieldsets = (
+        ('Request Info', {
+            'fields': (
+                'bunker',
+                'requested_by',
+                'status',
+                'created_at',
+                'current_values_display'
+            )
+        }),
+        ('Proposed Changes', {
+            'fields': (
+                'new_name_pl',
+                'new_name_en',
+                'new_description_pl',
+                'new_description_en',
+                'new_latitude',
+                'new_longitude',
+                'new_category',
+            )
+        }),
+        ('Explanation', {
+            'fields': (
+                'correction_reason',
+                'additional_info'
+            )
+        }),
+        ('Review', {
+            'fields': (
+                'rejection_reason',
+                'reviewed_by',
+                'reviewed_at'
+            )
+        }),
+    )
+    
+    actions = ['approve_corrections', 'reject_corrections']
+    
+    def bunker_link(self, obj):
+        """Link to bunker detail page"""
+        return format_html(
+            '<a href="/admin/bunkers/bunker/{}/change/">{}</a>',
+            obj.bunker.id,
+            obj.bunker.reference_number
+        )
+    bunker_link.short_description = 'Bunker'
+    
+    def status_badge(self, obj):
+        """Display status with color badge"""
+        colors = {
+            'pending': 'warning',
+            'approved': 'success',
+            'rejected': 'danger'
+        }
+        color = colors.get(obj.status, 'secondary')
+        return format_html(
+            '<span class="badge badge-{}">{}</span>',
+            color,
+            obj.get_status_display()
+        )
+    status_badge.short_description = 'Status'
+    
+    def has_changes_display(self, obj):
+        """Show if correction has any changes"""
+        return '✓' if obj.has_changes() else '✗'
+    has_changes_display.short_description = 'Has Changes'
+    has_changes_display.boolean = True
+    
+    def current_values_display(self, obj):
+        """Display current bunker values for comparison"""
+        bunker = obj.bunker
+        html = f"""
+        <table class="table table-sm">
+            <tr><th>Field</th><th>Current Value</th></tr>
+            <tr><td>Name (PL)</td><td>{bunker.name_pl}</td></tr>
+            <tr><td>Name (EN)</td><td>{bunker.name_en}</td></tr>
+            <tr><td>Category</td><td>{bunker.category.name_en}</td></tr>
+            <tr><td>Coordinates</td><td>{bunker.latitude}, {bunker.longitude}</td></tr>
+        </table>
+        """
+        return format_html(html)
+    current_values_display.short_description = 'Current Values'
+    
+    def approve_corrections(self, request, queryset):
+        """Admin action to approve correction requests and apply changes"""
+        approved_count = 0
+        
+        for correction in queryset.filter(status='pending'):
+            try:
+                bunker = correction.bunker
+                
+                # Apply corrections
+                if correction.new_name_pl:
+                    bunker.name_pl = correction.new_name_pl
+                if correction.new_name_en:
+                    bunker.name_en = correction.new_name_en
+                if correction.new_description_pl:
+                    bunker.description_pl = correction.new_description_pl
+                if correction.new_description_en:
+                    bunker.description_en = correction.new_description_en
+                if correction.new_latitude:
+                    bunker.latitude = correction.new_latitude
+                if correction.new_longitude:
+                    bunker.longitude = correction.new_longitude
+                if correction.new_category:
+                    bunker.category = correction.new_category
+                
+                bunker.save()
+                
+                # Update correction request status
+                correction.status = 'approved'
+                correction.reviewed_by = request.user
+                correction.reviewed_at = timezone.now()
+                correction.save()
+                
+                approved_count += 1
+            except Exception as e:
+                self.message_user(
+                    request,
+                    f'Error applying correction for {correction.bunker.reference_number}: {str(e)}',
+                    level='error'
+                )
+        
+        if approved_count > 0:
+            self.message_user(request, f'{approved_count} correction(s) approved and applied.')
+    approve_corrections.short_description = 'Approve and apply corrections'
+    
+    def reject_corrections(self, request, queryset):
+        """Admin action to reject correction requests"""
+        updated = queryset.filter(status='pending').update(
+            status='rejected',
+            reviewed_by=request.user,
+            reviewed_at=timezone.now(),
+            rejection_reason='Rejected by admin'
+        )
+        self.message_user(request, f'{updated} correction(s) rejected.')
+    reject_corrections.short_description = 'Reject selected corrections'

@@ -59,6 +59,7 @@ urlpatterns = [
     path('bunkers/', bunker_views.bunker_list, name='bunker_list'),
     path('bunkers/<path:reference>/', bunker_views.bunker_detail, name='bunker_detail'),
     path('bunkers-request/', bunker_views.request_bunker, name='request_bunker'),
+    path('bunkers/<int:bunker_id>/correction/', bunker_views.bunker_correction_request, name='bunker_correction_request'),
     path('my-bunker-requests/', bunker_views.my_bunker_requests, name='my_bunker_requests'),
     
     # Staff/Admin only

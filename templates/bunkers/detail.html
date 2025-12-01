@@ -48,6 +48,13 @@
                     </p>
                     {% endlocalize %}
                 </div>
+                <div class="card-footer">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'bunker_correction_request' bunker.id %}" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil-square"></i> {% trans "Suggest Correction" %}
+                    </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
