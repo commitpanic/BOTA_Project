@@ -297,13 +297,30 @@ def bunker_detail(request, reference):
     
     # Get activation statistics for this bunker
     from activations.models import ActivationLog
-    activation_count = ActivationLog.objects.filter(bunker=bunker).count()
+    from django.db.models import Count
+    from django.db.models.functions import TruncDate
+    
+    # Count unique activation sessions (unique combinations of activator + date)
+    activation_count = (
+        ActivationLog.objects
+        .filter(bunker=bunker)
+        .annotate(date_only=TruncDate('activation_date'))
+        .values('activator', 'date_only')
+        .distinct()
+        .count()
+    )
+    
+    # Count unique activators
     unique_activators = ActivationLog.objects.filter(bunker=bunker).values('activator').distinct().count()
+    
+    # Total QSOs for reference
+    total_qsos = ActivationLog.objects.filter(bunker=bunker).count()
     
     context = {
         'bunker': bunker,
         'activation_count': activation_count,
         'unique_activators': unique_activators,
+        'total_qsos': total_qsos,
     }
     return render(request, 'bunkers/detail.html', context)
 
