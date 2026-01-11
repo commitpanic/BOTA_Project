@@ -9,7 +9,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
             <li class="breadcrumb-item"><a href="{% url 'bunker_list' %}">{% trans "Bunkers" %}</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'bunker_detail' bunker.id %}">{{ bunker.reference_number }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'bunker_detail' bunker.reference_number %}">{{ bunker.reference_number }}</a></li>
             <li class="breadcrumb-item active">{% trans "Suggest Correction" %}</li>
         </ol>
     </nav>
@@ -113,7 +113,7 @@
                         {% endif %}
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a href="{% url 'bunker_detail' bunker.id %}" class="btn btn-secondary">
+                            <a href="{% url 'bunker_detail' bunker.reference_number %}" class="btn btn-secondary">
                                 <i class="bi bi-x-circle"></i> {% trans "Cancel" %}
                             </a>
                             <button type="submit" class="btn btn-warning">

@@ -125,8 +125,8 @@ class BunkerAdmin(admin.ModelAdmin):
         lat, lon = obj.get_coordinates()
         maps_url = f"https://www.google.com/maps?q={lat},{lon}"
         return format_html(
-            '<a href="{}" target="_blank">{:.6f}, {:.6f}</a>',
-            maps_url, lat, lon
+            '<a href="{}" target="_blank">{}, {}</a>',
+            maps_url, f"{lat:.6f}", f"{lon:.6f}"
         )
     coordinates_display.short_description = 'GPS Coordinates'
     
@@ -529,7 +529,7 @@ class BunkerCorrectionRequestAdmin(admin.ModelAdmin):
     
     def has_changes_display(self, obj):
         """Show if correction has any changes"""
-        return '✓' if obj.has_changes() else '✗'
+        return obj.has_changes()
     has_changes_display.short_description = 'Has Changes'
     has_changes_display.boolean = True
     

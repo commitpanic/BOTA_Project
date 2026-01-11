@@ -378,7 +378,7 @@ def bunker_correction_request(request, bunker_id):
                 request,
                 _('Your correction request has been submitted and will be reviewed by administrators.')
             )
-            return redirect('bunker_detail', reference=bunker.id)
+            return redirect('bunker_detail', reference=bunker.reference_number)
     else:
         form = BunkerCorrectionRequestForm()
     

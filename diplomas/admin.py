@@ -366,7 +366,7 @@ class DiplomaAdmin(admin.ModelAdmin):
     def generate_pdf(self, request, queryset):
         """Generate PDF diplomas (placeholder action)"""
         count = queryset.count()
-        self.message_user(request, f"PDF generation for {count} diploma(s) would be triggered here.")
+        self.message_user(request, _("PDF generation for %(count)d diploma(s) would be triggered here.") % {'count': count})
     generate_pdf.short_description = _("Generate PDF diplomas")
 
 
@@ -506,14 +506,14 @@ class DiplomaProgressAdmin(admin.ModelAdmin):
             progress.calculate_progress()
             progress.save()
             count += 1
-        self.message_user(request, f"Progress recalculated for {count} record(s).")
+        self.message_user(request, _("Progress recalculated for %(count)d record(s).") % {'count': count})
     recalculate_progress.short_description = _("Recalculate progress")
     
     def mark_eligible(self, request, queryset):
         """Mark selected records as eligible"""
         count = queryset.filter(percentage_complete__gte=100).update(is_eligible=True)
-        self.message_user(request, f"Marked {count} record(s) as eligible.")
-    mark_eligible.short_description = _("Mark as eligible (if 100%)")
+        self.message_user(request, _("Marked %(count)d record(s) as eligible.") % {'count': count})
+    mark_eligible.short_description = _("Mark as eligible (if 100%% complete)")
 
 
 @admin.register(DiplomaVerification)
