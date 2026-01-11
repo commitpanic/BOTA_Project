@@ -3,6 +3,12 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html
 from django.urls import reverse
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.contrib.sites.shortcuts import get_current_site
 from .models import (
     User, UserStatistics, UserRole, UserRoleAssignment,
     PointsTransaction, PointsTransactionBatch
@@ -100,7 +106,7 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('email', 'callsign')
     ordering = ('-date_joined',)
     
-    actions = ['deactivate_users', 'activate_users', 'mark_as_team_member', 'unmark_as_team_member', 'promote_to_superuser', 'demote_from_superuser']
+    actions = ['deactivate_users', 'activate_users', 'mark_as_team_member', 'unmark_as_team_member', 'promote_to_superuser', 'demote_from_superuser', 'force_password_reset']
     
     fieldsets = (
         (None, {
@@ -182,6 +188,72 @@ class UserAdmin(BaseUserAdmin):
         count = queryset.update(is_superuser=False)
         self.message_user(request, _(f'{count} user(s) demoted from superuser.'))
     demote_from_superuser.short_description = _('Remove superuser status')
+    
+    def force_password_reset(self, request, queryset):
+        """Force password reset for selected users by sending reset email"""
+        success_count = 0
+        errors = []
+        
+        for user in queryset:
+            if not user.email:
+                errors.append(_('User {} has no email address').format(user.callsign))
+                continue
+            
+            try:
+                # Generate password reset token
+                token = default_token_generator.make_token(user)
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                
+                # Get current site
+                current_site = get_current_site(request)
+                site_name = current_site.name
+                domain = current_site.domain
+                protocol = 'https' if request.is_secure() else 'http'
+                
+                # Prepare email context
+                context = {
+                    'email': user.email,
+                    'domain': domain,
+                    'site_name': site_name,
+                    'uid': uid,
+                    'token': token,
+                    'user': user,
+                    'protocol': protocol,
+                    'admin_forced': True,  # Flag to indicate this was admin-forced
+                }
+                
+                # Render email
+                subject = _('Password reset request for BOTA')
+                email_body = render_to_string('password_reset_email.html', context)
+                
+                # Send email
+                send_mail(
+                    subject,
+                    email_body,
+                    None,  # Use DEFAULT_FROM_EMAIL from settings
+                    [user.email],
+                    fail_silently=False,
+                )
+                
+                success_count += 1
+                
+            except Exception as e:
+                errors.append(_('Error sending email to {}: {}').format(user.callsign, str(e)))
+        
+        # Show success message
+        if success_count > 0:
+            self.message_user(
+                request,
+                _('Password reset email sent to {} user(s).').format(success_count),
+                level='success'
+            )
+        
+        # Show error messages
+        if errors:
+            for error in errors:
+                self.message_user(request, error, level='error')
+    
+    force_password_reset.short_description = _('Force password reset (send email)')
 
 
 # UserStatistics is managed via inline in UserAdmin - no need for separate admin
@@ -603,8 +675,10 @@ class PointsTransactionBatchAdmin(admin.ModelAdmin):
     
     def total_points_display(self, obj):
         """Calculate and display total points"""
-        from django.db.models import Sum
-        total = obj.transactions.aggregate(total=Sum('total_points'))['total'] or 0
+        from django.db.models import Sum, F
+        total = obj.transactions.aggregate(
+            total=Sum(F('activator_points') + F('hunter_points') + F('b2b_points') + F('event_points') + F('diploma_points'))
+        )['total'] or 0
         if total > 0:
             return format_html('<span style="color: green; font-weight: bold;">+{}</span>', total)
         elif total < 0:
@@ -613,10 +687,9 @@ class PointsTransactionBatchAdmin(admin.ModelAdmin):
     total_points_display.short_description = _('Total Points')
     
     def log_upload_link(self, obj):
-        """Link to log upload"""
+        """Display log upload filename"""
         if obj.log_upload:
-            url = reverse('admin:activations_logupload_change', args=[obj.log_upload.id])
-            return format_html('<a href="{}">{}</a>', url, obj.log_upload.filename)
+            return obj.log_upload.filename
         return '-'
     log_upload_link.short_description = _('Log Upload')
     

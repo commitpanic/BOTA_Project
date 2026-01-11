@@ -848,7 +848,7 @@ class DiplomaProgress(models.Model):
         unique_together = ['user', 'diploma_type']
 
     def __str__(self):
-        return f"{self.user.callsign} - {self.diploma_type.name_en} ({self.percentage_complete}%)"
+        return "{} - {} ({}%%)".format(self.user.callsign, self.diploma_type.name_en, self.percentage_complete)
 
     def calculate_progress(self):
         """Calculate progress percentage based on all requirements"""

@@ -4,7 +4,7 @@ Handles activator log uploads and hunter point calculations.
 """
 import hashlib
 import re
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from typing import Dict, List
@@ -76,188 +76,204 @@ class LogImportService:
         """
         from .models import LogUpload
         
-        # Calculate file checksum for duplicate detection
-        file_checksum = hashlib.sha256(file_content.encode('utf-8')).hexdigest()
-        
-        # Check for duplicate upload
-        existing_upload = LogUpload.objects.filter(
-            file_checksum=file_checksum,
-            user=uploader_user
-        ).first()
-        
-        if existing_upload:
-            return {
-                'success': False,
-                'errors': [f'This file was already uploaded on {existing_upload.uploaded_at.strftime("%Y-%m-%d %H:%M")}'],
-                'qsos_processed': 0,
-                'hunters_updated': 0,
-                'duplicate_upload': True
-            }
-        
-        # Create LogUpload record
-        log_upload = LogUpload.objects.create(
-            user=uploader_user,
-            filename=filename or 'unknown.adi',
-            file_format='ADIF',
-            file_checksum=file_checksum,
-            status='processing'
-        )
-        self.log_upload = log_upload
-        self.transactions = []  # Reset transactions list
-        
-        # Parse ADIF file
-        self.parser = ADIFParser(file_content)
-        parse_result = self.parser.parse()
-        
-        # Validate
-        validation = self.parser.validate()
-        if not validation['valid']:
-            log_upload.status = 'failed'
-            log_upload.error_message = '; '.join(validation['errors'])
-            log_upload.save()
-            return {
-                'success': False,
-                'errors': validation['errors'],
-                'qsos_processed': 0,
-                'hunters_updated': 0
-            }
-        
-        # Extract key information
-        bunker_ref = self.parser.extract_bunker_reference()
-        activator_callsign = self.parser.extract_activator_callsign()
-        
-        # Extract base callsign (remove portable indicators)
-        base_callsign = self._extract_base_callsign(activator_callsign)
-        
-        # Count unique bunker references in the log
-        unique_bunker_refs = set()
-        for qso in self.parser.qsos:
-            if 'MY_SIG_INFO' in qso:
-                bunker_ref_qso = qso['MY_SIG_INFO'].strip()
-                if re.match(r'^B/[A-Z]{2}-\d{4}$', bunker_ref_qso):
-                    unique_bunker_refs.add(bunker_ref_qso)
-        
-        # Validate max 3 references per ADIF session
-        if len(unique_bunker_refs) > 3:
-            log_upload.status = 'failed'
-            log_upload.error_message = f"Too many bunker references in log ({len(unique_bunker_refs)}). Maximum 3 references per upload allowed."
-            log_upload.save()
-            return {
-                'success': False,
-                'errors': [f"Too many bunker references in log ({len(unique_bunker_refs)}). Maximum 3 references per upload allowed. Found: {', '.join(sorted(unique_bunker_refs))}"],
-                'qsos_processed': 0,
-                'hunters_updated': 0
-            }
-        
-        # Verify bunker exists
         try:
-            self.bunker = Bunker.objects.get(reference_number=bunker_ref)
-        except Bunker.DoesNotExist:
-            log_upload.status = 'failed'
-            log_upload.error_message = f"Bunker {bunker_ref} not found in database"
-            log_upload.save()
-            return {
-                'success': False,
-                'errors': [f"Bunker {bunker_ref} not found in database"],
-                'qsos_processed': 0,
-                'hunters_updated': 0
-            }
-        
-        # Verify activator user (use base callsign)
-        try:
-            self.activator = User.objects.get(callsign=base_callsign)
-        except User.DoesNotExist:
-            # Try case-insensitive lookup
-            try:
-                self.activator = User.objects.get(callsign__iexact=base_callsign)
-            except User.DoesNotExist:
+            # Calculate file checksum for duplicate detection
+            file_checksum = hashlib.sha256(file_content.encode('utf-8')).hexdigest()
+            
+            # Check for duplicate upload
+            existing_upload = LogUpload.objects.filter(
+                file_checksum=file_checksum,
+                user=uploader_user
+            ).first()
+            
+            if existing_upload:
+                return {
+                    'success': False,
+                    'errors': [f'This file was already uploaded on {existing_upload.uploaded_at.strftime("%Y-%m-%d %H:%M")}'],
+                    'qsos_processed': 0,
+                    'hunters_updated': 0,
+                    'duplicate_upload': True
+                }
+            
+            # Create LogUpload record
+            log_upload = LogUpload.objects.create(
+                user=uploader_user,
+                filename=filename or 'unknown.adi',
+                file_format='ADIF',
+                file_checksum=file_checksum,
+                status='processing'
+            )
+            self.log_upload = log_upload
+            self.transactions = []  # Reset transactions list
+            
+            # Parse ADIF file
+            self.parser = ADIFParser(file_content)
+            parse_result = self.parser.parse()
+            
+            # Validate
+            validation = self.parser.validate()
+            if not validation['valid']:
                 log_upload.status = 'failed'
-                log_upload.error_message = f"Activator user {base_callsign} not found"
+                log_upload.error_message = '; '.join(validation['errors'])
                 log_upload.save()
                 return {
                     'success': False,
-                    'errors': [f"Activator user {base_callsign} not found. Please register first."],
+                    'errors': validation['errors'],
                     'qsos_processed': 0,
                     'hunters_updated': 0
                 }
-        
-        # Store full callsign with portable indicators
-        self.activator_callsign_full = activator_callsign
-        
-        # Verify uploader is the activator (security check - use base callsign)
-        if uploader_user.callsign != base_callsign and not uploader_user.is_staff:
-            log_upload.status = 'failed'
-            log_upload.error_message = "Security: You can only upload logs for your own callsign"
+            
+            # Extract key information
+            bunker_ref = self.parser.extract_bunker_reference()
+            activator_callsign = self.parser.extract_activator_callsign()
+            
+            # Extract base callsign (remove portable indicators)
+            base_callsign = self._extract_base_callsign(activator_callsign)
+            
+            # Count unique bunker references in the log
+            unique_bunker_refs = set()
+            for qso in self.parser.qsos:
+                if 'MY_SIG_INFO' in qso:
+                    bunker_ref_qso = qso['MY_SIG_INFO'].strip()
+                    if re.match(r'^B/[A-Z]{2}-\d{4}$', bunker_ref_qso):
+                        unique_bunker_refs.add(bunker_ref_qso)
+            
+            # Validate max 3 references per ADIF session
+            if len(unique_bunker_refs) > 3:
+                log_upload.status = 'failed'
+                log_upload.error_message = f"Too many bunker references in log ({len(unique_bunker_refs)}). Maximum 3 references per upload allowed."
+                log_upload.save()
+                return {
+                    'success': False,
+                    'errors': [f"Too many bunker references in log ({len(unique_bunker_refs)}). Maximum 3 references per upload allowed. Found: {', '.join(sorted(unique_bunker_refs))}"],
+                    'qsos_processed': 0,
+                    'hunters_updated': 0
+                }
+            
+            # Verify bunker exists
+            try:
+                self.bunker = Bunker.objects.get(reference_number=bunker_ref)
+            except Bunker.DoesNotExist:
+                log_upload.status = 'failed'
+                log_upload.error_message = f"Bunker {bunker_ref} not found in database"
+                log_upload.save()
+                return {
+                    'success': False,
+                    'errors': [f"Bunker {bunker_ref} not found in database"],
+                    'qsos_processed': 0,
+                    'hunters_updated': 0
+                }
+            
+            # Verify activator user (use base callsign)
+            try:
+                self.activator = User.objects.get(callsign=base_callsign)
+            except User.DoesNotExist:
+                # Try case-insensitive lookup
+                try:
+                    self.activator = User.objects.get(callsign__iexact=base_callsign)
+                except User.DoesNotExist:
+                    log_upload.status = 'failed'
+                    log_upload.error_message = f"Activator user {base_callsign} not found"
+                    log_upload.save()
+                    return {
+                        'success': False,
+                        'errors': [f"Activator user {base_callsign} not found. Please register first."],
+                        'qsos_processed': 0,
+                        'hunters_updated': 0
+                    }
+            
+            # Store full callsign with portable indicators
+            self.activator_callsign_full = activator_callsign
+            
+            # Verify uploader is the activator (security check - use base callsign)
+            if uploader_user.callsign != base_callsign and not uploader_user.is_staff:
+                log_upload.status = 'failed'
+                log_upload.error_message = "Security: You can only upload logs for your own callsign"
+                log_upload.save()
+                return {
+                    'success': False,
+                    'errors': [f"You can only upload logs for your own callsign ({uploader_user.callsign})"],
+                    'qsos_processed': 0,
+                    'hunters_updated': 0
+                }
+            
+            # Process QSOs
+            qsos_processed = 0
+            qsos_duplicates = 0
+            hunters_updated = set()
+            b2b_qsos = 0
+            
+            for qso in self.parser.qsos:
+                result = self._process_qso(qso)
+                if result['success']:
+                    qsos_processed += 1
+                    if result.get('hunter_callsign'):
+                        hunters_updated.add(result['hunter_callsign'])
+                    if result.get('is_b2b'):
+                        b2b_qsos += 1
+                else:
+                    # Only add warning if there's an actual error (not duplicate)
+                    if result.get('error'):
+                        self.warnings.append(result['error'])
+                    elif result.get('duplicate'):
+                        qsos_duplicates += 1
+            
+            # Create points transaction batch for audit trail
+            if self.transactions:
+                batch = PointsService.create_batch(
+                    name=f"Log import: {filename or 'unknown.adi'}",
+                    transactions=self.transactions,
+                    log_upload=log_upload,
+                    created_by=uploader_user
+                )
+                log_upload.points_batch = batch
+            
+            # Update diploma progress for activator
+            self._update_diploma_progress(self.activator)
+            
+            # Update diploma progress for all hunters
+            for hunter_callsign in hunters_updated:
+                try:
+                    hunter = User.objects.get(callsign=hunter_callsign)
+                    self._update_diploma_progress(hunter)
+                except User.DoesNotExist:
+                    pass
+            
+            # Update LogUpload with final statistics
+            total_qsos = qsos_processed + qsos_duplicates
+            log_upload.qso_count = total_qsos
+            log_upload.processed_qso_count = qsos_processed
+            log_upload.status = 'completed'
             log_upload.save()
+        
+            return {
+                'success': True,
+                'qsos_processed': qsos_processed,
+                'qsos_duplicates': qsos_duplicates,
+                'hunters_updated': len(hunters_updated),
+                'b2b_qsos': b2b_qsos,
+                'bunker': bunker_ref,
+                'activator': activator_callsign,
+                'warnings': self.warnings,
+                'errors': [],
+                'log_upload_id': log_upload.id,
+                'batch_id': batch.id if self.transactions else None
+            }
+            
+        except Exception as e:
+            # Catch any unexpected errors to prevent atomic block issues
+            import traceback
+            error_msg = str(e)
+            traceback_str = traceback.format_exc()
+            print(f"Error in process_adif_upload: {error_msg}")
+            print(traceback_str)
+            
             return {
                 'success': False,
-                'errors': [f"You can only upload logs for your own callsign ({uploader_user.callsign})"],
+                'errors': [f'Error processing file: {error_msg}'],
                 'qsos_processed': 0,
                 'hunters_updated': 0
             }
-        
-        # Process QSOs
-        qsos_processed = 0
-        qsos_duplicates = 0
-        hunters_updated = set()
-        b2b_qsos = 0
-        
-        for qso in self.parser.qsos:
-            result = self._process_qso(qso)
-            if result['success']:
-                qsos_processed += 1
-                if result.get('hunter_callsign'):
-                    hunters_updated.add(result['hunter_callsign'])
-                if result.get('is_b2b'):
-                    b2b_qsos += 1
-            else:
-                # Only add warning if there's an actual error (not duplicate)
-                if result.get('error'):
-                    self.warnings.append(result['error'])
-                elif result.get('duplicate'):
-                    qsos_duplicates += 1
-        
-        # Create points transaction batch for audit trail
-        if self.transactions:
-            batch = PointsService.create_batch(
-                name=f"Log import: {filename or 'unknown.adi'}",
-                transactions=self.transactions,
-                log_upload=log_upload,
-                created_by=uploader_user
-            )
-            log_upload.points_batch = batch
-        
-        # Update diploma progress for activator
-        self._update_diploma_progress(self.activator)
-        
-        # Update diploma progress for all hunters
-        for hunter_callsign in hunters_updated:
-            try:
-                hunter = User.objects.get(callsign=hunter_callsign)
-                self._update_diploma_progress(hunter)
-            except User.DoesNotExist:
-                pass
-        
-        # Update LogUpload with final statistics
-        total_qsos = qsos_processed + qsos_duplicates
-        log_upload.qso_count = total_qsos
-        log_upload.processed_qso_count = qsos_processed
-        log_upload.status = 'completed'
-        log_upload.save()
-        
-        return {
-            'success': True,
-            'qsos_processed': qsos_processed,
-            'qsos_duplicates': qsos_duplicates,
-            'hunters_updated': len(hunters_updated),
-            'b2b_qsos': b2b_qsos,
-            'bunker': bunker_ref,
-            'activator': activator_callsign,
-            'warnings': self.warnings,
-            'errors': [],
-            'log_upload_id': log_upload.id,
-            'batch_id': batch.id if self.transactions else None
-        }
     
     def _process_qso(self, qso: Dict) -> Dict:
         """
@@ -295,33 +311,30 @@ class LogImportService:
             # Note: Placeholder accounts are created silently - no need to inform user
             
             # Create activation log entry (unique_together will prevent duplicates at DB level)
+            # Use savepoint to handle duplicates without breaking the entire transaction
             try:
-                log = ActivationLog.objects.create(
-                    user=hunter_user,
-                    bunker=self.bunker,
-                    activator=self.activator,
-                    activator_callsign=self.activator_callsign_full,
-                    activation_date=qso_datetime,
-                    is_b2b=is_b2b,
-                    mode=self.parser.get_qso_mode(qso),
-                    band=self.parser.get_qso_band(qso),
-                    qso_count=1,  # Each ADIF record represents 1 QSO
-                    notes=f"Imported from ADIF log",
-                    verified=True,  # Auto-verify activator-uploaded logs
-                    log_upload=self.log_upload  # Link to upload batch
-                )
-            except Exception as e:
-                # Catch IntegrityError from unique_together constraint
-                if 'UNIQUE constraint failed' in str(e) or 'duplicate key' in str(e).lower():
-                    # Silently skip duplicates
-                    return {
-                        'success': False,
-                        'error': None,
-                        'duplicate': True
-                    }
-                else:
-                    # Re-raise other exceptions
-                    raise
+                with transaction.atomic():
+                    log = ActivationLog.objects.create(
+                        user=hunter_user,
+                        bunker=self.bunker,
+                        activator=self.activator,
+                        activator_callsign=self.activator_callsign_full,
+                        activation_date=qso_datetime,
+                        is_b2b=is_b2b,
+                        mode=self.parser.get_qso_mode(qso),
+                        band=self.parser.get_qso_band(qso),
+                        qso_count=1,  # Each ADIF record represents 1 QSO
+                        notes=f"Imported from ADIF log",
+                        verified=True,  # Auto-verify activator-uploaded logs
+                        log_upload=self.log_upload  # Link to upload batch
+                    )
+            except IntegrityError:
+                # Duplicate QSO - skip silently
+                return {
+                    'success': False,
+                    'error': None,
+                    'duplicate': True
+                }
             
             # Award points to ACTIVATOR using PointsService
             activator_tx = PointsService.award_activator_points(

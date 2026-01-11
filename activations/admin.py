@@ -59,7 +59,7 @@ class ActivationLogAdmin(admin.ModelAdmin):
         """Display activation duration"""
         hours = obj.get_duration_hours()
         if hours is not None:
-            return format_html('{:.1f} hours', hours)
+            return format_html('{} hours', f"{hours:.1f}")
         return '-'
     duration_display.short_description = 'Duration'
     
