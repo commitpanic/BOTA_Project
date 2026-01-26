@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}API Documentation - BOTA{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">API Documentation</h1>
+    <p class="lead">Public REST API for accessing BOTA (Bunkers On The Air) data.</p>
+    
+    <div class="alert alert-info">
+        <strong>Base URL:</strong> <code>{{ request.scheme }}://{{ request.get_host }}/api/public/</code>
+    </div>
+
+    <h2 class="mt-5 mb-3">Endpoints</h2>
+
+    <!-- Awards -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <span class="badge bg-success">GET</span>
+                <code>/api/public/awards/</code>
+            </h4>
+        </div>
+        <div class="card-body">
+            <p>Returns a list of all awards/diplomas in the system.</p>
+            <strong>Response Example:</strong>
+            <pre class="bg-light p-3 mt-2"><code>[
+  {
+    "id": 1,
+    "name": "BOTA Basic",
+    "description": "Basic BOTA diploma",
+    "points_required": 100
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <!-- Award Types -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <span class="badge bg-success">GET</span>
+                <code>/api/public/award-types/</code>
+            </h4>
+        </div>
+        <div class="card-body">
+            <p>Returns available award/diploma types.</p>
+            <strong>Response Example:</strong>
+            <pre class="bg-light p-3 mt-2"><code>[
+  {
+    "id": 1,
+    "name": "Standard",
+    "category": "Basic"
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <!-- User Statistics -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <span class="badge bg-success">GET</span>
+                <code>/api/public/stats/</code>
+            </h4>
+        </div>
+        <div class="card-body">
+            <p>Returns aggregated user statistics.</p>
+            <strong>Response Example:</strong>
+            <pre class="bg-light p-3 mt-2"><code>{
+  "total_users": 150,
+  "total_activations": 1234,
+  "total_points": 45678
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- Activation Statistics -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <span class="badge bg-success">GET</span>
+                <code>/api/public/activation-stats/</code>
+            </h4>
+        </div>
+        <div class="card-body">
+            <p>Returns statistics about activations (QSOs, bunkers activated, etc.).</p>
+            <strong>Response Example:</strong>
+            <pre class="bg-light p-3 mt-2"><code>[
+  {
+    "bunker_ref": "SP-0001",
+    "activations_count": 5,
+    "total_qsos": 234
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <!-- Bunkers -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <span class="badge bg-success">GET</span>
+                <code>/api/public/bunkers/</code>
+            </h4>
+        </div>
+        <div class="card-body">
+            <p>Returns a list of all bunkers in the database.</p>
+            <strong>Response Example:</strong>
+            <pre class="bg-light p-3 mt-2"><code>[
+  {
+    "reference": "SP-0001",
+    "name": "Bunker Jastarnia",
+    "latitude": 54.7012,
+    "longitude": 18.6768,
+    "locator": "JO94qq",
+    "category": "Coastal Battery",
+    "points": 5
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <!-- Clusters GET -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <span class="badge bg-success">GET</span>
+                <code>/api/public/clusters/</code>
+            </h4>
+        </div>
+        <div class="card-body">
+            <p>Returns DX cluster spots (recent activations being spotted).</p>
+            <strong>Response Example:</strong>
+            <pre class="bg-light p-3 mt-2"><code>[
+  {
+    "id": 1,
+    "frequency": "14.250",
+    "callsign": "SP3FKB",
+    "bunker": "SP-0123",
+    "spotter": "SP1ABC",
+    "comment": "QRV from bunker",
+    "timestamp": "2026-01-26T14:30:00Z"
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <!-- Clusters POST -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <span class="badge bg-primary">POST</span>
+                <code>/api/public/clusters/</code>
+            </h4>
+        </div>
+        <div class="card-body">
+            <p>Submit a new DX cluster spot.</p>
+            <strong>Request Body:</strong>
+            <pre class="bg-light p-3 mt-2"><code>{
+  "frequency": "14.250",
+  "callsign": "SP3FKB",
+  "bunker": "SP-0123",
+  "spotter": "SP1ABC",
+  "comment": "QRV from bunker"
+}</code></pre>
+        </div>
+    </div>
+
+    <!-- Spots GET -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <span class="badge bg-success">GET</span>
+                <code>/api/public/spots/</code>
+            </h4>
+        </div>
+        <div class="card-body">
+            <p>Returns individual spots/sightings.</p>
+            <strong>Response Example:</strong>
+            <pre class="bg-light p-3 mt-2"><code>[
+  {
+    "id": 1,
+    "frequency": "7.144",
+    "callsign": "SP2XYZ",
+    "bunker": "SP-0045",
+    "time": "2026-01-26T10:15:00Z"
+  }
+]</code></pre>
+        </div>
+    </div>
+
+    <!-- Spots POST -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <span class="badge bg-primary">POST</span>
+                <code>/api/public/spots/</code>
+            </h4>
+        </div>
+        <div class="card-body">
+            <p>Submit a new spot/sighting.</p>
+            <strong>Request Body:</strong>
+            <pre class="bg-light p-3 mt-2"><code>{
+  "frequency": "7.144",
+  "callsign": "SP2XYZ",
+  "bunker": "SP-0045",
+  "comment": "Loud signal"
+}</code></pre>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <h2 class="mb-3">Authentication</h2>
+    <p>Most endpoints are publicly accessible for <strong>GET</strong> requests. <strong>POST</strong> requests may require authentication depending on configuration.</p>
+    
+    <h3 class="mt-4">JWT Authentication</h3>
+    <p>To authenticate, obtain a JWT token from <code>/api/auth/token/</code> and include it in the Authorization header:</p>
+    <pre class="bg-light p-3"><code>Authorization: Bearer &lt;your-token&gt;</code></pre>
+
+</div>
+{% endblock %}

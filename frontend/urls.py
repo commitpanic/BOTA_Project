@@ -5,6 +5,7 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
 from . import bunker_views
+from .api_docs_view import api_documentation
 from accounts.forms import CallsignPasswordResetForm
 
 urlpatterns = [
@@ -58,6 +59,9 @@ urlpatterns = [
     # Statistics
     path('statistics/', views.public_stats, name='public_stats'),
     path('statistics/user/', views.user_stats_search, name='user_stats_search'),
+    
+    # API Documentation
+    path('api-docs/', api_documentation, name='api_docs'),
     
     # Bunker views
     path('bunkers/', bunker_views.bunker_list, name='bunker_list'),

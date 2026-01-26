@@ -22,7 +22,7 @@
         <div class="card">
             <div class="card-body text-center">
                 <h6 class="text-muted mb-2">{% trans "Total QSOs" %}</h6>
-                <h2 class="text-primary">{{ stats.total_points }}</h2>
+                <h2 style="color: var(--primary-color); font-weight: 900;">{{ stats.total_points }}</h2>
             </div>
         </div>
     </div>
@@ -31,7 +31,7 @@
         <div class="card">
             <div class="card-body text-center">
                 <h6 class="text-muted mb-2">{% trans "Activator QSOs" %}</h6>
-                <h2 class="text-success">{{ stats.total_activator_qso }}</h2>
+                <h2 style="color: var(--secondary-color); font-weight: 900;">{{ stats.total_activator_qso }}</h2>
             </div>
         </div>
     </div>
@@ -40,7 +40,7 @@
         <div class="card">
             <div class="card-body text-center">
                 <h6 class="text-muted mb-2">{% trans "Hunter QSOs" %}</h6>
-                <h2 class="text-info">{{ stats.total_hunter_qso }}</h2>
+                <h2 style="color: var(--primary-color); font-weight: 900;">{{ stats.total_hunter_qso }}</h2>
             </div>
         </div>
     </div>
@@ -49,7 +49,7 @@
         <div class="card">
             <div class="card-body text-center">
                 <h6 class="text-muted mb-2">{% trans "B2B QSOs" %}</h6>
-                <h2 class="text-warning">{{ stats.activator_b2b_qso }}</h2>
+                <h2 style="color: var(--accent-color); font-weight: 900;">{{ stats.activator_b2b_qso }}</h2>
             </div>
         </div>
     </div>
@@ -59,7 +59,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <div class="card">
-            <div class="card-header bg-success text-white" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#activatorSection">
+            <div class="card-header text-white" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#activatorSection">
                 <h5 class="mb-0">
                     <i class="bi bi-geo-alt-fill"></i> {% trans "Activator Statistics" %}
                     <i class="bi bi-chevron-down float-end"></i>
@@ -164,7 +164,7 @@
                                     {% if activated_bunkers %}
                                     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                                         <table class="table table-sm table-hover" id="activatedBunkersTable">
-                                            <thead class="sticky-top bg-white">
+                                            <thead class="sticky-top">
                                                 <tr>
                                                     <th>{% trans "Reference" %}</th>
                                                     <th>{% trans "Name" %}</th>
@@ -333,7 +333,7 @@
                                     {% if hunted_bunkers %}
                                     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                                         <table class="table table-sm table-hover" id="huntedBunkersTable">
-                                            <thead class="sticky-top bg-white">
+                                            <thead class="sticky-top">
                                                 <tr>
                                                     <th>{% trans "Reference" %}</th>
                                                     <th>{% trans "Name" %}</th>
@@ -431,7 +431,7 @@
                 {% if non_activated_bunkers %}
                 <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                     <table class="table table-sm table-hover" id="nonActivatedBunkersTable">
-                        <thead class="sticky-top bg-white">
+                        <thead class="sticky-top">
                             <tr>
                                 <th>{% trans "Reference" %}</th>
                                 <th>{% trans "Name" %}</th>
@@ -512,7 +512,7 @@
                 {% if non_hunted_bunkers %}
                 <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                     <table class="table table-sm table-hover" id="nonHuntedBunkersTable">
-                        <thead class="sticky-top bg-white">
+                        <thead class="sticky-top">
                             <tr>
                                 <th>{% trans "Reference" %}</th>
                                 <th>{% trans "Name" %}</th>

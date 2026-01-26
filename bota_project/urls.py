@@ -16,6 +16,7 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 from .api_router import router
+from .public_api_router import public_router, urlpatterns as public_api_urlpatterns
 from frontend.health import health_check
 from frontend.static_debug import static_files_debug
 
@@ -38,15 +39,18 @@ urlpatterns = [
     # API endpoints (not translated for consistency)
     path('api/', include(router.urls)),
     
+    # Public API endpoints (documented)
+    path('api/public/', include(public_router.urls)),
+    
     # JWT Authentication
     path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     
-    # API Documentation
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    # API Documentation (for public API only)
+    path('api/public/schema/', SpectacularAPIView.as_view(urlconf=public_api_urlpatterns), name='public-schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='public-schema'), name='swagger-ui'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='public-schema'), name='redoc'),
 ]
 
 # Frontend URLs with i18n

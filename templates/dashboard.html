@@ -6,60 +6,50 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-12">
-        <h1>{% trans "Welcome back" %}, {{ user.callsign }}!</h1>
+        <h1><i class="bi bi-speedometer2"></i> {% trans "Welcome back" %}, {{ user.callsign }}!</h1>
         <p class="text-muted">{% trans "Track your progress and manage your activations" %}</p>
     </div>
 </div>
 
 <!-- User Statistics -->
 <div class="row mb-5">
-    <div class="col mb-3">
-        <div class="card">
-            <div class="card-body text-center">
-                <h6 class="text-muted mb-2">{% trans "Bunkers Activated" %}</h6>
-                <h2 class="text-primary">{{ stats.unique_activations }}</h2>
-                <small class="text-muted">{{ stats.total_activator_qso }} {% trans "QSOs" %}</small>
-            </div>
+    <div class="col-md mb-3">
+        <div class="stat-card text-center">
+            <h6 style="opacity: 0.85; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1rem;">{% trans "Bunkers Activated" %}</h6>
+            <div class="stat-value">{{ stats.unique_activations }}</div>
+            <small style="opacity: 0.8;">{{ stats.total_activator_qso }} {% trans "QSOs" %}</small>
         </div>
     </div>
     
-    <div class="col mb-3">
-        <div class="card">
-            <div class="card-body text-center">
-                <h6 class="text-muted mb-2">{% trans "Bunkers Hunted" %}</h6>
-                <h2 class="text-success">{{ stats.unique_bunkers_hunted }}</h2>
-                <small class="text-muted">{{ stats.total_hunter_qso }} {% trans "QSOs" %}</small>
-            </div>
+    <div class="col-md mb-3">
+        <div class="stat-card text-center">
+            <h6 style="opacity: 0.85; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1rem;">{% trans "Bunkers Hunted" %}</h6>
+            <div class="stat-value">{{ stats.unique_bunkers_hunted }}</div>
+            <small style="opacity: 0.8;">{{ stats.total_hunter_qso }} {% trans "QSOs" %}</small>
         </div>
     </div>
     
-    <div class="col mb-3">
-        <div class="card">
-            <div class="card-body text-center">
-                <h6 class="text-muted mb-2">{% trans "Activator Points" %}</h6>
-                <h2 class="text-info">{{ stats.total_activator_qso }}</h2>
-                <small class="text-muted">{% trans "1 point per QSO" %}</small>
-            </div>
+    <div class="col-md mb-3">
+        <div class="stat-card text-center">
+            <h6 style="opacity: 0.85; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1rem;">{% trans "Activator Points" %}</h6>
+            <div class="stat-value">{{ stats.total_activator_qso }}</div>
+            <small style="opacity: 0.8;">{% trans "1 point per QSO" %}</small>
         </div>
     </div>
     
-    <div class="col mb-3">
-        <div class="card">
-            <div class="card-body text-center">
-                <h6 class="text-muted mb-2">{% trans "Hunter Points" %}</h6>
-                <h2 class="text-warning">{{ stats.total_hunter_qso }}</h2>
-                <small class="text-muted">{% trans "1 point per QSO" %}</small>
-            </div>
+    <div class="col-md mb-3">
+        <div class="stat-card text-center">
+            <h6 style="opacity: 0.85; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1rem;">{% trans "Hunter Points" %}</h6>
+            <div class="stat-value">{{ stats.total_hunter_qso }}</div>
+            <small style="opacity: 0.8;">{% trans "1 point per QSO" %}</small>
         </div>
     </div>
     
-    <div class="col mb-3">
-        <div class="card">
-            <div class="card-body text-center">
-                <h6 class="text-muted mb-2">{% trans "B2B Confirmed" %}</h6>
-                <h2 class="text-danger">{{ stats.activator_b2b_qso }}</h2>
-                <small class="text-muted">{% trans "Both logs uploaded" %}</small>
-            </div>
+    <div class="col-md mb-3">
+        <div class="stat-card text-center">
+            <h6 style="opacity: 0.85; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1rem;">{% trans "B2B Confirmed" %}</h6>
+            <div class="stat-value">{{ stats.activator_b2b_qso }}</div>
+            <small style="opacity: 0.8;">{% trans "Both logs uploaded" %}</small>
         </div>
     </div>
 </div>
@@ -68,15 +58,19 @@
 {% if user.is_staff %}
 <div class="row mb-4">
     <div class="col-12 mb-3">
-        <h3><i class="bi bi-shield-check"></i> {% trans "Admin Actions" %}</h3>
+        <h3 style="font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--primary-color);">
+            <i class="bi bi-shield-check"></i> {% trans "Admin Actions" %}
+        </h3>
     </div>
     
     <div class="col-md-4 mb-3">
-        <a href="{% url 'upload_bunkers_csv' %}" class="text-decoration-none">
-            <div class="card h-100 border-success">
-                <div class="card-body text-center">
-                    <i class="bi bi-file-earmark-arrow-up display-4 text-success mb-3"></i>
-                    <h5>{% trans "Upload Bunkers CSV" %}</h5>
+        <a href="{% url 'upload_bunkers_csv' %}" class="text-decoration-none" style="display: block; height: 100%;">
+            <div class="card h-100" style="border: 2px solid var(--secondary-color); transition: all 0.3s;">
+                <div class="card-body text-center p-4">
+                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 4px 15px rgba(127, 166, 80, 0.3);">
+                        <i class="bi bi-file-earmark-arrow-up" style="font-size: 2rem; color: white;"></i>
+                    </div>
+                    <h5 style="font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--primary-color);">{% trans "Upload Bunkers CSV" %}</h5>
                     <p class="text-muted">{% trans "Bulk import bunker data" %}</p>
                 </div>
             </div>
@@ -84,11 +78,13 @@
     </div>
     
     <div class="col-md-4 mb-3">
-        <a href="/admin/" class="text-decoration-none">
-            <div class="card h-100 border-danger">
-                <div class="card-body text-center">
-                    <i class="bi bi-gear display-4 text-danger mb-3"></i>
-                    <h5>{% trans "Django Admin" %}</h5>
+        <a href="/admin/" class="text-decoration-none" style="display: block; height: 100%;">
+            <div class="card h-100" style="border: 2px solid var(--accent-color); transition: all 0.3s;">
+                <div class="card-body text-center p-4">
+                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--accent-color) 0%, #E5B98A 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 4px 15px rgba(212, 165, 116, 0.3);">
+                        <i class="bi bi-gear" style="font-size: 2rem; color: white;"></i>
+                    </div>
+                    <h5 style="font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--primary-color);">{% trans "Django Admin" %}</h5>
                     <p class="text-muted">{% trans "Full admin panel access" %}</p>
                 </div>
             </div>
@@ -96,12 +92,14 @@
     </div>
     
     <div class="col-md-4 mb-3">
-        <a href="{% url 'manage_bunker_requests' %}" class="text-decoration-none">
-            <div class="card h-100 border-warning">
-                <div class="card-body text-center">
-                    <i class="bi bi-inbox display-4 text-warning mb-3"></i>
-                    <h5>{% trans "Manage Requests" %}</h5>
-                    <p class="text-muted">{% trans "Review bunker requests" %}</p>
+        <a href="{% url 'manage_bunker_requests' %}" class="text-decoration-none" style="display: block; height: 100%;">
+            <div class="card h-100" style="border: 2px solid var(--primary-color); transition: all 0.3s;">
+                <div class="card-body text-center p-4">
+                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 4px 15px rgba(61, 90, 60, 0.3);">
+                        <i class="bi bi-envelope-check" style="font-size: 2rem; color: white;"></i>
+                    </div>
+                    <h5 style="font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--primary-color);">{% trans "Bunker Requests" %}</h5>
+                    <p class="text-muted">{% trans "Review user submissions" %}</p>
                 </div>
             </div>
         </a>
@@ -216,7 +214,7 @@
                 <div class="progress" style="height: 25px;">
                     <div class="progress-bar" 
                          role="progressbar" 
-                         style="width: {{ progress.percentage_complete|stringformat:"d" }}%; background-color: {% if progress.percentage_complete >= 75 %}#28a745{% elif progress.percentage_complete >= 50 %}#17a2b8{% elif progress.percentage_complete >= 25 %}#ffc107{% else %}#6c757d{% endif %};"
+                         style="width: {{ progress.percentage_complete|stringformat:"d" }}%; background-color: {% if progress.percentage_complete >= 75 %}var(--secondary-color){% elif progress.percentage_complete >= 50 %}var(--primary-color){% elif progress.percentage_complete >= 25 %}var(--accent-color){% else %}#6c757d{% endif %};"
                          aria-valuenow="{{ progress.percentage_complete }}" 
                          aria-valuemin="0" 
                          aria-valuemax="100">
@@ -291,7 +289,7 @@
                 <div class="progress" style="height: 25px;">
                     <div class="progress-bar" 
                          role="progressbar" 
-                         style="width: {{ progress.percentage_complete|stringformat:"d" }}%; background-color: {% if progress.percentage_complete >= 75 %}#28a745{% elif progress.percentage_complete >= 50 %}#17a2b8{% elif progress.percentage_complete >= 25 %}#ffc107{% else %}#6c757d{% endif %};"
+                         style="width: {{ progress.percentage_complete|stringformat:"d" }}%; background-color: {% if progress.percentage_complete >= 75 %}var(--secondary-color){% elif progress.percentage_complete >= 50 %}var(--primary-color){% elif progress.percentage_complete >= 25 %}var(--accent-color){% else %}#6c757d{% endif %};"
                          aria-valuenow="{{ progress.percentage_complete }}" 
                          aria-valuemin="0" 
                          aria-valuemax="100">
@@ -356,7 +354,7 @@
                 <div class="progress" style="height: 25px;">
                     <div class="progress-bar" 
                          role="progressbar" 
-                         style="width: {{ progress.percentage_complete|stringformat:"d" }}%; background-color: {% if progress.percentage_complete >= 75 %}#28a745{% elif progress.percentage_complete >= 50 %}#17a2b8{% elif progress.percentage_complete >= 25 %}#ffc107{% else %}#6c757d{% endif %};"
+                         style="width: {{ progress.percentage_complete|stringformat:"d" }}%; background-color: {% if progress.percentage_complete >= 75 %}var(--secondary-color){% elif progress.percentage_complete >= 50 %}var(--primary-color){% elif progress.percentage_complete >= 25 %}var(--accent-color){% else %}#6c757d{% endif %};"
                          aria-valuenow="{{ progress.percentage_complete }}" 
                          aria-valuemin="0" 
                          aria-valuemax="100">
@@ -431,7 +429,7 @@
                 <div class="progress" style="height: 25px;">
                     <div class="progress-bar" 
                          role="progressbar" 
-                         style="width: {{ progress.percentage_complete|stringformat:"d" }}%; background-color: {% if progress.percentage_complete >= 75 %}#28a745{% elif progress.percentage_complete >= 50 %}#17a2b8{% elif progress.percentage_complete >= 25 %}#ffc107{% else %}#6c757d{% endif %};"
+                         style="width: {{ progress.percentage_complete|stringformat:"d" }}%; background-color: {% if progress.percentage_complete >= 75 %}var(--secondary-color){% elif progress.percentage_complete >= 50 %}var(--primary-color){% elif progress.percentage_complete >= 25 %}var(--accent-color){% else %}#6c757d{% endif %};"
                          aria-valuenow="{{ progress.percentage_complete }}" 
                          aria-valuemin="0" 
                          aria-valuemax="100">
