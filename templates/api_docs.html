@@ -122,51 +122,7 @@
         </div>
     </div>
 
-    <!-- Clusters GET -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h4 class="mb-0">
-                <span class="badge bg-success">GET</span>
-                <code>/api/public/clusters/</code>
-            </h4>
-        </div>
-        <div class="card-body">
-            <p>Returns DX cluster spots (recent activations being spotted).</p>
-            <strong>Response Example:</strong>
-            <pre class="bg-light p-3 mt-2"><code>[
-  {
-    "id": 1,
-    "frequency": "14.250",
-    "callsign": "SP3FKB",
-    "bunker": "SP-0123",
-    "spotter": "SP1ABC",
-    "comment": "QRV from bunker",
-    "timestamp": "2026-01-26T14:30:00Z"
-  }
-]</code></pre>
-        </div>
-    </div>
 
-    <!-- Clusters POST -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h4 class="mb-0">
-                <span class="badge bg-primary">POST</span>
-                <code>/api/public/clusters/</code>
-            </h4>
-        </div>
-        <div class="card-body">
-            <p>Submit a new DX cluster spot.</p>
-            <strong>Request Body:</strong>
-            <pre class="bg-light p-3 mt-2"><code>{
-  "frequency": "14.250",
-  "callsign": "SP3FKB",
-  "bunker": "SP-0123",
-  "spotter": "SP1ABC",
-  "comment": "QRV from bunker"
-}</code></pre>
-        </div>
-    </div>
 
     <!-- Spots GET -->
     <div class="card mb-4">
