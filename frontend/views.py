@@ -57,8 +57,18 @@ def dashboard(request):
     from diplomas.models import DiplomaType
     from django.db.models.functions import TruncDate
     
-    # Get or create user statistics
-    stats, created = UserStatistics.objects.get_or_create(user=request.user)
+    try:
+        # Get or create user statistics
+        stats, created = UserStatistics.objects.get_or_create(user=request.user)
+    except Exception as e:
+        messages.error(request, _('Unable to load dashboard. Please try again later.'))
+        return render(request, 'dashboard.html', {
+            'stats': None,
+            'error': str(e)
+        })
+    
+    try:
+        stats, created = UserStatistics.objects.get_or_create(user=request.user)
     
     # Get earned diplomas
     earned_diplomas = Diploma.objects.filter(
@@ -129,15 +139,26 @@ def dashboard(request):
         Q(user=request.user) | Q(activator=request.user)
     ).select_related('bunker', 'activator', 'user').order_by('-activation_date').distinct()[:10]
     
-    context = {
-        'stats': stats,
-        'activator_progress': activator_progress,
-        'hunter_progress': hunter_progress,
-        'b2b_progress': b2b_progress,
-        'special_progress': special_progress,
-        'recent_logs': recent_logs,
-    }
-    return render(request, 'dashboard.html', context)
+        context = {
+            'stats': stats,
+            'activator_progress': activator_progress,
+            'hunter_progress': hunter_progress,
+            'b2b_progress': b2b_progress,
+            'special_progress': special_progress,
+            'recent_logs': recent_logs,
+        }
+        return render(request, 'dashboard.html', context)
+    except Exception as e:
+        messages.error(request, _('Error loading dashboard data.'))
+        return render(request, 'dashboard.html', {
+            'stats': UserStatistics.objects.get_or_create(user=request.user)[0],
+            'activator_progress': [],
+            'hunter_progress': [],
+            'b2b_progress': [],
+            'special_progress': [],
+            'recent_logs': [],
+            'error': str(e)
+        })
 
 
 @login_required
@@ -712,8 +733,14 @@ def cluster_view(request):
     Displays active spots with auto-refresh capability
     """
     from django.http import JsonResponse
-    from cluster.models import Spot
     from django.utils import timezone
+    
+    try:
+        from cluster.models import Spot
+    except Exception as e:
+        # Graceful fallback if cluster app not ready
+        messages.error(request, f"Cluster system temporarily unavailable: {str(e)}")
+        return redirect('home')
     
     # Handle POST request (create new spot) - requires authentication
     if request.method == 'POST' and request.user.is_authenticated:
@@ -778,35 +805,47 @@ def cluster_view(request):
     spotter_filter = request.GET.get('spotter', '')
     band_filter = request.GET.get('band', '')
     
-    # Get active spots (not expired)
-    spots = Spot.objects.filter(
-        is_active=True,
-        expires_at__gt=timezone.now()
-    ).select_related('spotter', 'bunker').order_by('-updated_at')
-    
-    # Apply filters
-    if activator_filter:
-        spots = spots.filter(activator_callsign__icontains=activator_filter)
-    if spotter_filter:
-        spots = spots.filter(spotter__callsign__icontains=spotter_filter)
-    if band_filter:
-        spots = spots.filter(band=band_filter)
-    
-    # Get unique bands for filter dropdown
-    unique_bands = Spot.objects.filter(
-        is_active=True,
-        expires_at__gt=timezone.now()
-    ).values_list('band', flat=True).distinct().order_by('band')
-    
-    context = {
-        'spots': spots,
-        'unique_bands': unique_bands,
-        'activator_filter': activator_filter,
-        'spotter_filter': spotter_filter,
-        'band_filter': band_filter,
-    }
-    
-    return render(request, 'cluster.html', context)
+    try:
+        # Get active spots (not expired)
+        spots = Spot.objects.filter(
+            is_active=True,
+            expires_at__gt=timezone.now()
+        ).select_related('spotter', 'bunker').order_by('-updated_at')
+        
+        # Apply filters
+        if activator_filter:
+            spots = spots.filter(activator_callsign__icontains=activator_filter)
+        if spotter_filter:
+            spots = spots.filter(spotter__callsign__icontains=spotter_filter)
+        if band_filter:
+            spots = spots.filter(band=band_filter)
+        
+        # Get unique bands for filter dropdown
+        unique_bands = Spot.objects.filter(
+            is_active=True,
+            expires_at__gt=timezone.now()
+        ).values_list('band', flat=True).distinct().order_by('band')
+        
+        context = {
+            'spots': spots,
+            'unique_bands': unique_bands,
+            'activator_filter': activator_filter,
+            'spotter_filter': spotter_filter,
+            'band_filter': band_filter,
+        }
+        
+        return render(request, 'cluster.html', context)
+    except Exception as e:
+        # Database error - show error message
+        messages.error(request, _('Unable to load spots. Please try again later.'))
+        return render(request, 'cluster.html', {
+            'spots': [],
+            'unique_bands': [],
+            'activator_filter': '',
+            'spotter_filter': '',
+            'band_filter': '',
+            'error': str(e)
+        })
 
 
 def privacy_policy(request):
@@ -940,10 +979,15 @@ def map_view(request):
     """
     from bunkers.models import Bunker
     from activations.models import ActivationLog
-    from cluster.models import Spot
     from django.db.models import Q
     from django.utils import timezone
     import json
+    
+    try:
+        from cluster.models import Spot
+    except ImportError:
+        # Gracefully handle if cluster app not available
+        Spot = None
     
     # Get all verified bunkers with coordinates
     bunkers = Bunker.objects.filter(
@@ -952,14 +996,20 @@ def map_view(request):
         longitude__isnull=False
     ).select_related().order_by('reference_number')
     
-    # Get active spots (not expired)
-    active_spot_bunker_ids = set(
-        Spot.objects.filter(
-            is_active=True,
-            expires_at__gt=timezone.now(),
-            bunker__isnull=False
-        ).values_list('bunker_id', flat=True).distinct()
-    )
+    # Get active spots (not expired) - only if Spot model available
+    active_spot_bunker_ids = set()
+    if Spot:
+        try:
+            active_spot_bunker_ids = set(
+                Spot.objects.filter(
+                    is_active=True,
+                    expires_at__gt=timezone.now(),
+                    bunker__isnull=False
+                ).values_list('bunker_id', flat=True).distinct()
+            )
+        except Exception:
+            # Ignore errors if table doesn't exist yet
+            pass
     
     bunkers_data = []
     
