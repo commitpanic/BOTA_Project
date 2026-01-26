@@ -35,6 +35,13 @@ if os.environ.get('RENDER'):
     if RENDER_EXTERNAL_HOSTNAME:
         ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+# CSRF settings for production
+CSRF_TRUSTED_ORIGINS = []
+if os.environ.get('RENDER'):
+    RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+    if RENDER_EXTERNAL_HOSTNAME:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
+
 
 # Application definition
 
@@ -109,7 +116,6 @@ if 'DATABASE_URL' in os.environ:
             default=os.environ.get('DATABASE_URL'),
             conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=True,  # Render requires SSL
         )
     }
 else:

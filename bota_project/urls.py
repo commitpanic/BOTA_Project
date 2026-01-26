@@ -19,6 +19,7 @@ from .api_router import router
 from .public_api_router import public_router, urlpatterns as public_api_urlpatterns
 from frontend.health import health_check
 from frontend.static_debug import static_files_debug
+from frontend.diagnostics import production_diagnostics
 
 # Import admin customizations
 from . import admin as admin_customizations
@@ -26,6 +27,9 @@ from . import admin as admin_customizations
 urlpatterns = [
     # Health check (for monitoring)
     path('health/', health_check, name='health_check'),
+    
+    # Production diagnostics
+    path('diagnostics/', production_diagnostics, name='diagnostics'),
     
     # Static files debug (for troubleshooting)
     path('static-debug/', static_files_debug, name='static_debug'),
