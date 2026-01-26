@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme 4: Military Green - BOTA Project</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #3D5A3C;
+            --secondary-color: #7FA650;
+            --accent-color: #D4A574;
+            --dark-bg: #2C3E2B;
+            --light-bg: #F4F1E8;
+            --text-dark: #2A3529;
+            --gradient-start: #3D5A3C;
+            --gradient-end: #7FA650;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light-bg) 0%, #E8E4D9 100%);
+            min-height: 100vh;
+        }
+        
+        /* Texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(61, 90, 60, 0.02) 2px, rgba(61, 90, 60, 0.02) 4px);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            box-shadow: 0 4px 20px rgba(61, 90, 60, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: white !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.95) !important;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            padding: 4rem 0;
+            color: white;
+            border-radius: 0 0 50px 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="camo" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><polygon points="20,10 40,30 25,45 10,35" fill="rgba(0,0,0,0.05)"/><polygon points="60,5 80,25 70,40 50,30" fill="rgba(0,0,0,0.03)"/><polygon points="10,60 30,80 20,95 5,85" fill="rgba(0,0,0,0.04)"/><polygon points="70,60 90,75 85,90 65,80" fill="rgba(0,0,0,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23camo)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            margin-bottom: 1.5rem;
+            position: relative;
+            letter-spacing: 2px;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            font-weight: 400;
+            opacity: 0.95;
+            position: relative;
+        }
+        
+        .card {
+            border: 2px solid rgba(61, 90, 60, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            background: white;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 50px rgba(61, 90, 60, 0.25);
+            border-color: var(--primary-color);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            padding: 1.5rem;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: 2px solid var(--primary-color);
+            padding: 0.75rem 2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(61, 90, 60, 0.3);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(61, 90, 60, 0.4);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent-color) 0%, #E5B98A 100%);
+            border: 2px solid var(--accent-color);
+            padding: 0.75rem 2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(212, 165, 116, 0.3);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-accent:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(212, 165, 116, 0.4);
+            color: white;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(61, 90, 60, 0.25);
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.05) 10px,
+                rgba(255,255,255,0.05) 20px
+            );
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 12px 40px rgba(61, 90, 60, 0.35);
+        }
+        
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 700;
+            letter-spacing: 2px;
+            position: relative;
+            text-transform: uppercase;
+        }
+        
+        .badge {
+            background: var(--accent-color);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: 700;
+            box-shadow: 0 2px 10px rgba(212, 165, 116, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .progress {
+            height: 30px;
+            border-radius: 15px;
+            background-color: #E8E4D9;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            border: 2px solid rgba(61, 90, 60, 0.2);
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(61, 90, 60, 0.3);
+            font-weight: 700;
+        }
+        
+        .theme-badge {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--accent-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(212, 165, 116, 0.4);
+            z-index: 1000;
+            border: 2px solid rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(61, 90, 60, 0.25);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-badge">
+        <i class="bi bi-palette-fill"></i> Military Green
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-broadcast-pin"></i> BOTA PROJECT
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-map"></i> Map</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-trophy"></i> Diplomas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-graph-up"></i> Statistics</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-person-circle"></i> Profile</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero-section">
+        <div class="container text-center">
+            <h1 class="hero-title">BUNKERS ON THE AIR</h1>
+            <p class="hero-subtitle">Discover historic military bunkers through amateur radio</p>
+            <div class="mt-4">
+                <button class="btn btn-primary me-3"><i class="bi bi-upload"></i> Upload Log</button>
+                <button class="btn btn-accent"><i class="bi bi-trophy-fill"></i> View Diplomas</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <div class="stat-value">1,247</div>
+                    <div class="stat-label">Total Bunkers</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <div class="stat-value">8,932</div>
+                    <div class="stat-label">Activations</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <div class="stat-value">456</div>
+                    <div class="stat-label">Active Hunters</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card text-center">
+                    <div class="stat-value">89</div>
+                    <div class="stat-label">Diplomas Earned</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-broadcast"></i> Recent Activations
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3 d-flex align-items-center">
+                            <div class="feature-icon me-3">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">BOTA-0234</h6>
+                                <small class="text-muted">SP9XYZ - 2 hours ago</small>
+                            </div>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center">
+                            <div class="feature-icon me-3">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">BOTA-0156</h6>
+                                <small class="text-muted">OK2ABC - 5 hours ago</small>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary w-100">View All</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-trophy-fill"></i> Your Progress
+                    </div>
+                    <div class="card-body">
+                        <h6 class="mb-2">Bunkers Activated</h6>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: 65%">65%</div>
+                        </div>
+                        
+                        <h6 class="mb-2">QSOs Made</h6>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: 80%">80%</div>
+                        </div>
+                        
+                        <h6 class="mb-2">Diploma Progress</h6>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: 45%">45%</div>
+                        </div>
+                        
+                        <button class="btn btn-accent w-100 mt-2">View Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="bi bi-star-fill"></i> Featured Bunkers
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <span class="badge mb-2"><i class="bi bi-fire"></i> Live Now</span>
+                            <h6>BOTA-0567 <small class="text-muted">Poland</small></h6>
+                            <p class="small mb-0">Atlantic Wall fortification</p>
+                        </div>
+                        <hr>
+                        <div class="mb-3">
+                            <h6>BOTA-0892 <small class="text-muted">Czech Republic</small></h6>
+                            <p class="small mb-0">WWII command bunker</p>
+                        </div>
+                        <hr>
+                        <div>
+                            <h6>BOTA-0345 <small class="text-muted">Germany</small></h6>
+                            <p class="small mb-0">Cold War bunker complex</p>
+                        </div>
+                        <button class="btn btn-primary w-100 mt-3">Explore Map</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

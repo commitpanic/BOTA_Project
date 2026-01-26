@@ -111,6 +111,12 @@ class Bunker(models.Model):
         verbose_name=_("Locator"),
         help_text=_("Maidenhead grid locator (e.g., JO72RI)")
     )
+    info_url = models.URLField(
+        max_length=500,
+        blank=True,
+        verbose_name=_("Info URL"),
+        help_text=_("External URL with additional information about the bunker")
+    )
     is_verified = models.BooleanField(
         default=False,
         verbose_name=_("Verified"),
@@ -369,6 +375,11 @@ class BunkerRequest(models.Model):
         blank=True,
         verbose_name=_("Photo URL"),
         help_text=_("Link to photo (optional)")
+    )
+    info_url = models.URLField(
+        blank=True,
+        verbose_name=_("Information URL"),
+        help_text=_("Link to external information about the bunker (optional)")
     )
     additional_info = models.TextField(
         blank=True,

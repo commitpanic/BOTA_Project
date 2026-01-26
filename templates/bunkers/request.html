@@ -1,12 +1,27 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
 
 {% block title %}{% trans "Request New Bunker" %} - BOTA Project{% endblock %}
+
+{% block extra_css %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #request-map {
+        height: 400px;
+        width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <div class="card">
                 <div class="card-header">
                     <h4><i class="bi bi-plus-circle"></i> {% trans "Request New Bunker" %}</h4>
@@ -33,22 +48,43 @@
                                    placeholder="{% trans 'e.g., WW2 Battle Bunker' %}">
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="latitude" class="form-label">{% trans "Latitude" %} *</label>
-                                <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" required>
-                                <small class="form-text text-muted">{% trans "Decimal format, e.g., 52.237049" %}</small>
+                        <!-- Map for location selection -->
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "Location" %} *</label>
+                            <div class="alert alert-secondary mb-2">
+                                <i class="bi bi-cursor"></i> {% trans "Click on the map to set the bunker location" %}
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div id="request-map"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="latitude" class="form-label">{% trans "Latitude" %} *</label>
+                                <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" required readonly>
+                                <small class="form-text text-muted">{% trans "Set by clicking on map" %}</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label for="longitude" class="form-label">{% trans "Longitude" %} *</label>
-                                <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" required>
-                                <small class="form-text text-muted">{% trans "Decimal format, e.g., 21.008804" %}</small>
+                                <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" required readonly>
+                                <small class="form-text text-muted">{% trans "Set by clicking on map" %}</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="locator" class="form-label">{% trans "Locator" %}</label>
+                                <input type="text" class="form-control" id="locator" name="locator" readonly>
+                                <small class="form-text text-muted">{% trans "Auto-calculated" %}</small>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="description" class="form-label">{% trans "Description" %}</label>
                             <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="info_url" class="form-label">{% trans "Information URL" %}</label>
+                            <input type="url" class="form-control" id="info_url" name="info_url" 
+                                   placeholder="https://example.com/bunker-info">
+                            <small class="form-text text-muted">{% trans "Link to external information about this bunker (Wikipedia, historical society, etc.)" %}</small>
                         </div>
 
                         <div class="mb-3">
@@ -70,4 +106,87 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Initialize map centered on Poland
+const map = L.map('request-map').setView([52.0, 19.0], 6);
+
+// Add OpenStreetMap tiles
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+let marker = null;
+
+// Function to calculate Maidenhead locator
+function latLonToLocator(lat, lon) {
+    const A = 'A'.charCodeAt(0);
+    
+    lon += 180;
+    lat += 90;
+    
+    const field1 = String.fromCharCode(A + Math.floor(lon / 20));
+    const field2 = String.fromCharCode(A + Math.floor(lat / 10));
+    
+    lon = lon % 20;
+    lat = lat % 10;
+    
+    const square1 = Math.floor(lon / 2).toString();
+    const square2 = Math.floor(lat).toString();
+    
+    lon = (lon % 2) * 12;
+    lat = (lat % 1) * 24;
+    
+    const subsquare1 = String.fromCharCode(A + Math.floor(lon));
+    const subsquare2 = String.fromCharCode(A + Math.floor(lat));
+    
+    return field1 + field2 + square1 + square2 + subsquare1.toLowerCase() + subsquare2.toLowerCase();
+}
+
+// Handle map click
+map.on('click', function(e) {
+    const lat = e.latlng.lat.toFixed(6);
+    const lon = e.latlng.lng.toFixed(6);
+    const locator = latLonToLocator(parseFloat(lat), parseFloat(lon));
+    
+    // Update form fields
+    document.getElementById('latitude').value = lat;
+    document.getElementById('longitude').value = lon;
+    document.getElementById('locator').value = locator;
+    
+    // Remove old marker if exists
+    if (marker) {
+        map.removeLayer(marker);
+    }
+    
+    // Add new marker
+    marker = L.marker([lat, lon]).addTo(map);
+    marker.bindPopup(`<b>{% trans "Selected Location" %}</b><br>
+                      Lat: ${lat}<br>
+                      Lon: ${lon}<br>
+                      Locator: ${locator}`).openPopup();
+});
+
+// If coordinates already exist (from validation error), show marker
+window.addEventListener('DOMContentLoaded', function() {
+    const lat = document.getElementById('latitude').value;
+    const lon = document.getElementById('longitude').value;
+    
+    if (lat && lon) {
+        marker = L.marker([lat, lon]).addTo(map);
+        map.setView([lat, lon], 13);
+        const locator = latLonToLocator(parseFloat(lat), parseFloat(lon));
+        document.getElementById('locator').value = locator;
+        marker.bindPopup(`<b>{% trans "Selected Location" %}</b><br>
+                          Lat: ${lat}<br>
+                          Lon: ${lon}<br>
+                          Locator: ${locator}`).openPopup();
+    }
+});
+</script>
 {% endblock %}

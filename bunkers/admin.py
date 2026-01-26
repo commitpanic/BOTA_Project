@@ -104,7 +104,7 @@ class BunkerAdmin(admin.ModelAdmin):
             'fields': ('name_pl', 'description_pl')
         }),
         ('GPS Coordinates', {
-            'fields': ('latitude', 'longitude'),
+            'fields': ('latitude', 'longitude', 'locator', 'info_url'),
             'description': 'Enter coordinates in decimal format (e.g., 54.403844)'
         }),
         ('Verification', {
@@ -350,7 +350,7 @@ class BunkerRequestAdmin(admin.ModelAdmin):
             'fields': ('latitude', 'longitude', 'locator')
         }),
         ('Description', {
-            'fields': ('description', 'additional_info', 'photo_url')
+            'fields': ('description', 'additional_info', 'photo_url', 'info_url')
         }),
         ('Status', {
             'fields': ('status', 'rejection_reason')

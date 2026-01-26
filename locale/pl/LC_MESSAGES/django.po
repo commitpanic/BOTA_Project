@@ -371,6 +371,9 @@ msgstr "Regulamin"
 msgid "Map"
 msgstr "Mapa"
 
+msgid "API Documentation"
+msgstr "Dokumentacja API"
+
 msgid "Admin"
 msgstr "Admin"
 
@@ -545,6 +548,51 @@ msgstr "Wszystkie QSO"
 
 msgid "Recent Activations"
 msgstr "Ostatnie Aktywacje"
+
+msgid "Your Progress"
+msgstr "Twój Postęp"
+
+msgid "Featured Bunkers"
+msgstr "Wyróżnione Bunkry"
+
+msgid "View Diplomas"
+msgstr "Zobacz Dyplomy"
+
+msgid "Active Hunters"
+msgstr "Aktywni Łowcy"
+
+msgid "Diplomas Earned"
+msgstr "Zdobyte Dyplomy"
+
+msgid "Live Now"
+msgstr "Aktywny Teraz"
+
+msgid "View All"
+msgstr "Zobacz Wszystkie"
+
+msgid "View Details"
+msgstr "Zobacz Szczegóły"
+
+msgid "QSOs Made"
+msgstr "Wykonane QSO"
+
+msgid "Diploma Progress"
+msgstr "Postęp Dyplomów"
+
+msgid "Explore Map"
+msgstr "Przeglądaj Mapę"
+
+msgid "WWII command bunker"
+msgstr "Bunkier dowodzenia z II WŚ"
+
+msgid "Cold War bunker complex"
+msgstr "Kompleks bunkrów z Zimnej Wojny"
+
+msgid "Czech Republic"
+msgstr "Czechy"
+
+msgid "Germany"
+msgstr "Niemcy"
 
 msgid "Last QSO"
 msgstr "Ostatnie QSO"
@@ -2262,6 +2310,30 @@ msgstr "Format dziesiętny, np. 21.008804"
 msgid "Description"
 msgstr "Opis"
 
+msgid "Location"
+msgstr "Lokalizacja"
+
+msgid "Click on the map to set the bunker location"
+msgstr "Kliknij na mapie aby ustawić lokalizację bunkra"
+
+msgid "Set by clicking on map"
+msgstr "Ustaw klikając na mapie"
+
+msgid "Locator"
+msgstr "Lokator"
+
+msgid "Auto-calculated"
+msgstr "Obliczany automatycznie"
+
+msgid "Information URL"
+msgstr "URL z Informacjami"
+
+msgid "Link to external information about this bunker (Wikipedia, historical society, etc.)"
+msgstr "Link do zewnętrznych informacji o tym bunkrze (Wikipedia, towarzystwo historyczne, itp.)"
+
+msgid "Selected Location"
+msgstr "Wybrana Lokalizacja"
+
 msgid "Submit Request"
 msgstr "Wyślij Prośbę"
 
@@ -2340,5 +2412,95 @@ msgstr "Informacje o weryfikacji"
 msgid "Verified by:"
 msgstr "Zweryfikowane przez:"
 
+# Log History Page
+msgid "Log History"
+msgstr "Historia Logów"
+
+msgid "Log Upload History"
+msgstr "Historia Przesłanych Logów"
+
+msgid "View your uploaded logs and QSOs"
+msgstr "Zobacz przesłane logi i QSO"
+
+msgid "Uploaded Logs"
+msgstr "Przesłane Logi"
+
+msgid "No logs uploaded yet."
+msgstr "Nie przesłano jeszcze żadnych logów."
+
+msgid "Upload Your First Log"
+msgstr "Prześlij Pierwszy Log"
+
+msgid "Filter QSOs"
+msgstr "Filtruj QSO"
+
+msgid "Date From"
+msgstr "Data Od"
+
+msgid "Date To"
+msgstr "Data Do"
+
+msgid "QSO(s) found"
+msgstr "Znaleziono QSO"
+
+msgid "Hunter/Activator"
+msgstr "Łowca/Aktywator"
+
+msgid "QSOs in this upload"
+msgstr "QSO w tym przesłaniu"
+
+msgid "No QSOs match the current filters."
+msgstr "Brak QSO pasujących do filtrów."
+
+# Bunker Request Management
+msgid "Info URL"
+msgstr "URL Informacyjny"
+
+msgid "Requested Location"
+msgstr "Zgłoszona Lokalizacja"
+
+msgid "Approve Bunker Request"
+msgstr "Zatwierdź Prośbę o Bunkier"
+
+msgid "Request Details"
+msgstr "Szczegóły Prośby"
+
+msgid "Optional - edit if needed"
+msgstr "Opcjonalne - edytuj jeśli potrzeba"
+
+msgid "External URL with additional information about the bunker"
+msgstr "Zewnętrzny URL z dodatkowymi informacjami o bunkrze"
+
+msgid "A new reference number will be automatically generated when you approve this request."
+msgstr "Nowy numer referencyjny zostanie automatycznie wygenerowany po zatwierdzeniu."
+
+msgid "Approve & Create Bunker"
+msgstr "Zatwierdź i Utwórz Bunkier"
+
+msgid "Locator:"
+msgstr "Lokator:"
+
+msgid "Info URL:"
+msgstr "URL Informacyjny:"
+
 msgid "View on google maps"
 msgstr "Zobacz w Google Maps"
+
+# Bunker List Page
+msgid "Bunkers Database"
+msgstr "Baza Bunkerów"
+
+msgid "Browse and search all bunkers in the BOTA program"
+msgstr "Przeglądaj i wyszukuj wszystkie bunkry w programie BOTA"
+
+msgid "Results"
+msgstr "Wyniki"
+
+msgid "Coordinates"
+msgstr "Współrzędne"
+
+msgid "Pending Verification"
+msgstr "Oczekuje na Weryfikację"
+
+msgid "Filters & Search"
+msgstr "Filtry i Wyszukiwanie"

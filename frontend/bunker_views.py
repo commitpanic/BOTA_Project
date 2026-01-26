@@ -129,6 +129,8 @@ def request_bunker(request):
                 bunker_type=request.POST.get('bunker_type', ''),
                 latitude=latitude,
                 longitude=longitude,
+                locator=request.POST.get('locator', ''),
+                info_url=request.POST.get('info_url', ''),
                 additional_info=request.POST.get('additional_info', ''),
                 requested_by=request.user,
                 status='pending'
@@ -190,6 +192,20 @@ def manage_bunker_requests(request):
         bunker_type=''
     ).values_list('bunker_type', flat=True).distinct().order_by('bunker_type')
     
+    # Get existing bunkers for map display
+    from bunkers.models import Bunker
+    import json
+    existing_bunkers = Bunker.objects.values('reference_number', 'name_en', 'latitude', 'longitude')
+    existing_bunkers_json = json.dumps([
+        {
+            'ref': b['reference_number'],
+            'name': b['name_en'],
+            'lat': float(b['latitude']) if b['latitude'] else 0,
+            'lng': float(b['longitude']) if b['longitude'] else 0
+        }
+        for b in existing_bunkers if b['latitude'] and b['longitude']
+    ])
+    
     context = {
         'requests': requests_list,
         'status_filter': status_filter,
@@ -198,6 +214,7 @@ def manage_bunker_requests(request):
         'approved_count': approved_count,
         'rejected_count': rejected_count,
         'bunker_types': bunker_types,
+        'existing_bunkers_json': existing_bunkers_json,
     }
     return render(request, 'bunkers/manage_requests.html', context)
 
@@ -213,6 +230,14 @@ def approve_bunker_request(request, request_id):
         messages.warning(request, _('This request has already been processed.'))
         return redirect('manage_bunker_requests')
     
+    # If GET request, show form with editable info_url
+    if request.method == 'GET':
+        context = {
+            'bunker_request': bunker_request,
+        }
+        return render(request, 'bunkers/approve.html', context)
+    
+    # POST - process approval
     try:
         # Get or create default category
         default_category, created = BunkerCategory.objects.get_or_create(
@@ -245,6 +270,9 @@ def approve_bunker_request(request, request_id):
         # Format as B/SP-XXXX (4 digits with leading zeros)
         reference_number = f"B/SP-{next_number:04d}"
         
+        # Get edited info_url from form
+        info_url = request.POST.get('info_url', bunker_request.info_url or '')
+        
         # Create the bunker
         bunker = Bunker.objects.create(
             reference_number=reference_number,
@@ -255,6 +283,8 @@ def approve_bunker_request(request, request_id):
             category=default_category,
             latitude=bunker_request.latitude,
             longitude=bunker_request.longitude,
+            locator=bunker_request.locator or '',
+            info_url=info_url,
             is_verified=True,
             verified_by=request.user,
             created_by=bunker_request.requested_by
@@ -317,6 +347,8 @@ def bunker_detail(request, reference):
     from activations.models import ActivationLog
     from django.db.models import Count
     from django.db.models.functions import TruncDate
+    import json
+    from math import radians, sin, cos, sqrt, atan2
     
     # Count unique activation sessions (unique combinations of activator + date)
     activation_count = (
@@ -346,12 +378,44 @@ def bunker_detail(request, reference):
         .order_by('-qso_count')
     )
     
+    # Get nearby bunkers (within 50km)
+    def get_distance(lat1, lon1, lat2, lon2):
+        R = 6371  # Earth radius in km
+        lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * atan2(sqrt(a), sqrt(1-a))
+        return R * c
+    
+    nearby_bunkers = []
+    all_bunkers = Bunker.objects.exclude(id=bunker.id).filter(
+        latitude__isnull=False, 
+        longitude__isnull=False
+    ).values('reference_number', 'name_en', 'latitude', 'longitude')
+    
+    for b in all_bunkers:
+        distance = get_distance(
+            float(bunker.latitude), float(bunker.longitude),
+            float(b['latitude']), float(b['longitude'])
+        )
+        if distance < 50:  # Within 50km
+            nearby_bunkers.append({
+                'ref': b['reference_number'],
+                'name': b['name_en'],
+                'lat': float(b['latitude']),
+                'lng': float(b['longitude'])
+            })
+    
+    nearby_bunkers_json = json.dumps(nearby_bunkers)
+    
     context = {
         'bunker': bunker,
         'activation_count': activation_count,
         'unique_activators': unique_activators,
         'total_qsos': total_qsos,
         'activator_details': activator_details,
+        'nearby_bunkers_json': nearby_bunkers_json,
     }
     return render(request, 'bunkers/detail.html', context)
 
