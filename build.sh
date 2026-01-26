@@ -31,7 +31,10 @@ test -f staticfiles/images/favicon.svg && echo "✓ favicon.svg found" || echo "
 
 echo ""
 echo "=== Running migrations ==="
-python manage.py migrate --no-input
+python manage.py migrate --no-input --verbosity 2
+echo ""
+echo "=== Showing migration status ==="
+python manage.py showmigrations
 
 echo ""
 echo "=== Compiling translations ==="
