@@ -2125,8 +2125,26 @@ msgstr "Nigdy nie aktywowany"
 msgid "Search location (city, address, coordinates)"
 msgstr "Szukaj lokalizacji (miasto, adres, współrzędne)"
 
+msgid "Search by reference (Pz.W. 716, B/SP-0001) or location"
+msgstr "Szukaj po referencji (Pz.W. 716, B/SP-0001) lub lokalizacji"
+
+msgid "Search by reference, name or location"
+msgstr "Szukaj po referencji, nazwie lub lokalizacji"
+
 msgid "Examples: Warsaw, Krakow, ul. Piotrkowska 1 Łódź, 52.2297,21.0122"
 msgstr "Przykłady: Warszawa, Kraków, ul. Piotrkowska 1 Łódź, 52.2297,21.0122"
+
+msgid "Examples: Pz.W. 716, B/SP-0001, Warsaw, 52.2297,21.0122"
+msgstr "Przykłady: Pz.W. 716, B/SP-0001, Warszawa, 52.2297,21.0122"
+
+msgid "Examples: Pz.W. 716, Wisła, B/SP-0001, Warsaw, 52.2297,21.0122"
+msgstr "Przykłady: Pz.W. 716, Wisła, B/SP-0001, Warszawa, 52.2297,21.0122"
+
+msgid "Location not found. Try another search term or use coordinates (lat,lon)."
+msgstr "Nie znaleziono lokalizacji. Spróbuj innego wyszukiwania lub użyj współrzędnych (szer,dł)."
+
+msgid "Location or bunker not found. Try another search term."
+msgstr "Nie znaleziono lokalizacji ani bunkra. Spróbuj innego wyszukiwania."
 
 # V2 Improvements - Models verbose names
 msgid "Activator Callsign (with prefix/suffix)"
