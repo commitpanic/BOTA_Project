@@ -295,13 +295,13 @@
     <div class="col-md-8 col-lg-6">
         <div class="input-group">
             <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input type="text" class="form-control" id="locationSearch" placeholder="{% trans 'Search location (city, address, coordinates)' %}">
+            <input type="text" class="form-control" id="locationSearch" placeholder="{% trans 'Search by reference, name or location' %}">
             <button class="btn btn-primary" type="button" id="searchButton">
                 {% trans "Search" %}
             </button>
         </div>
         <small class="text-muted">
-            {% trans "Examples: Warsaw, Krakow, ul. Piotrkowska 1 Łódź, 52.2297,21.0122" %}
+            {% trans "Examples: Pz.W. 716, Wisła, B/SP-0001, Warsaw, 52.2297,21.0122" %}
         </small>
     </div>
 </div>
@@ -502,6 +502,61 @@
             return;
         }
         
+        const searchTerm = query.toLowerCase();
+        
+        // First, try to find bunker by reference number
+        let matchedBunker = bunkersData.find(bunker => {
+            const ref = bunker.reference.toLowerCase();
+            
+            // Exact match
+            if (ref === searchTerm) return true;
+            
+            // Partial match (e.g., "A8" matches "A Pz.W. 8")
+            if (ref.includes(searchTerm)) return true;
+            
+            // Match without spaces/dots (e.g., "A8" matches "A Pz.W. 8")
+            const refNormalized = ref.replace(/[\s\.\-\/]/g, '');
+            const searchNormalized = searchTerm.replace(/[\s\.\-\/]/g, '');
+            if (refNormalized.includes(searchNormalized)) return true;
+            
+            return false;
+        });
+        
+        // If not found by reference, try to find by bunker name
+        if (!matchedBunker) {
+            matchedBunker = bunkersData.find(bunker => {
+                if (!bunker.name) return false;
+                
+                const name = bunker.name.toLowerCase();
+                
+                // Check if search term is in the bunker name
+                if (name.includes(searchTerm)) return true;
+                
+                // Also check normalized version (without special characters)
+                const nameNormalized = name.replace(/[\s\.\-\/]/g, '');
+                const searchNormalized = searchTerm.replace(/[\s\.\-\/]/g, '');
+                if (nameNormalized.includes(searchNormalized)) return true;
+                
+                return false;
+            });
+        }
+        
+        if (matchedBunker) {
+            // Found bunker by reference or name - zoom to it and open popup
+            const markerItem = markers.find(m => m.data.reference === matchedBunker.reference);
+            if (markerItem) {
+                map.setView([matchedBunker.lat, matchedBunker.lng], 15);
+                markerItem.marker.openPopup();
+                
+                // Remove previous search marker if any
+                if (searchMarker) {
+                    map.removeLayer(searchMarker);
+                    searchMarker = null;
+                }
+                return;
+            }
+        }
+        
         // Check if input is coordinates (lat,lon format)
         const coordMatch = query.match(/^(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)$/);
         if (coordMatch) {
@@ -533,7 +588,7 @@
                 const lon = parseFloat(result.lon);
                 showSearchResult(lat, lon, result.display_name);
             } else {
-                alert('{% trans "Location not found. Try another search term or use coordinates (lat,lon)." %}');
+                alert('{% trans "Location or bunker not found. Try another search term." %}');
             }
         } catch (error) {
             console.error('Geocoding error:', error);
