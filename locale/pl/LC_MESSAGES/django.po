@@ -573,6 +573,15 @@ msgstr "Zobacz Wszystkie"
 msgid "View Details"
 msgstr "Zobacz Szczegóły"
 
+msgid "ago"
+msgstr "temu"
+
+msgid "Discover historic military bunkers through amateur radio"
+msgstr "Odkrywaj historyczne bunkry wojskowe poprzez radioamatorstwo"
+
+msgid "View Cluster"
+msgstr "Zobacz Klaster"
+
 msgid "QSOs Made"
 msgstr "Wykonane QSO"
 
