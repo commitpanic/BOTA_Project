@@ -2515,7 +2515,7 @@ msgstr "Zobacz w Google Maps"
 
 # Bunker List Page
 msgid "Bunkers Database"
-msgstr "Baza Bunkerów"
+msgstr "Baza Bunkrów"
 
 msgid "Browse and search all bunkers in the BOTA program"
 msgstr "Przeglądaj i wyszukuj wszystkie bunkry w programie BOTA"
