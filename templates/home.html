@@ -14,10 +14,10 @@
         </p>
         <div class="mt-4">
             {% if not user.is_authenticated %}
-                <a href="{% url 'upload_log' %}" class="btn btn-primary btn-lg me-3"><i class="bi bi-upload"></i> {% trans "Upload Log" %}</a>
+                <a href="{% url 'cluster' %}" class="btn btn-primary btn-lg me-3"><i class="bi bi-broadcast-pin"></i> {% trans "View Cluster" %}</a>
                 <a href="{% url 'register' %}" class="btn btn-accent btn-lg"><i class="bi bi-trophy-fill"></i> {% trans "Get Started" %}</a>
             {% else %}
-                <a href="{% url 'upload_log' %}" class="btn btn-primary btn-lg me-3"><i class="bi bi-upload"></i> {% trans "Upload Log" %}</a>
+                <a href="{% url 'cluster' %}" class="btn btn-primary btn-lg me-3"><i class="bi bi-broadcast-pin"></i> {% trans "View Cluster" %}</a>
                 <a href="{% url 'diplomas' %}" class="btn btn-accent btn-lg"><i class="bi bi-trophy-fill"></i> {% trans "View Diplomas" %}</a>
             {% endif %}
         </div>
@@ -55,7 +55,7 @@
 <!-- Main Content Cards -->
 <div class="row g-4">
     <!-- Recent Activations -->
-    <div class="col-md-4">
+    <div class="col-md-6">
         <div class="card h-100">
             <div class="card-header">
                 <i class="bi bi-broadcast"></i> {% trans "Recent Activations" %}
@@ -82,7 +82,7 @@
     </div>
 
     <!-- User Progress -->
-    <div class="col-md-4">
+    <div class="col-md-6">
         <div class="card h-100">
             <div class="card-header">
                 <i class="bi bi-trophy-fill"></i> {% trans "Your Progress" %}
@@ -109,37 +109,6 @@
                     <p class="text-muted mb-3">{% trans "Sign in to track your progress and earn awards!" %}</p>
                     <a href="{% url 'register' %}" class="btn btn-accent w-100">{% trans "Create Account" %}</a>
                 {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Featured Bunkers -->
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <i class="bi bi-star-fill"></i> {% trans "Featured Bunkers" %}
-            </div>
-            <div class="card-body">
-                {% if recent_activations %}
-                    {% for activation in recent_activations|slice:":1" %}
-                    <div class="mb-3">
-                        <span class="badge mb-2" style="background: var(--accent-color); padding: 0.5rem 1rem; border-radius: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;"><i class="bi bi-fire"></i> {% trans "Live Now" %}</span>
-                        <h6>{{ activation.bunker__reference_number }} <small class="text-muted">{{ activation.bunker__country }}</small></h6>
-                        <p class="small mb-0">{{ activation.bunker__name_en|default:"Historic bunker site" }}</p>
-                    </div>
-                    <hr>
-                    {% endfor %}
-                {% endif %}
-                <div class="mb-3">
-                    <h6>{% trans "BOTA-0892" %} <small class="text-muted">{% trans "Czech Republic" %}</small></h6>
-                    <p class="small mb-0">{% trans "WWII command bunker" %}</p>
-                </div>
-                <hr>
-                <div>
-                    <h6>{% trans "BOTA-0345" %} <small class="text-muted">{% trans "Germany" %}</small></h6>
-                    <p class="small mb-0">{% trans "Cold War bunker complex" %}</p>
-                </div>
-                <a href="{% url 'map' %}" class="btn btn-primary w-100 mt-3">{% trans "Explore Map" %}</a>
             </div>
         </div>
     </div>
